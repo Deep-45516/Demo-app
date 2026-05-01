@@ -1,0 +1,166 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: rgb(113, 29, 29);
+}
+
+/* Layout */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Form */
+.form {
+  flex: 1;
+  min-width: 280px;
+  max-width: 400px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Inputs */
+textarea {
+  width: 90%;
+  border: none;
+  outline: none;
+  resize: none;
+
+  padding: 12px 14px;
+  border-radius: 10px;
+
+  font-family: 'League Spartan', sans-serif;
+  font-size: 15px;
+
+  background: #f5f5f5;
+  transition: 0.2s;
+}
+
+/* Focus effect */
+textarea:focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #000;
+}
+
+/* Different sizes */
+#toInput,
+#fromInput {
+  height: 50px;
+}
+
+#messageInput {
+  height: 150px;
+}
+
+/* Button */
+button {
+  margin-top: 10px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+
+  background: black;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+/* Button hover */
+button:hover {
+  background: #333;
+}
+.form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* Carousel */
+.preview-wrapper {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;   /* vertical pages */
+  gap: 20px;
+  align-items: center;
+}
+
+/* Template */
+.template {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 794 / 1123;
+  position: relative;
+  background: url("/template.png") no-repeat center/cover;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid black;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border-radius: 8px;
+}
+
+
+/* Hide original template */
+#template {
+  display: none;
+}
+
+/* Text positioning */
+.previewTo {
+  font-family: 'Lilita One', cursive;
+  position: absolute;
+  top: 11%;
+  opacity: 0.85;
+  left: 14.3%;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.message {
+  position: absolute;
+  /* margin-left: 5%; */
+  top: 17%;
+  left: 16%;
+  width: 70%;
+  height: 69%;
+  font-family: 'League Spartan', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.8;
+}
+
+.previewFrom {
+  font-family: 'Lilita One', cursive;
+  opacity: 0.85;
+  margin: 0;
+  text-align: center;       /* grow both sides */
+  white-space: pre-line;
+  word-break: break-word;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.from {
+  position: absolute;
+  top: 91%;
+  left: 77.5%;                /* adjust if needed */
+  transform: translateX(-50%);
+  width: 260px;             /* fixed width (IMPORTANT) */
+}
