@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+
+    body{
+      margin:0;
+      padding:0;
+    }
+
+.template{
+  width:678px;
+  height:959px;
+
+  position:relative;
+
+  background-image:url("{{BACKGROUND_IMAGE}}");
+
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+
+  overflow:hidden;
+}
+
+    .previewTo{
+      position:absolute;
+      top:11%;
+      left:14.3%;
+
+      font-size:19px;
+      font-family:Arial,sans-serif;
+      font-weight:bold;
+    }
+
+    .message{
+      position:absolute;
+
+      top:16%;
+      left:16%;
+
+      width:70%;
+      height:69%;
+
+      display:flex;
+      justify-content:center;
+      align-items:center;
+
+      text-align:center;
+
+      white-space:pre-wrap;
+      word-break:break-word;
+
+      font-size:42px;
+      line-height:1.4;
+
+      font-family:Arial,sans-serif;
+    }
+
+    .previewFrom{
+      position:absolute;
+
+      top:91%;
+      left:77.5%;
+
+      transform:translateX(-50%);
+
+      font-size:22px;
+      font-family:Arial,sans-serif;
+      font-weight:bold;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="template">
+
+    <div class="previewTo">
+      {{TO}}
+    </div>
+
+    <div class="message">
+      {{MESSAGE}}
+    </div>
+
+    <div class="previewFrom">
+      {{FROM}}
+    </div>
+
+  </div>
+
+</body>
+</html>

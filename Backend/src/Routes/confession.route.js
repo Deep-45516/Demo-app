@@ -1,7 +1,7 @@
 import { Router } from "express";
 import Confession from "../models/confession.model.js";
 import { generateImage } from "../utils/generateImage.js";
-
+import { uploadImage } from "../utils/uploadToFirebase.js";
 const router = Router();
 
 // CREATE CONFESSION
@@ -10,10 +10,7 @@ router.post("/", async (req, res) => {
     const { to, from, message } = req.body;
 
      // 🔥 generate image
-    const imageBuffer = await generateImage({ to, from, message });
-
-    console.log("Image generated ✅");
-
+   
     // 🔴 BASIC VALIDATION
     if (!message || message.trim() === "") {
       return res.status(400).json({
@@ -21,15 +18,22 @@ router.post("/", async (req, res) => {
         message: "Message is required"
       });
     }
+    // 1. generate image locally
+    // 🔴 NEVER TRUST FRONTEND imageUrl so creat from backend
+    //Hey backend, create image using this data 
+  const imagePath = await generateImage({ to, from, message });
 
-    // 🔴 NEVER TRUST FRONTEND imageUrl so creat from backend 
-const imagePath = await generateImage({ to, from, message });
+  // 2. upload to firebase
+    const imageUrl = await uploadImage(imagePath, to);
 
+    console.log("Uploaded:", imageUrl);
+
+  // 3. save in DB
 const confession = await Confession.create({
   to,
   from,
   message,
-  imageUrl: imagePath // temporary (local path)
+  imageUrl: imageUrl // temporary (local path)
 });
 
     res.status(201).json({
@@ -37,7 +41,7 @@ const confession = await Confession.create({
       data: confession
     });
 
-  } catch (err) {
+} catch (err) {
     console.error("CREATE CONFESSION ERROR:", err);
 
     res.status(500).json({
