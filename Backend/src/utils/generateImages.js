@@ -32,6 +32,7 @@ const base64Image =
 
 const browser = await puppeteer.launch({
   headless: true,
+  executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
 });
 
