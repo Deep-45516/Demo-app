@@ -31,8 +31,9 @@ const base64Image =
   `data:image/png;base64,${imageBuffer.toString("base64")}`;
 
   const browser = await puppeteer.launch({
-    headless: true
-  });
+  headless: true,
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+});
 
   const page = await browser.newPage();
 
