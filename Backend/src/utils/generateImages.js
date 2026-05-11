@@ -32,8 +32,6 @@ const base64Image =
 
 const browser = await puppeteer.launch({
   headless: true,
-  executablePath:
-    "/opt/render/.cache/puppeteer/chrome/linux-148.0.7778.97/chrome-linux64/chrome",
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
 });
 
