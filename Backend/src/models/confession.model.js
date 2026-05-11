@@ -17,10 +17,24 @@ const confessionSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
-    imageUrl: {
-      type: String,
-      default: null
+    imageUrls: {
+      type: [String],
+      default: []
     },
+
+    approvedAt: {
+  type: Date,
+  default: null
+},
+
+rejectedAt: {
+  type: Date,
+  default: null
+},
+    caption: {
+    type: String,
+    default: "Here is our next confession 👀"
+  },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected", "posted"],

@@ -1,53 +1,299 @@
 import { Router } from "express";
 import Confession from "../models/confession.model.js";
-import { generateImage } from "../utils/generateImage.js";
+import { generateImages } from "../utils/generateImages.js";
 import { uploadImage } from "../utils/uploadToFirebase.js";
+import { ApiResponse } from "../utils/api-response.js";
+import { ApiError } from "../utils/api-errors.js";
+
 const router = Router();
 
 // CREATE CONFESSION
 router.post("/", async (req, res) => {
   try {
     const { to, from, message } = req.body;
-
+    console.log(req.body);
      // 🔥 generate image
    
     // 🔴 BASIC VALIDATION
-    if (!message || message.trim() === "") {
-      return res.status(400).json({
-        success: false,
-        message: "Message is required"
-      });
+    if (typeof message !== "string" || message.trim() === "")
+   {
+      throw new ApiError(400, "Message is required");
     }
     // 1. generate image locally
     // 🔴 NEVER TRUST FRONTEND imageUrl so creat from backend
     //Hey backend, create image using this data 
-  const imagePath = await generateImage({ to, from, message });
-
-  // 2. upload to firebase
-    const imageUrl = await uploadImage(imagePath, to);
-
-    console.log("Uploaded:", imageUrl);
-
-  // 3. save in DB
-const confession = await Confession.create({
+  const imagePaths = await generateImages({
   to,
   from,
-  message,
-  imageUrl: imageUrl // temporary (local path)
+  message
 });
 
-    res.status(201).json({
-      success: true,
-      data: confession
-    });
+  // 2. upload to firebase
+    //const imageUrl = await uploadImage(imagePath, to);
+    const imageUrls = [];
 
-} catch (err) {
-    console.error("CREATE CONFESSION ERROR:", err);
+    for (const imagePath of imagePaths) {
 
-    res.status(500).json({
-      success: false,
-      message: "Error saving confession"
-    });
+      const imageUrl =
+        await uploadImage(imagePath);
+
+      imageUrls.push(imageUrl);
+       console.log("Uploaded:", imageUrl);
+    }
+
+  // 3. save in DB
+const confession =
+  await Confession.create({
+    to,
+    from,
+    message,
+    imageUrls
+  });
+
+    // SUCCESS RESPONSE
+    return res.status(201).json(
+      new ApiResponse(
+        201,
+        confession,
+        "Confession created successfully"
+      )
+    );
+
+  } catch (error) {
+    console.error(error.stack);
+    if (error instanceof ApiError) {
+      
+      return res.status(error.statuscode).json(error);
+    }
+
+    // UNKNOWN ERROR
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message || "Something went wrong"
+      )
+    );
+  }
+});
+
+
+
+//GET PENDING CONFESSIONS
+router.get("/pending", async (req, res) => {
+
+  try {
+
+    const confessions =
+      await Confession.find({
+        status: "pending"
+      }).sort({
+        createdAt: -1
+      });
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confessions,
+        "Pending confessions fetched"
+      )
+    );
+
+  } catch (error) {
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message
+      )
+    );
+  }
+
+});
+
+
+//APPROVE CONFESSION
+router.patch("/:id/approve", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const { caption } = req.body;
+
+    const confession =
+      await Confession.findByIdAndUpdate(
+
+        id,
+
+        {
+          status: "approved",
+          approvedAt: new Date(),
+
+          caption:
+            caption ||
+            "Here is our next confession 👀"
+        },
+
+        {
+          new: true
+        }
+      );
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confession,
+        "Confession approved"
+      )
+    );
+
+  } catch (error) {
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message
+      )
+    );
+  }
+
+});
+
+//REJECT CONFESSION
+router.patch("/:id/reject", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const confession =
+      await Confession.findByIdAndUpdate(
+
+        id,
+
+        {
+          status: "rejected",
+          rejectedAt: new Date()
+        },
+
+        {
+          new: true
+        }
+      );
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confession,
+        "Confession rejected"
+      )
+    );
+
+  } catch (error) {
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message
+      )
+    );
+  }
+
+});
+
+// RECENT APPROVED
+router.get("/approved/recent", async (req, res) => {
+
+  try {
+
+    const twoDaysAgo =
+      new Date(
+        Date.now() - 2 * 24 * 60 * 60 * 1000
+      );
+
+    const confessions =
+      await Confession.find({
+
+        status: "approved",
+
+        approvedAt: {
+          $gte: twoDaysAgo
+        }
+
+      })
+      .sort({ approvedAt: -1 });
+
+    return res.status(200).json(
+
+      new ApiResponse(
+        200,
+        confessions,
+        "Recent approved confessions"
+      )
+
+    );
+
+  } catch (error) {
+
+    return res.status(500).json(
+
+      new ApiResponse(
+        500,
+        null,
+        error.message
+      )
+
+    );
+  }
+});
+
+// RECENT REJECTED
+router.get("/rejected/recent", async (req, res) => {
+
+  try {
+
+    const twoDaysAgo =
+      new Date(
+        Date.now() - 2 * 24 * 60 * 60 * 1000
+      );
+
+    const confessions =
+      await Confession.find({
+
+        status: "rejected",
+
+        rejectedAt: {
+          $gte: twoDaysAgo
+        }
+
+      })
+      .sort({ rejectedAt: -1 });
+
+    return res.status(200).json(
+
+      new ApiResponse(
+        200,
+        confessions,
+        "Recent rejected confessions"
+      )
+
+    );
+
+  } catch (error) {
+
+    return res.status(500).json(
+
+      new ApiResponse(
+        500,
+        null,
+        error.message
+      )
+
+    );
   }
 });
 

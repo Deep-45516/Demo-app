@@ -1,6 +1,6 @@
 //connect to firebase then connect to storage bucket
 import admin from "firebase-admin";
-import serviceAccount from "./firebase-key.json" assert { type: "json" };
+import serviceAccount from "./firebase-key.json" with { type: "json" };
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

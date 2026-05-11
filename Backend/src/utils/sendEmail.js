@@ -36,6 +36,7 @@ console.log(process.env.MAILTRAP_SMTP_PORT);
   try {
     await transporter.sendMail(mail);
   } catch (error) {
+    console.error(error.stack);
     console.error("Email failed", error);
   }
 };

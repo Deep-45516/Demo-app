@@ -9,6 +9,7 @@ node_modules/
 .env
 .env.*
 firebase-key.json
+uploads
 
 # =========================
 # Logs

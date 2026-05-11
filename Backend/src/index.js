@@ -16,4 +16,5 @@ connectDB()
     )
     .catch((err) => {
         console.error("MOngoDB COnnection Error", err);
+        console.error(error.stack);
     })

@@ -4,8 +4,8 @@ import confessionRouter from "../routes/confession.route.js";
 export const uploadImage = async (filePath, to) => {
   const date = new Date().toISOString().split("T")[0];
 
-  const cleanTo = to
-  .trim()
+  const cleanTo = (to || "someone")
+  typeof value === "string"
   .replace(/\s+/g, "-")
   .toLowerCase();
 

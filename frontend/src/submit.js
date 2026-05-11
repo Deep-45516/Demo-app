@@ -1,4 +1,9 @@
 export async function submitConfession(to, from, message) {
+  console.log({
+    to,
+    from,
+    message
+  });
   try {
     const res = await fetch("http://localhost:3000/api/v1/confessions", {
       method: "POST",
@@ -13,6 +18,6 @@ export async function submitConfession(to, from, message) {
     alert("Submitted!");
 
   } catch (err) {
-    console.error(err);
+    console.error(error.stack);
   }
 }
