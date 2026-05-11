@@ -1,7 +1,7 @@
 import { Router } from "express";
 import Confession from "../models/confession.model.js";
 import { generateImages } from "../utils/generateImages.js";
-import { uploadImage } from "../utils/uploadToFirebase.js";
+import { uploadImage } from "../utils/uploadTOFirebase.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-errors.js";
 
