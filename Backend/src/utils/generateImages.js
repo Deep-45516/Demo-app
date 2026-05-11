@@ -30,7 +30,6 @@ const imageBuffer =
 const base64Image =
   `data:image/png;base64,${imageBuffer.toString("base64")}`;
 
-import puppeteer from "puppeteer";
 
 const browser = await puppeteer.launch({
   headless: true,
