@@ -187,13 +187,19 @@ const imageBuffer =
     type: "png"
   });
 
-    const filePath = path.join(
-      "uploads",
-      `${Date.now()}-${i + 1}.png`
-    );
+    const uploadDir = path.resolve("uploads");
 
-    fs.writeFileSync(filePath, imageBuffer);
+// create uploads folder if not exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
+const filePath = path.join(
+  uploadDir,
+  `${Date.now()}-${i + 1}.png`
+);
+
+fs.writeFileSync(filePath, imageBuffer);
     imagePaths.push(filePath);
   }
 
