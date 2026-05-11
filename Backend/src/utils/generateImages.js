@@ -30,10 +30,12 @@ const imageBuffer =
 const base64Image =
   `data:image/png;base64,${imageBuffer.toString("base64")}`;
 
+import puppeteer from "puppeteer";
+
 const browser = await puppeteer.launch({
-  headless: true,
-  executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+  headless: "new",
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  executablePath: puppeteer.executablePath(),
 });
 
   const page = await browser.newPage();
