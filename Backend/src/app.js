@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
 });
 
 // routes
-import authRouter from "./routes/temp.js";
+import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/healthcheck.route.js";
 import confessionRouter from "./routes/confession.route.js";
 
