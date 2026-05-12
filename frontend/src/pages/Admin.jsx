@@ -6,6 +6,8 @@ export default function Admin() {
   const [approved, setApproved] = useState([]);
   const [rejected, setRejected] = useState([]);
 
+  const API = import.meta.env.VITE_BACKEND_URL;
+
   // FETCH ALL
   const fetchData = async () => {
 
@@ -13,17 +15,17 @@ export default function Admin() {
 
       const pendingRes =
         await fetch(
-          "http://localhost:3000/api/v1/confessions/pending"
+          `${API}/api/v1/confessions/pending`
         );
 
       const approvedRes =
         await fetch(
-          "http://localhost:3000/api/v1/confessions/approved/recent"
+          "${API}/api/v1/confessions/approved/recent"
         );
 
       const rejectedRes =
         await fetch(
-          "http://localhost:3000/api/v1/confessions/rejected/recent"
+          "${API}/api/v1/confessions/rejected/recent"
         );
 
       const pendingData =
@@ -53,7 +55,7 @@ export default function Admin() {
     async (id, caption) => {
 
       await fetch(
-        `http://localhost:3000/api/v1/confessions/${id}/approve`,
+        `${API}/api/v1/confessions/${id}/approve`,
         {
           method: "PATCH",
 
@@ -75,7 +77,7 @@ export default function Admin() {
     async (id) => {
 
       await fetch(
-        `http://localhost:3000/api/v1/confessions/${id}/reject`,
+        `${API}/api/v1/confessions/${id}/reject`,
         {
           method: "PATCH"
         }
