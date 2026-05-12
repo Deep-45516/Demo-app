@@ -20,12 +20,12 @@ export default function Admin() {
 
       const approvedRes =
         await fetch(
-          "${API}/api/v1/confessions/approved/recent"
+          `${API}/api/v1/confessions/approved/recent`
         );
 
       const rejectedRes =
         await fetch(
-          "${API}/api/v1/confessions/rejected/recent"
+          `${API}/api/v1/confessions/rejected/recent`
         );
 
       const pendingData =
