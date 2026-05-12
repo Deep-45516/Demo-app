@@ -137,8 +137,8 @@ router.patch("/:id/approve", async (req, res) => {
         },
 
         {
-          new: true
-        }
+  returnDocument: "after"
+}
       );
 
     return res.status(200).json(
@@ -180,8 +180,8 @@ router.patch("/:id/reject", async (req, res) => {
         },
 
         {
-          new: true
-        }
+  returnDocument: "after"
+}
       );
 
     return res.status(200).json(
