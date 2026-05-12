@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import instagramRouter from "./routes/instagram.route.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/healthcheck.route.js";
 import confessionRouter from "./routes/confession.route.js";
 
+app.use("/api/v1/instagram", instagramRouter);
 app.use("/api/v1/confessions", confessionRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/healthcheck", healthRouter);
