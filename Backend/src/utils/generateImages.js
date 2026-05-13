@@ -204,7 +204,7 @@ await page.evaluate((fontSize) => {
 
 const imageBuffer =
   await element.screenshot({
-    type: "jpng",
+    type: "jpeg",
     quality: 85
   });
 

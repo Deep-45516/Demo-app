@@ -5,6 +5,7 @@ import { uploadImage } from "../utils/uploadTOFirebase.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-errors.js";
 import{ postConfessionToInstagram } from "../utils/postConfessionToInstagram.js";
+import { verifyAdmin, verifyToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -81,7 +82,7 @@ const confession =
 
 
 //GET PENDING CONFESSIONS
-router.get("/pending", async (req, res) => {
+router.get("/pending",verifyAdmin, async (req, res) => {
 
   try {
 
@@ -115,7 +116,7 @@ router.get("/pending", async (req, res) => {
 
 
 //APPROVE CONFESSION
-router.patch("/:id/approve", async (req, res) => {
+router.patch("/:id/approve", verifyAdmin, async (req, res) => {
 
   try {
 
@@ -166,7 +167,7 @@ router.patch("/:id/approve", async (req, res) => {
 });
 
 //REJECT CONFESSION
-router.patch("/:id/reject", async (req, res) => {
+router.patch("/:id/reject",verifyAdmin, async (req, res) => {
 
   try {
 
@@ -209,7 +210,7 @@ router.patch("/:id/reject", async (req, res) => {
 });
 
 // RECENT APPROVED
-router.get("/approved/recent", async (req, res) => {
+router.get("/approved/recent",verifyAdmin, async (req, res) => {
 
   try {
 
@@ -255,7 +256,7 @@ router.get("/approved/recent", async (req, res) => {
 });
 
 // RECENT REJECTED
-router.get("/rejected/recent", async (req, res) => {
+router.get("/rejected/recent",verifyAdmin, async (req, res) => {
 
   try {
 

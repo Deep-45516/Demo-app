@@ -7,10 +7,11 @@ import {
   createCarouselContainer,
   publishInstagramMedia
 } from "../utils/instagram.js";
+import { verifyAdmin } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.post("/post/:id", async (req, res) => {
+router.post("/post/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
