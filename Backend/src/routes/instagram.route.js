@@ -67,10 +67,14 @@ router.post("/post/:id", async (req, res) => {
         );
       }
 
-      published =
-        await publishInstagramMedia(
-          media.id
-        );
+      await new Promise((resolve) =>
+  setTimeout(resolve, 10000)
+);
+
+published =
+  await publishInstagramMedia(
+    media.id
+  );
     }
 
     // CAROUSEL
@@ -116,10 +120,14 @@ router.post("/post/:id", async (req, res) => {
         );
       }
 
-      published =
-        await publishInstagramMedia(
-          carousel.id
-        );
+      await new Promise((resolve) =>
+  setTimeout(resolve, 10000)
+);
+
+published =
+  await publishInstagramMedia(
+    carousel.id
+  );
     }
 
     if (!published.id) {
