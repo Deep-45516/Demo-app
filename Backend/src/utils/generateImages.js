@@ -31,10 +31,30 @@ const base64Image =
   `data:image/png;base64,${imageBuffer.toString("base64")}`;
 
 
-const browser = await puppeteer.launch({
-  headless: true,
-  args: ["--no-sandbox", "--disable-setuid-sandbox"],
-});
+let browser;
+
+try {
+
+  browser = await puppeteer.launch({
+    headless: "new",
+
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--single-process",
+      "--no-zygote"
+    ]
+  });
+
+} catch (err) {
+
+  console.log("PUPPETEER FAILED");
+  console.log(err);
+
+  throw err;
+}
 
   const page = await browser.newPage();
 
