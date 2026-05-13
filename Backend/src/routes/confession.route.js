@@ -4,6 +4,7 @@ import { generateImages } from "../utils/generateImages.js";
 import { uploadImage } from "../utils/uploadTOFirebase.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-errors.js";
+import{ postConfessionToInstagram } from "../utils/postConfessionToInstagram.js";
 
 const router = Router();
 
@@ -141,11 +142,13 @@ router.patch("/:id/approve", async (req, res) => {
 }
       );
 
+      const postedConfession = await postConfessionToInstagram(confession);
+
     return res.status(200).json(
       new ApiResponse(
         200,
-        confession,
-        "Confession approved"
+        postedConfession,
+        "Confession approved and posted"
       )
     );
 

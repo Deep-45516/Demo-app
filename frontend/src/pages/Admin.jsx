@@ -48,6 +48,10 @@ export default function Admin() {
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(() => {
+      fetchData();
+    },5000); 
+    return () => clearInterval(interval);
   }, []);
 
   // APPROVE

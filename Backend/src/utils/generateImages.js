@@ -204,7 +204,8 @@ await page.evaluate((fontSize) => {
 
 const imageBuffer =
   await element.screenshot({
-    type: "png"
+    type: "jpng",
+    quality: 85
   });
 
     const uploadDir = path.resolve("uploads");
@@ -216,7 +217,7 @@ if (!fs.existsSync(uploadDir)) {
 
 const filePath = path.join(
   uploadDir,
-  `${Date.now()}-${i + 1}.png`
+  `${Date.now()}-${i + 1}.jpg`
 );
 
 fs.writeFileSync(filePath, imageBuffer);
