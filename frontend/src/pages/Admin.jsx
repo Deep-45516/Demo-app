@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AdminLogin from "./AdminLogin";
 
 export default function Admin() {
 
@@ -7,6 +8,38 @@ export default function Admin() {
   const [rejected, setRejected] = useState([]);
 
   const API = import.meta.env.VITE_BACKEND_URL;
+
+  const [loggedIn, setLoggedIn] =
+    useState(false);
+
+  useEffect(() => {
+
+    const token =
+      localStorage.getItem("adminToken");
+
+    if (token) {
+      setLoggedIn(true);
+    }
+
+  }, []);
+
+  if (!loggedIn) {
+    return (
+      <AdminLogin
+        onLogin={() => setLoggedIn(true)}
+      />
+    );
+  }
+
+  return (
+    <div>
+
+      <h1>Admin Dashboard</h1>
+
+    </div>
+  );
+}
+
 
   // FETCH ALL
   const fetchData = async () => {
