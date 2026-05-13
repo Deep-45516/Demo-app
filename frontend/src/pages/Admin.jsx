@@ -1,260 +1,223 @@
 import { useEffect, useState } from "react";
-import AdminLogin from "./AdminLogin";
+
+const API = import.meta.env.VITE_BACKEND_URL;
 
 export default function Admin() {
+  const [token, setToken] = useState(
+    localStorage.getItem("adminToken") || ""
+  );
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const [pending, setPending] = useState([]);
   const [approved, setApproved] = useState([]);
   const [rejected, setRejected] = useState([]);
 
-  const API = import.meta.env.VITE_BACKEND_URL;
+  const loginAdmin = async () => {
+    const res = await fetch(`${API}/api/v1/auth/admin-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-  const [loggedIn, setLoggedIn] =
-    useState(false);
+    const data = await res.json();
 
-  useEffect(() => {
-
-    const token =
-      localStorage.getItem("adminToken");
-
-    if (token) {
-      setLoggedIn(true);
+    if (!data.success) {
+      alert(data.message || "Login failed");
+      return;
     }
 
-  }, []);
+    localStorage.setItem("adminToken", data.data.token);
+    setToken(data.data.token);
+  };
 
-  if (!loggedIn) {
-    return (
-      <AdminLogin
-        onLogin={() => setLoggedIn(true)}
-      />
-    );
-  }
-
-  return (
-    <div>
-
-      <h1>Admin Dashboard</h1>
-
-    </div>
-  );
-}
-
-
-  // FETCH ALL
   const fetchData = async () => {
+    if (!token) return;
 
-    try {
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
 
-      const pendingRes =
-        await fetch(
-          `${API}/api/v1/confessions/pending`
-        );
+    const pendingRes = await fetch(
+      `${API}/api/v1/confessions/pending`,
+      { headers }
+    );
 
-      const approvedRes =
-        await fetch(
-          `${API}/api/v1/confessions/approved/recent`
-        );
+    const approvedRes = await fetch(
+      `${API}/api/v1/confessions/approved/recent`,
+      { headers }
+    );
 
-      const rejectedRes =
-        await fetch(
-          `${API}/api/v1/confessions/rejected/recent`
-        );
+    const rejectedRes = await fetch(
+      `${API}/api/v1/confessions/rejected/recent`,
+      { headers }
+    );
 
-      const pendingData =
-        await pendingRes.json();
-
-      const approvedData =
-        await approvedRes.json();
-
-      const rejectedData =
-        await rejectedRes.json();
-
-      setPending(pendingData.data || []);
-      setApproved(approvedData.data || []);
-      setRejected(rejectedData.data || []);
-
-    } catch (error) {
-      console.log(error);
+    if (pendingRes.status === 401) {
+      localStorage.removeItem("adminToken");
+      setToken("");
+      return;
     }
+
+    const pendingData = await pendingRes.json();
+    const approvedData = await approvedRes.json();
+    const rejectedData = await rejectedRes.json();
+
+    setPending(pendingData.data || []);
+    setApproved(approvedData.data || []);
+    setRejected(rejectedData.data || []);
+  };
+
+  const approveConfession = async (id, caption) => {
+    await fetch(`${API}/api/v1/confessions/${id}/approve`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ caption })
+    });
+
+    fetchData();
+  };
+
+  const rejectConfession = async (id) => {
+    await fetch(`${API}/api/v1/confessions/${id}/reject`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    fetchData();
+  };
+
+  const logout = () => {
+    localStorage.removeItem("adminToken");
+    setToken("");
   };
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(() => {
-      fetchData();
-    },5000); 
+
+    const interval = setInterval(fetchData, 5000);
+
     return () => clearInterval(interval);
-  }, []);
+  }, [token]);
 
-  // APPROVE
-  const approveConfession =
-    async (id, caption) => {
+  if (!token) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h1>Admin Login</h1>
 
-      await fetch(
-        `${API}/api/v1/confessions/${id}/approve`,
-        {
-          method: "PATCH",
+        <input
+          placeholder="Admin email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+        <br />
+        <br />
 
-          body: JSON.stringify({
-            caption
-          })
-        }
-      );
+        <input
+          type="password"
+          placeholder="Admin password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-      fetchData();
-    };
+        <br />
+        <br />
 
-  // REJECT
-  const rejectConfession =
-    async (id) => {
-
-      await fetch(
-        `${API}/api/v1/confessions/${id}/reject`,
-        {
-          method: "PATCH"
-        }
-      );
-
-      fetchData();
-    };
-
-  // CARD UI
-  const renderCards = (
-    list,
-    showButtons = false
-  ) => {
-
-    return list.map((confession) => (
-
-      <div
-        key={confession._id}
-        style={{
-          border: "1px solid gray",
-          padding: 20,
-          marginBottom: 20,
-          borderRadius: 10
-        }}
-      >
-
-        <h3>
-          To: {confession.to}
-        </h3>
-
-        <p>
-          {confession.message}
-        </p>
-
-        {
-          confession.imageUrls?.map(
-            (url, index) => (
-
-              <img
-                key={index}
-                src={url}
-                alt=""
-                width="250"
-                style={{
-                  display: "block",
-                  marginBottom: 10
-                }}
-              />
-            )
-          )
-        }
-
-        {
-          showButtons && (
-
-            <>
-              <textarea
-                placeholder="Optional caption"
-                id={`caption-${confession._id}`}
-                style={{
-                  width: "100%",
-                  height: 80
-                }}
-              />
-
-              <br />
-              <br />
-
-              <button
-                onClick={() => {
-
-                  const caption =
-                    document.getElementById(
-                      `caption-${confession._id}`
-                    ).value;
-
-                  approveConfession(
-                    confession._id,
-                    caption
-                  );
-                }}
-              >
-                Approve
-              </button>
-
-              <button
-                onClick={() =>
-                  rejectConfession(
-                    confession._id
-                  )
-                }
-                style={{
-                  marginLeft: 10
-                }}
-              >
-                Reject
-              </button>
-            </>
-          )
-        }
-
+        <button onClick={loginAdmin}>
+          Login
+        </button>
       </div>
-    ));
-  };
+    );
+  }
 
   return (
-
     <div style={{ padding: 20 }}>
+      <h1>Admin Panel</h1>
 
-      <h1>
-        Admin Panel
-      </h1>
+      <button onClick={logout}>
+        Logout
+      </button>
 
-      {/* PENDING */}
+      <h2>Pending Requests</h2>
 
-      <h2>
-        Pending Confessions
-      </h2>
+      {pending.map((confession) => (
+        <div
+          key={confession._id}
+          style={{
+            border: "1px solid gray",
+            padding: 20,
+            marginBottom: 20
+          }}
+        >
+          <h3>To: {confession.to}</h3>
+          <p>{confession.message}</p>
+          <p>From: {confession.from}</p>
 
-      {renderCards(pending, true)}
+          {confession.imageUrls?.map((url, index) => (
+            <img
+              key={index}
+              src={url}
+              alt=""
+              width="250"
+              style={{ display: "block", marginBottom: 10 }}
+            />
+          ))}
 
-      <hr />
+          <textarea
+            id={`caption-${confession._id}`}
+            placeholder="Optional caption"
+            defaultValue={confession.caption || ""}
+            style={{ width: "100%", height: 80 }}
+          />
 
-      {/* APPROVED */}
+          <br />
+          <br />
 
-      <h2>
-        Recently Approved
-      </h2>
+          <button
+            onClick={() => {
+              const caption = document.getElementById(
+                `caption-${confession._id}`
+              ).value;
 
-      {renderCards(approved)}
+              approveConfession(confession._id, caption);
+            }}
+          >
+            Approve
+          </button>
 
-      <hr />
+          <button
+            onClick={() => rejectConfession(confession._id)}
+            style={{ marginLeft: 10 }}
+          >
+            Reject
+          </button>
+        </div>
+      ))}
 
-      {/* REJECTED */}
+      <h2>Recently Approved</h2>
 
-      <h2>
-        Recently Rejected
-      </h2>
+      {approved.map((confession) => (
+        <div key={confession._id}>
+          <p>{confession.to} - {confession.status}</p>
+        </div>
+      ))}
 
-      {renderCards(rejected)}
+      <h2>Recently Rejected</h2>
 
+      {rejected.map((confession) => (
+        <div key={confession._id}>
+          <p>{confession.to} - {confession.status}</p>
+        </div>
+      ))}
     </div>
   );
+}
