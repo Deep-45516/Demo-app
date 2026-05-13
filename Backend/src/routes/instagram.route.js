@@ -3,6 +3,8 @@ import Confession from "../models/confession.model.js";
 import { ApiResponse } from "../utils/api-response.js";
 import {
   createInstagramMedia,
+  createCarouselItem,
+  createCarouselContainer,
   publishInstagramMedia
 } from "../utils/instagram.js";
 
@@ -25,15 +27,16 @@ router.post("/post/:id", async (req, res) => {
       );
     }
 
-    const imageUrl =
-      confession.imageUrls?.[0];
+    const imageUrls =
+      confession.imageUrls || [];
 
-    if (!imageUrl) {
+    if (imageUrls.length === 0) {
+
       return res.status(400).json(
         new ApiResponse(
           400,
           null,
-          "No image found"
+          "No images found"
         )
       );
     }
@@ -42,26 +45,85 @@ router.post("/post/:id", async (req, res) => {
       confession.caption ||
       "Here is our next confession 👀";
 
-    const media =
-      await createInstagramMedia({
-        imageUrl,
-        caption
-      });
+    let published;
 
-    if (!media.id) {
-      return res.status(500).json(
-        new ApiResponse(
-          500,
-          media,
-          "Instagram media creation failed"
-        )
-      );
+    // SINGLE IMAGE
+    if (imageUrls.length === 1) {
+
+      const media =
+        await createInstagramMedia({
+          imageUrl: imageUrls[0],
+          caption
+        });
+
+      if (!media.id) {
+
+        return res.status(500).json(
+          new ApiResponse(
+            500,
+            media,
+            "Instagram media creation failed"
+          )
+        );
+      }
+
+      published =
+        await publishInstagramMedia(
+          media.id
+        );
     }
 
-    const published =
-      await publishInstagramMedia(media.id);
+    // CAROUSEL
+    else {
+
+      const children = [];
+
+      for (const imageUrl of imageUrls) {
+
+        const item =
+          await createCarouselItem(
+            imageUrl
+          );
+
+        if (!item.id) {
+
+          return res.status(500).json(
+            new ApiResponse(
+              500,
+              item,
+              "Carousel item failed"
+            )
+          );
+        }
+
+        children.push(item.id);
+      }
+
+      const carousel =
+        await createCarouselContainer({
+          children,
+          caption
+        });
+
+      if (!carousel.id) {
+
+        return res.status(500).json(
+          new ApiResponse(
+            500,
+            carousel,
+            "Carousel container failed"
+          )
+        );
+      }
+
+      published =
+        await publishInstagramMedia(
+          carousel.id
+        );
+    }
 
     if (!published.id) {
+
       return res.status(500).json(
         new ApiResponse(
           500,
@@ -72,8 +134,12 @@ router.post("/post/:id", async (req, res) => {
     }
 
     confession.status = "posted";
-    confession.postedAt = new Date();
-    confession.instagramPostId = published.id;
+
+    confession.postedAt =
+      new Date();
+
+    confession.instagramPostId =
+      published.id;
 
     await confession.save();
 
@@ -86,6 +152,7 @@ router.post("/post/:id", async (req, res) => {
     );
 
   } catch (error) {
+
     return res.status(500).json(
       new ApiResponse(
         500,

@@ -1,33 +1,88 @@
-export const createInstagramMedia = async ({ imageUrl, caption }) => {
-  const url = `https://graph.facebook.com/v25.0/${process.env.IG_USER_ID}/media`;
+export const createInstagramMedia = async ({
+  imageUrl,
+  caption
+}) => {
+
+  const url =
+    `https://graph.facebook.com/v25.0/${process.env.IG_USER_ID}/media`;
 
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       image_url: imageUrl,
       caption,
-      access_token: process.env.IG_ACCESS_TOKEN,
-    }),
+      access_token: process.env.IG_ACCESS_TOKEN
+    })
   });
 
   return await res.json();
 };
 
-export const publishInstagramMedia = async (creationId) => {
-  const url = `https://graph.facebook.com/v25.0/${process.env.IG_USER_ID}/media_publish`;
+export const createCarouselItem = async (
+  imageUrl
+) => {
+
+  const url =
+    `https://graph.facebook.com/v25.0/${process.env.IG_USER_ID}/media`;
 
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      image_url: imageUrl,
+      is_carousel_item: true,
+      access_token: process.env.IG_ACCESS_TOKEN
+    })
+  });
+
+  return await res.json();
+};
+
+export const createCarouselContainer =
+async ({
+  children,
+  caption
+}) => {
+
+  const url =
+    `https://graph.facebook.com/v25.0/${process.env.IG_USER_ID}/media`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      media_type: "CAROUSEL",
+      children,
+      caption,
+      access_token: process.env.IG_ACCESS_TOKEN
+    })
+  });
+
+  return await res.json();
+};
+
+export const publishInstagramMedia =
+async (creationId) => {
+
+  const url =
+    `https://graph.facebook.com/v25.0/${process.env.IG_USER_ID}/media_publish`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       creation_id: creationId,
-      access_token: process.env.IG_ACCESS_TOKEN,
-    }),
+      access_token: process.env.IG_ACCESS_TOKEN
+    })
   });
 
   return await res.json();
