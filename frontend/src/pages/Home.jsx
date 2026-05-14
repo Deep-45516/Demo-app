@@ -136,7 +136,7 @@ export default function Home() {
               to,
               from,
               message,
-              user.email
+              user?.email
             );
           }}
         >

@@ -1,5 +1,6 @@
 export function generatePages(to, from, message) {
   const container = document.getElementById("previewWrapper");
+  if (!container) return;
   container.innerHTML = "";
 
   let remainingText = message || "";
