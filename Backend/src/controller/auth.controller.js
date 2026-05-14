@@ -6,6 +6,9 @@ import { asyncHandler } from "../utils/async-handler.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
 const generateToken = (user) => {
+   if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET missing");
+  }
   return jwt.sign(
     {
       id: user._id,
