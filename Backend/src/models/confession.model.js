@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const confessionSchema = new mongoose.Schema(
   {
+    userEmail: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     to: {
       type: String,
       default: "Someone",

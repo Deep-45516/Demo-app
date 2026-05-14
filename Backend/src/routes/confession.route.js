@@ -12,7 +12,7 @@ const router = Router();
 // CREATE CONFESSION
 router.post("/", async (req, res) => {
   try {
-    const { to, from, message } = req.body;
+    const { to, from, message, userEmail } = req.body;
     console.log(req.body);
      // 🔥 generate image
    
