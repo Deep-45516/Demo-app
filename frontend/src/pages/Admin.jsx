@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { enableAdminNotifications } from "../notifications.js";
 
 const API = import.meta.env.VITE_BACKEND_URL;
 
@@ -146,6 +147,9 @@ export default function Admin() {
       <button onClick={logout}>
         Logout
       </button>
+      <button onClick={enableAdminNotifications}>
+  Enable Notifications
+</button>
 
       <h2>Pending Requests</h2>
 
