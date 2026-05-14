@@ -1,35 +1,45 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";
 
-import { signInWithPopup,onAuthStateChanged,signOut } from "firebase/auth";
-import { auth, googleProvider } from "../firebase.js";
+import {
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut
+} from "firebase/auth";
+
+import {
+  auth,
+  googleProvider
+} from "../firebase.js";
 
 export default function Home() {
-
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-
     const unsub = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
 
-    return () => {
-      unsub();
-    };
+    return () => unsub();
   }, []);
 
   const loginWithGoogle = async () => {
+    if (loginLoading) return;
+
     try {
-      await signInWithPopup(auth, googleProvider);  
+      setLoginLoading(true);
+      await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Error logging in with Google:", error);
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -41,56 +51,47 @@ export default function Home() {
     }
   };
 
-
   useEffect(() => {
-
     document.fonts.ready.then(() => {
-
       requestAnimationFrame(() => {
-
-        generatePages(
-          to,
-          from,
-          message
-        );
-
+        generatePages(to, from, message);
       });
-
     });
-
   }, [to, from, message]);
 
-  return (
+  if (!user) {
+    return (
+      <div className="container">
+        <div className="form">
+          <h2>Login to submit confession</h2>
 
+          <button
+            disabled={loginLoading}
+            onClick={loginWithGoogle}
+          >
+            {loginLoading
+              ? "Opening..."
+              : "Continue with Google"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
     <div className="container">
 
-
-      {!user ? (
-  <div>
-    <h2>Login to submit confession</h2>
-
-    <button onClick={loginWithGoogle}>
-      Continue with Google
-    </button>
-  </div>
-) : (
-  <div>
-    <p>Logged in as {user.email}</p>
-
-    <button onClick={logoutUser}>
-      Logout
-    </button>
-
-    {/* Your confession form here */}
-  </div>
-)}
-
-      {/* FORM */}
       <div className="form">
 
-        <label>
-          To
-        </label>
+        <p>
+          Logged in as {user.email}
+        </p>
+
+        <button onClick={logoutUser}>
+          Logout
+        </button>
+
+        <label>To</label>
 
         <textarea
           id="toInput"
@@ -100,9 +101,7 @@ export default function Home() {
           }
         />
 
-        <label>
-          Message
-        </label>
+        <label>Message</label>
 
         <textarea
           id="messageInput"
@@ -112,9 +111,7 @@ export default function Home() {
           }
         />
 
-        <label>
-          From
-        </label>
+        <label>From</label>
 
         <textarea
           id="fromInput"
@@ -124,59 +121,53 @@ export default function Home() {
           }
         />
 
-        <button
-          onClick={downloadPages}
-        >
+        <button onClick={downloadPages}>
           Download Pages
         </button>
 
         <button
-          onClick={() =>
+          onClick={() => {
+            if (!user) {
+              alert("Please login first");
+              return;
+            }
+
             submitConfession(
               to,
               from,
               message,
               user.email
-            )
-          }
+            );
+          }}
         >
           Submit Confession
         </button>
 
       </div>
 
-      {/* GENERATED PAGES */}
       <div
         className="preview-wrapper"
         id="previewWrapper"
       />
-
-      {/* HIDDEN TEMPLATE */}
 
       <div
         className="template"
         id="template"
         style={{ display: "none" }}
       >
-
         <div className="to">
-
           <h2 className="previewTo">
             Someone
           </h2>
-
         </div>
 
         <div className="message"></div>
 
         <div className="from">
-
           <h3 className="previewFrom">
             Unknown
           </h3>
-
         </div>
-
       </div>
 
     </div>
