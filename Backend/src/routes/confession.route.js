@@ -46,12 +46,13 @@ router.post("/", async (req, res) => {
 
   // 3. save in DB
 const confession =
-  await Confession.create({
-    to,
-    from,
-    message,
-    imageUrls
-  });
+ await Confession.create({
+  to,
+  from,
+  message,
+  userEmail,
+  imageUrls
+});
   await sendAdminNotification({
   title: "New confession request",
   body: `${confession.to || "Someone"} sent a confession`
