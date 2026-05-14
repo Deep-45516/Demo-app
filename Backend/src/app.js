@@ -15,6 +15,7 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: true }));
 
+
 // test route
 app.get("/", (req, res) => {
   res.send("Backend working 🚀");
@@ -25,9 +26,11 @@ import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/healthcheck.route.js";
 import confessionRouter from "./routes/confession.route.js";
 
+import notificationRouter from "./routes/notification.route.js";
 app.use("/api/v1/instagram", instagramRouter);
 app.use("/api/v1/confessions", confessionRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/healthcheck", healthRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 export default app;

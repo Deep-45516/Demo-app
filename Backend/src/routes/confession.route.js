@@ -6,7 +6,8 @@ import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-errors.js";
 import{ postConfessionToInstagram } from "../utils/postConfessionToInstagram.js";
 import { verifyAdmin, verifyToken } from "../middlewares/auth.middleware.js";
-
+import { sendAdminNotification } from
+"../utils/sendAdminNotification.js";
 const router = Router();
 
 // CREATE CONFESSION
@@ -51,6 +52,10 @@ const confession =
     message,
     imageUrls
   });
+  await sendAdminNotification({
+  title: "New confession request",
+  body: `${confession.to || "Someone"} sent a confession`
+});
 
     // SUCCESS RESPONSE
     return res.status(201).json(
