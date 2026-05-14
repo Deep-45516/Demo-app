@@ -1,14 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";
+
+import { signInWithPopup,onAuthStateChanged,signOut } from "firebase/auth";
+import { auth, googleProvider } from "../firebase.js";
 
 export default function Home() {
 
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+
+    const unsub = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => {
+      unsub();
+    };
+  }, []);
+
+  const loginWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);  
+    } catch (error) {
+      console.error("Error logging in with Google:", error);
+    }
+  };
+
+  const logoutUser = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
 
   useEffect(() => {
 
@@ -31,6 +63,27 @@ export default function Home() {
   return (
 
     <div className="container">
+
+
+      {!user ? (
+  <div>
+    <h2>Login to submit confession</h2>
+
+    <button onClick={loginWithGoogle}>
+      Continue with Google
+    </button>
+  </div>
+) : (
+  <div>
+    <p>Logged in as {user.email}</p>
+
+    <button onClick={logoutUser}>
+      Logout
+    </button>
+
+    {/* Your confession form here */}
+  </div>
+)}
 
       {/* FORM */}
       <div className="form">
@@ -82,7 +135,8 @@ export default function Home() {
             submitConfession(
               to,
               from,
-              message
+              message,
+              user.email
             )
           }
         >

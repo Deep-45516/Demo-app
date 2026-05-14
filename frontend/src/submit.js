@@ -5,6 +5,8 @@ export async function submitConfession(to, from, message) {
     to,
     from,
     message,
+    userEmail,
+
   });
 
   try {
@@ -13,7 +15,7 @@ export async function submitConfession(to, from, message) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ to, from, message }),
+      body: JSON.stringify({ to, from, message, userEmail }),
     });
 
     const data = await res.json();
