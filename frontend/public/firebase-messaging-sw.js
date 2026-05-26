@@ -21,7 +21,26 @@ messaging.onBackgroundMessage((payload) => {
     payload.notification.title,
     {
       body: payload.notification.body,
-      icon: "/favicon.svg"
+      icon: "/favicon.svg",
+      data: {
+        url:
+          "https://sayitfreely.vercel.app/admin"
+      }
     }
   );
+
 });
+
+self.addEventListener(
+  "notificationclick",
+  (event) => {
+
+    event.notification.close();
+
+    event.waitUntil(
+      clients.openWindow(
+        event.notification.data.url
+      )
+    );
+  }
+  );
