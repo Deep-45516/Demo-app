@@ -4,8 +4,7 @@ import { messaging } from "./firebase.js";
 const API = import.meta.env.VITE_BACKEND_URL;
 
 export const enableAdminNotifications = async () => {
-  const permission =
-    await Notification.requestPermission();
+  const permission = await Notification.requestPermission();
 
   if (permission !== "granted") {
     alert("Notification permission denied");
@@ -16,17 +15,24 @@ export const enableAdminNotifications = async () => {
     vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
   });
 
-  const adminToken =
-    localStorage.getItem("adminToken");
+  console.log("FCM TOKEN:", token);
 
-  await fetch(`${API}/api/v1/notifications/admin-token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${adminToken}`
-    },
-    body: JSON.stringify({ token })
-  });
+  const adminToken = localStorage.getItem("adminToken");
 
-  alert("Admin notifications enabled");
+  const res = await fetch(
+    `${API}/api/v1/notifications/admin-token`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ token })
+    }
+  );
+
+  const data = await res.json();
+  console.log(data);
+
+  alert("Notifications enabled");
 };

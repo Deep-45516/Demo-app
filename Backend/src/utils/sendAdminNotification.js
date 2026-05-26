@@ -1,6 +1,7 @@
 import admin from "firebase-admin";
-import AdminNotificationToken from
-"../models/adminNotificationToken.model.js";
+
+import AdminNotificationToken
+from "../models/adminNotificationToken.model.js";
 
 export const sendAdminNotification =
 async ({ title, body }) => {
@@ -9,19 +10,43 @@ async ({ title, body }) => {
     await AdminNotificationToken.find();
 
   for (const item of tokens) {
+
     try {
+
       await admin.messaging().send({
         token: item.token,
+
         notification: {
           title,
           body
+        },
+
+        webpush: {
+          fcmOptions: {
+            link: "https://sayitfreely.vercel.app/admin"
+          }
         }
       });
+
+      console.log("Notification sent");
+
     } catch (error) {
+
       console.log(
         "Notification failed:",
         error.message
       );
+
+      if (
+        error.code ===
+          "messaging/registration-token-not-registered" ||
+        error.code ===
+          "messaging/invalid-registration-token"
+      ) {
+        await AdminNotificationToken.deleteOne({
+          token: item.token
+        });
+      }
     }
   }
 };
