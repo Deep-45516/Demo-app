@@ -36,6 +36,7 @@ async ({ title, body }) => {
         "Notification failed:",
         error.message
       );
+      console.error(error);
 
       if (
         error.code ===
