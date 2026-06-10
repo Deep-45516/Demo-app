@@ -9,7 +9,7 @@ console.log("Firebase email:", serviceAccount.client_email);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "confessionvault.firebasestorage.app"
+  storageBucket: "confessionvault"
 });
 
 const bucket = admin.storage().bucket();
