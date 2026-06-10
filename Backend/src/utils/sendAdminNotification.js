@@ -39,14 +39,15 @@ async ({ title, body }) => {
       console.error(error);
 
       if (
-        error.code ===
-          "messaging/registration-token-not-registered" ||
-        error.code ===
-          "messaging/invalid-registration-token"
-      ) {
-        await AdminNotificationToken.deleteOne({
-          token: item.token
-        });
+  error.code === "messaging/registration-token-not-registered" ||
+  error.code === "messaging/invalid-registration-token" ||
+  error.code === "messaging/mismatched-credential"
+) {
+  await AdminNotificationToken.deleteOne({
+    token: item.token
+  });
+
+  console.log("Deleted invalid FCM token");
       }
     }
   }

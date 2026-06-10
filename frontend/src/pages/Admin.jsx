@@ -4,9 +4,7 @@ import { enableAdminNotifications } from "../notifications.js";
 const API = import.meta.env.VITE_BACKEND_URL;
 
 export default function Admin() {
-  const [token, setToken] = useState(
-    localStorage.getItem("adminToken") || ""
-  );
+  const [token, setToken] = useState(localStorage.getItem("adminToken") || "");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,9 +17,9 @@ export default function Admin() {
     const res = await fetch(`${API}/api/v1/auth/admin-login`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
@@ -39,22 +37,21 @@ export default function Admin() {
     if (!token) return;
 
     const headers = {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     };
 
-    const pendingRes = await fetch(
-      `${API}/api/v1/confessions/pending`,
-      { headers }
-    );
+    const pendingRes = await fetch(`${API}/api/v1/confessions/pending`, {
+      headers,
+    });
 
     const approvedRes = await fetch(
       `${API}/api/v1/confessions/approved/recent`,
-      { headers }
+      { headers },
     );
 
     const rejectedRes = await fetch(
       `${API}/api/v1/confessions/rejected/recent`,
-      { headers }
+      { headers },
     );
 
     if (pendingRes.status === 401) {
@@ -77,9 +74,9 @@ export default function Admin() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ caption })
+      body: JSON.stringify({ caption }),
     });
 
     fetchData();
@@ -89,8 +86,8 @@ export default function Admin() {
     await fetch(`${API}/api/v1/confessions/${id}/reject`, {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     fetchData();
@@ -133,9 +130,7 @@ export default function Admin() {
         <br />
         <br />
 
-        <button onClick={loginAdmin}>
-          Login
-        </button>
+        <button onClick={loginAdmin}>Login</button>
       </div>
     );
   }
@@ -144,12 +139,8 @@ export default function Admin() {
     <div style={{ padding: 20 }}>
       <h1>Admin Panel</h1>
 
-      <button onClick={logout}>
-        Logout
-      </button>
-      <button onClick={enableAdminNotifications}>
-  Enable Notifications
-</button>
+      <button onClick={logout}>Logout</button>
+      <button onClick={enableAdminNotifications}>Enable Notifications</button>
 
       <h2>Pending Requests</h2>
 
@@ -159,7 +150,7 @@ export default function Admin() {
           style={{
             border: "1px solid gray",
             padding: 20,
-            marginBottom: 20
+            marginBottom: 20,
           }}
         >
           <h3>To: {confession.to}</h3>
@@ -189,7 +180,7 @@ export default function Admin() {
           <button
             onClick={() => {
               const caption = document.getElementById(
-                `caption-${confession._id}`
+                `caption-${confession._id}`,
               ).value;
 
               approveConfession(confession._id, caption);
@@ -211,7 +202,9 @@ export default function Admin() {
 
       {approved.map((confession) => (
         <div key={confession._id}>
-          <p>{confession.to} - {confession.status}</p>
+          <p>
+            {confession.to} - {confession.status}
+          </p>
         </div>
       ))}
 
@@ -219,7 +212,9 @@ export default function Admin() {
 
       {rejected.map((confession) => (
         <div key={confession._id}>
-          <p>{confession.to} - {confession.status}</p>
+          <p>
+            {confession.to} - {confession.status}
+          </p>
         </div>
       ))}
     </div>
