@@ -54,6 +54,7 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
           imageUrl: imageUrls[0],
           caption
         });
+        console.log("CREATE MEDIA RESPONSE:", media);
 
       if (!media.id) {
         return res.status(500).json(
@@ -69,6 +70,7 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
         setTimeout(resolve, 10000)
       );
 
+      
       console.log(
         "IG ACCOUNT:",
         process.env.INSTAGRAM_ACCOUNT_ID
@@ -88,6 +90,7 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
         await publishInstagramMedia(
           media.id
         );
+        console.log("PUBLISH RESPONSE:", published);
     }
 
     // CAROUSEL
@@ -118,7 +121,7 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
           children,
           caption
         });
-
+        console.log("CREATE CAROUSEL RESPONSE:", carousel);
       if (!carousel.id) {
         return res.status(500).json(
           new ApiResponse(
