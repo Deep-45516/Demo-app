@@ -54,6 +54,10 @@ const confessionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    postError: {
+  type: String,
+  default: null
+}
   },
   { timestamps: true },
 );

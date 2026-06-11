@@ -149,15 +149,31 @@ router.patch("/:id/approve", verifyAdmin, async (req, res) => {
 }
       );
 
-      const postedConfession = await postConfessionToInstagram(confession);
+      try {
+  const postedConfession =
+    await postConfessionToInstagram(confession);
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        postedConfession,
-        "Confession approved and posted"
-      )
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      postedConfession,
+      "Confession approved and posted"
+    )
+  );
+
+} catch (error) {
+  confession.status = "approved";
+  confession.postError = error.message;
+  await confession.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      confession,
+      "Confession approved but Instagram post failed"
+    )
+  );
+}
 
   } catch (error) {
     console.log("APPROVE ERROR:", error);
@@ -214,6 +230,47 @@ router.patch("/:id/reject",verifyAdmin, async (req, res) => {
   }
 
 });
+
+router.patch(
+  "/:id/retry-post",
+  verifyAdmin,
+  async (req, res) => {
+    const confession =
+      await Confession.findById(req.params.id);
+
+    if (!confession) {
+      throw new ApiError(404, "Confession not found");
+    }
+
+    try {
+      const posted =
+        await postConfessionToInstagram(confession);
+
+      posted.postError = null;
+      await posted.save();
+
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          posted,
+          "Instagram post retried successfully"
+        )
+      );
+
+    } catch (error) {
+      confession.postError = error.message;
+      await confession.save();
+
+      return res.status(500).json(
+        new ApiResponse(
+          500,
+          confession,
+          "Instagram retry failed"
+        )
+      );
+    }
+  }
+);
 
 // RECENT APPROVED
 router.get("/approved/recent",verifyAdmin, async (req, res) => {
