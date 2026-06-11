@@ -1,3 +1,10 @@
+// Take the emails in adminEmails
+// Check if each email already exists in MongoDB
+// If not, create a new user with:
+// that email
+// a hashed password
+// role: "admin"
+// isVerified: true
 import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 

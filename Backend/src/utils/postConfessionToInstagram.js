@@ -9,7 +9,13 @@ const delay = (ms) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export const postConfessionToInstagram = async (confession) => {
-  const imageUrls = confession.imageUrls || [];
+  // const imageUrls = confession.imageUrls || [];
+  const imageUrls =
+  confession.imageUrls?.length
+    ? confession.imageUrls
+    : confession.imageUrl
+      ? [confession.imageUrl]
+      : [];
 
   if (imageUrls.length === 0) {
     throw new Error("No images found");

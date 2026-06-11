@@ -13,7 +13,7 @@ const router = Router();
 // CREATE CONFESSION
 router.post("/", async (req, res) => {
   try {
-    const { to, from, message, userEmail } = req.body;
+    const { to, from, message, userEmail } = req.body;//basic take input from browser
     console.log(req.body);
      // 🔥 generate image
    
@@ -160,7 +160,7 @@ router.patch("/:id/approve", verifyAdmin, async (req, res) => {
     );
 
   } catch (error) {
-
+    console.log("APPROVE ERROR:", error);
     return res.status(500).json(
       new ApiResponse(
         500,
