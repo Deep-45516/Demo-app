@@ -98,9 +98,8 @@ button:hover {
 
 /* Template */
 .template {
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 794 / 1123;
+  width: 794px;
+  height: 1123px;
   position: relative;
   background: url("/template.png") no-repeat center/cover;
   overflow: hidden;
@@ -108,6 +107,9 @@ button:hover {
   border: 2px solid black;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   border-radius: 8px;
+  transform: scale(0.63);
+  transform-origin: top center;
+  margin-bottom: -400px;
 }
 
 

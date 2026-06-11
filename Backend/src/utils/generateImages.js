@@ -110,7 +110,7 @@ await page.evaluateHandle(
           container.querySelector(".message");
 
         let fontSize = 42;
-        const MIN_FONT = 24;
+        const MIN_FONT = 16;
 
         let visibleText = remainingText;
 

@@ -91,3 +91,12 @@ if (visibleText.length === 0 && lastGoodText.length > 0) {
     usedLength: visibleText.length
   };
 }
+
+function trimToWord(text) {
+  const trimmed = text.trimEnd();
+  const lastSpace = trimmed.lastIndexOf(" ");
+
+  if (lastSpace === -1) return trimmed;
+
+  return trimmed.slice(0, lastSpace).trimEnd();
+}
