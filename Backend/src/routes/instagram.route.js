@@ -32,7 +32,6 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
       confession.imageUrls || [];
 
     if (imageUrls.length === 0) {
-
       return res.status(400).json(
         new ApiResponse(
           400,
@@ -50,7 +49,6 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
 
     // SINGLE IMAGE
     if (imageUrls.length === 1) {
-
       const media =
         await createInstagramMedia({
           imageUrl: imageUrls[0],
@@ -58,7 +56,6 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
         });
 
       if (!media.id) {
-
         return res.status(500).json(
           new ApiResponse(
             500,
@@ -69,29 +66,41 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
       }
 
       await new Promise((resolve) =>
-  setTimeout(resolve, 10000)
-);
+        setTimeout(resolve, 10000)
+      );
 
-published =
-  await publishInstagramMedia(
-    media.id
-  );
+      console.log(
+        "IG ACCOUNT:",
+        process.env.INSTAGRAM_ACCOUNT_ID
+      );
+
+      console.log(
+        "TOKEN:",
+        process.env.INSTAGRAM_ACCESS_TOKEN
+      );
+
+      console.log(
+        "MEDIA ID:",
+        media.id
+      );
+
+      published =
+        await publishInstagramMedia(
+          media.id
+        );
     }
 
     // CAROUSEL
     else {
-
       const children = [];
 
       for (const imageUrl of imageUrls) {
-
         const item =
           await createCarouselItem(
             imageUrl
           );
 
         if (!item.id) {
-
           return res.status(500).json(
             new ApiResponse(
               500,
@@ -111,7 +120,6 @@ published =
         });
 
       if (!carousel.id) {
-
         return res.status(500).json(
           new ApiResponse(
             500,
@@ -122,17 +130,41 @@ published =
       }
 
       await new Promise((resolve) =>
-  setTimeout(resolve, 10000)
-);
+        setTimeout(resolve, 10000)
+      );
 
-published =
-  await publishInstagramMedia(
-    carousel.id
-  );
+      console.log(
+        "IG ACCOUNT:",
+        process.env.INSTAGRAM_ACCOUNT_ID
+      );
+
+      console.log(
+        "TOKEN:",
+        process.env.INSTAGRAM_ACCESS_TOKEN
+      );
+
+      console.log(
+        "CAROUSEL ID:",
+        carousel.id
+      );
+
+      console.log(
+        "CHILDREN:",
+        children
+      );
+
+      published =
+        await publishInstagramMedia(
+          carousel.id
+        );
     }
 
-    if (!published.id) {
+    console.log(
+      "PUBLISH RESPONSE:",
+      published
+    );
 
+    if (!published.id) {
       return res.status(500).json(
         new ApiResponse(
           500,
@@ -161,6 +193,10 @@ published =
     );
 
   } catch (error) {
+    console.error(
+      "Instagram posting error:",
+      error
+    );
 
     return res.status(500).json(
       new ApiResponse(
