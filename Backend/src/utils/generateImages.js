@@ -2,15 +2,6 @@ import puppeteer from "puppeteer";
 import fs from "fs";
 import path from "path";
 
-function trimToWord(text) {
-  const trimmed = text.trimEnd();
-  const lastSpace = trimmed.lastIndexOf(" ");
-
-  if (lastSpace === -1) return trimmed;
-
-  return trimmed.slice(0, lastSpace).trimEnd();
-}
-
 export const generateImages = async ({
   to,
   from,
@@ -149,8 +140,6 @@ await page.evaluateHandle(
 
           msgBox.style.lineHeight = String(lineHeight);
         }
-        visibleText = trimToWord(visibleText);
-        msgBox.innerText = visibleText;
 
         while (
           msgBox.scrollHeight >

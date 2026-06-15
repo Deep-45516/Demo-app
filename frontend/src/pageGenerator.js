@@ -23,13 +23,18 @@ export function generatePages(to, from, message) {
 
 function createPage(to, from, text) {
   const template = document.getElementById("template");
+  const previewWrapper = document.getElementById("previewWrapper");
+
+  if (!template || !previewWrapper) {
+    return { usedLength: 0 };
+  }
   const clone = template.cloneNode(true);
 
   clone.removeAttribute("id");
   clone.style.display = "block";
   clone.style.visibility = "hidden";
 
-  document.getElementById("previewWrapper").appendChild(clone);
+  previewWrapper.appendChild(clone);
 
   const msgBox = clone.querySelector(".message");
   const toBox = clone.querySelector(".previewTo");
