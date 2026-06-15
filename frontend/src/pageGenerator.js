@@ -73,8 +73,7 @@ while (msgBox.scrollHeight > msgBox.clientHeight && fontSize > MIN_FONT) {
 
   msgBox.style.lineHeight = lineHeight;
 }
-visibleText = trimToWord(visibleText);
-msgBox.innerText = visibleText;
+
 
 
 // Step 2: cut text if still overflowing
