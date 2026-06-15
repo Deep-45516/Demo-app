@@ -46,7 +46,7 @@ function createPage(to, from, text) {
   fromBox.innerText = from || "Unknown";
 
 let fontSize = 42;
-const MIN_FONT = 16;
+const MIN_FONT = 24;
 
 let visibleText = text;
 
