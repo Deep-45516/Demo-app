@@ -10,7 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^12.13.0",
+    "@react-oauth/google": "^0.13.5",
+    "axios": "^1.18.1",
     "html2canvas": "^1.4.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
