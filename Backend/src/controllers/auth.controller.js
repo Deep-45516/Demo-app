@@ -3,8 +3,58 @@ import jwt from "jsonwebtoken";
 import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-errors.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import { OAuth2Client } from "google-auth-library";
 // import { sendEmail } from "../utils/sendEmail.js";
+const client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID
+);
+const googleLogin = asyncHandler(async (req, res) => {
+  const { credential } = req.body;
 
+  if (!credential) {
+    throw new ApiError(400, "Google credential missing");
+  }
+
+  const ticket = await client.verifyIdToken({
+    idToken: credential,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  const {
+    sub,
+    email,
+    name,
+    picture,
+  } = payload;
+
+  let user = await User.findOne({
+    googleId: sub,
+  });
+
+  if (!user) {
+    user = await User.create({
+      googleId: sub,
+      email,
+      name,
+      profilePicture: picture,
+    });
+  }
+
+  const token = generateToken(user);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        token,
+        user,
+      },
+      "Login successful"
+    )
+  );
+});
 const generateToken = (user) => {
    if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET missing");
@@ -156,5 +206,6 @@ const getMe = asyncHandler(async (req, res) => {
 
 export {
   adminLogin,
+  googleLogin,
   getMe
 };

@@ -1,8 +1,7 @@
 import { Router } from "express";
 import {
   adminLogin,
-  sendUserOtp,
-  verifyUserOtp,
+  googleLogin,
   getMe
 } from "../controllers/auth.controller.js";
 
@@ -16,5 +15,6 @@ router.post("/admin-login", adminLogin);
 // router.post("/send-otp", sendUserOtp);
 // router.post("/verify-otp", verifyUserOtp);
 router.get("/me", verifyToken, getMe);
+router.post("/google", googleLogin);
 
 export default router;
