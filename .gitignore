@@ -2,7 +2,9 @@
 # Dependencies
 # =========================
 node_modules/
-
+Backend/.cache/
+Backend/node_modules/
+frontend/node_modules/
 # =========================
 # Environment variables
 # =========================
@@ -10,7 +12,8 @@ node_modules/
 .env.*
 firebase-key.json
 uploads
-
+Backend/.env
+frontend/.env
 # =========================
 # Logs
 # =========================

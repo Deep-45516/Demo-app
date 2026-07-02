@@ -1,55 +1,21 @@
 import { useState, useEffect } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";
 
-import {
-  signInWithPopup,
-  onAuthStateChanged,
-  signOut
-} from "firebase/auth";
-
-import {
-  auth,
-  googleProvider
-} from "../firebase.js";
+const API = import.meta.env.VITE_BACKEND_URL;
 
 export default function Home() {
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
-  const [user, setUser] = useState(null);
-  const [loginLoading, setLoginLoading] = useState(false);
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-
-    return () => unsub();
-  }, []);
-
-  const loginWithGoogle = async () => {
-    if (loginLoading) return;
-
-    try {
-      setLoginLoading(true);
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("Error logging in with Google:", error);
-    } finally {
-      setLoginLoading(false);
-    }
-  };
-
-  const logoutUser = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  });
 
   useEffect(() => {
     document.fonts.ready.then(() => {
@@ -59,20 +25,54 @@ export default function Home() {
     });
   }, [to, from, message]);
 
+  const logoutUser = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.reload();
+  };
+
   if (!user) {
     return (
       <div className="container">
         <div className="form">
           <h2>Login to submit confession</h2>
 
-          <button
-            disabled={loginLoading}
-            onClick={loginWithGoogle}
-          >
-            {loginLoading
-              ? "Opening..."
-              : "Continue with Google"}
-          </button>
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                const res = await fetch(`${API}/api/v1/auth/google`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    credential: credentialResponse.credential,
+                  }),
+                });
+
+                const data = await res.json();
+
+                if (!data.success) {
+                  alert(data.message);
+                  return;
+                }
+
+                localStorage.setItem("token", data.data.token);
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify(data.data.user)
+                );
+
+                window.location.reload();
+              } catch (err) {
+                console.error(err);
+                alert("Login failed");
+              }
+            }}
+            onError={() => {
+              alert("Google Login Failed");
+            }}
+          />
         </div>
       </div>
     );
@@ -80,45 +80,30 @@ export default function Home() {
 
   return (
     <div className="container">
-
       <div className="form">
+        <p>Logged in as {user.email}</p>
 
-        <p>
-          Logged in as {user.email}
-        </p>
-
-        <button onClick={logoutUser}>
-          Logout
-        </button>
+        <button onClick={logoutUser}>Logout</button>
 
         <label>To</label>
 
         <textarea
-          id="toInput"
           value={to}
-          onChange={(e) =>
-            setTo(e.target.value)
-          }
+          onChange={(e) => setTo(e.target.value)}
         />
 
         <label>Message</label>
 
         <textarea
-          id="messageInput"
           value={message}
-          onChange={(e) =>
-            setMessage(e.target.value)
-          }
+          onChange={(e) => setMessage(e.target.value)}
         />
 
         <label>From</label>
 
         <textarea
-          id="fromInput"
           value={from}
-          onChange={(e) =>
-            setFrom(e.target.value)
-          }
+          onChange={(e) => setFrom(e.target.value)}
         />
 
         <button onClick={downloadPages}>
@@ -127,22 +112,15 @@ export default function Home() {
 
         <button
           onClick={() => {
-            if (!user) {
-              alert("Please login first");
-              return;
-            }
-
             submitConfession(
               to,
               from,
-              message,
-              user?.email
+              message
             );
           }}
         >
           Submit Confession
         </button>
-
       </div>
 
       <div
@@ -169,7 +147,6 @@ export default function Home() {
           </h3>
         </div>
       </div>
-
     </div>
   );
 }

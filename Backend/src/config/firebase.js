@@ -1,8 +1,10 @@
 import admin from "firebase-admin";
 
-const serviceAccount = JSON.parse(
-  process.env.FIREBASE_SERVICE_ACCOUNT
-);
+import serviceAccountFile from "./firebase-key.json" assert { type: "json" };
+
+const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+  : serviceAccountFile;
 
 console.log("Firebase project:", serviceAccount.project_id);
 console.log("Firebase email:", serviceAccount.client_email);
