@@ -12,20 +12,21 @@ export async function submitConfession(
     message,
     userEmail
   });
+  const token = localStorage.getItem("token");
 
   try {
     const res = await fetch(`${API}/api/v1/confessions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        to,
-        from,
-        message,
-        userEmail
-      })
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    to,
+    from,
+    message,
+  }),
+});
 
     const data = await res.json();
     console.log(data);
