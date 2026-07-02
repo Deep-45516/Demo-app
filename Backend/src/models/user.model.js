@@ -8,27 +8,24 @@ const userSchema = new mongoose.Schema(
       unique: true
     },
 
-    user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-},
-    // email: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    //   lowercase: true,
-    //   trim: true
-    // },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true
+    },
 
     name: {
       type: String,
       required: true
     },
+
     profilePicture: {
       type: String,
       default: null
     },
+
     instagramVerified: {
       type: Boolean,
       default: false
@@ -43,23 +40,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "admin"],
       default: "user"
-    },
-    password: {
-  type: String,
-  default: null
-},
-
-    // otp: {
-    //   type: String,
-    //   default: null
-    // },
-
-    // otpExpiry: {
-    //   type: Date,
-    //   default: null
-    // }
+    }
   },
-  { timestamps: true }
+  {
+    timestamps: true
+  }
 );
 
 export default mongoose.model("User", userSchema);
