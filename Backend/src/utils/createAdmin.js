@@ -1,15 +1,6 @@
-// Take the emails in adminEmails
-// Check if each email already exists in MongoDB
-// If not, create a new user with:
-// that email
-// a hashed password
-// role: "admin"
-// isVerified: true
-import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 
 export const createAdmins = async () => {
-
   const adminEmails = [
     "deeplokhande07@gmail.com",
     "sayitfreely.connect@gmail.com",
@@ -17,7 +8,6 @@ export const createAdmins = async () => {
   ];
 
   for (const email of adminEmails) {
-
     const existingAdmin = await User.findOne({ email });
 
     if (existingAdmin) {
@@ -25,16 +15,13 @@ export const createAdmins = async () => {
       continue;
     }
 
-    const hashedPassword = await bcrypt.hash(
-      "yourStrongPassword123",
-      10
-    );
-
     await User.create({
+      googleId: `admin-${email}`,
       email,
-      password: hashedPassword,
+      name: email.split("@")[0],
       role: "admin",
-      isVerified: true
+      profilePicture: null,
+      instagramVerified: false
     });
 
     console.log(`Admin created: ${email}`);
