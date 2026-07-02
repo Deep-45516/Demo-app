@@ -1,19 +1,20 @@
 import admin from "firebase-admin";
 
-import serviceAccountFile from "./firebase-key.json" with { type: "json" };
+let serviceAccount;
 
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-  : serviceAccountFile;
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} else {
+  const module = await import("./firebase-key.json", {
+    with: { type: "json" }
+  });
 
-console.log("Firebase project:", serviceAccount.project_id);
-console.log("Firebase email:", serviceAccount.client_email);
+  serviceAccount = module.default;
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "confessionvault"
+  storageBucket: "confessionvault",
 });
 
-const bucket = admin.storage().bucket();
-
-export { bucket };
+export const bucket = admin.storage().bucket();
