@@ -1,6 +1,6 @@
 import admin from "firebase-admin";
 
-import serviceAccountFile from "./firebase-key.json" assert { type: "json" };
+import serviceAccountFile from "./firebase-key.json" with { type: "json" };
 
 const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
   ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
