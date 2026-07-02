@@ -11,9 +11,9 @@ import { sendAdminNotification } from
 const router = Router();
 
 // CREATE CONFESSION
-router.post("/", async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
-    const { to, from, message, userEmail } = req.body;//basic take input from browser
+    const { to, from, message } = req.body;;//basic take input from browser
     console.log(req.body);
      // 🔥 generate image
    
@@ -45,12 +45,11 @@ router.post("/", async (req, res) => {
     }
 
   // 3. save in DB
-const confession =
- await Confession.create({
+const confession = await Confession.create({
   to,
   from,
   message,
-  userEmail,
+  user: req.user.id,
   imageUrls
 });
   await sendAdminNotification({
