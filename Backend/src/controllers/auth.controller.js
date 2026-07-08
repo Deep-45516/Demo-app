@@ -47,19 +47,27 @@ const googleLogin = asyncHandler(async (req, res) => {
   Google only proves the user's identity.
   MongoDB stores our application's data.
   */
-  let user = await User.findOne({
+let user = await User.findOne({
+  $or: [
+    { googleId: sub },
+    { email }
+  ]
+});
+//not created , create new user in database with googleId, email, name, profilePicture
+if (!user) {
+  user = await User.create({
     googleId: sub,
+    email,
+    name,
+    profilePicture: picture,
   });
+} else {
+  user.googleId = sub;
+  user.name = name;
+  user.profilePicture = picture;
 
-  //If not, create a new user in our database with the info from Google
-  if (!user) {
-    user = await User.create({
-      googleId: sub,
-      email,
-      name,
-      profilePicture: picture,
-    });
-  }
+  await user.save();
+}
 
   //token ="eyJhbGciOiJIUzI1NiIsInR5cCI..."
   const token = generateToken(user);
