@@ -12,11 +12,13 @@ export default function Home() {
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
 
+  //Has this browser already logged into ConfessionVault?
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
 
+  //useeffect trigged when to, from, or message changes. It generates the pages for preview.
   useEffect(() => {
     document.fonts.ready.then(() => {
       requestAnimationFrame(() => {
@@ -36,7 +38,15 @@ export default function Home() {
       <div className="container">
         <div className="form">
           <h2>Login to submit confession</h2>
+          {/*
+Google doesn't directly give us the user's name/email.
+It gives a digitally signed identity token called a "credential".
 
+We can't trust it on the frontend, so we send the credential
+to the backend (/api/v1/auth/google). The backend verifies
+the token with Google, and if it's valid, returns our own JWT
+and the user's information.
+*/}
           <GoogleLogin
             onSuccess={async (credentialResponse) => {
               try {
@@ -58,10 +68,7 @@ export default function Home() {
                 }
 
                 localStorage.setItem("token", data.data.token);
-                localStorage.setItem(
-                  "user",
-                  JSON.stringify(data.data.user)
-                );
+                localStorage.setItem("user", JSON.stringify(data.data.user));
 
                 window.location.reload();
               } catch (err) {
@@ -87,10 +94,7 @@ export default function Home() {
 
         <label>To</label>
 
-        <textarea
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-        />
+        <textarea value={to} onChange={(e) => setTo(e.target.value)} />
 
         <label>Message</label>
 
@@ -101,50 +105,30 @@ export default function Home() {
 
         <label>From</label>
 
-        <textarea
-          value={from}
-          onChange={(e) => setFrom(e.target.value)}
-        />
+        <textarea value={from} onChange={(e) => setFrom(e.target.value)} />
 
-        <button onClick={downloadPages}>
-          Download Pages
-        </button>
+        <button onClick={downloadPages}>Download Pages</button>
 
         <button
           onClick={() => {
-            submitConfession(
-              to,
-              from,
-              message
-            );
+            submitConfession(to, from, message);
           }}
         >
           Submit Confession
         </button>
       </div>
 
-      <div
-        className="preview-wrapper"
-        id="previewWrapper"
-      />
+      <div className="preview-wrapper" id="previewWrapper" />
 
-      <div
-        className="template"
-        id="template"
-        style={{ display: "none" }}
-      >
+      <div className="template" id="template" style={{ display: "none" }}>
         <div className="to">
-          <h2 className="previewTo">
-            Someone
-          </h2>
+          <h2 className="previewTo">Someone</h2>
         </div>
 
         <div className="message"></div>
 
         <div className="from">
-          <h3 className="previewFrom">
-            Unknown
-          </h3>
+          <h3 className="previewFrom">Unknown</h3>
         </div>
       </div>
     </div>

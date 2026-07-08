@@ -6,15 +6,13 @@ const app = express();
 
 // middlewares
 app.use(express.json());
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://sayitfreely.vercel.app"
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://sayitfreely.vercel.app"],
+    credentials: true,
+  }),
+);
 app.use(express.urlencoded({ extended: true }));
-
 
 // test route
 app.get("/", (req, res) => {

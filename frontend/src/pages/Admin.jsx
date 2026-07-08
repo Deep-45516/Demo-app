@@ -93,18 +93,15 @@ export default function Admin() {
     fetchData();
   };
   const retryPost = async (id) => {
-  await fetch(
-    `${API}/api/v1/confessions/${id}/retry-post`,
-    {
+    await fetch(`${API}/api/v1/confessions/${id}/retry-post`, {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  fetchData();
-};
+    fetchData();
+  };
 
   const logout = () => {
     localStorage.removeItem("adminToken");
@@ -209,20 +206,16 @@ export default function Admin() {
             Reject
           </button>
           {confession.postError && (
-  <>
-    <p style={{ color: "red" }}>
-      Post failed: {confession.postError}
-    </p>
+            <>
+              <p style={{ color: "red" }}>
+                Post failed: {confession.postError}
+              </p>
 
-    <button
-      onClick={() =>
-        retryPost(confession._id)
-      }
-    >
-      Retry Post
-    </button>
-  </>
-)}
+              <button onClick={() => retryPost(confession._id)}>
+                Retry Post
+              </button>
+            </>
+          )}
         </div>
       ))}
 
