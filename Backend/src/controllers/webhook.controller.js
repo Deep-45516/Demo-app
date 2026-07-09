@@ -8,12 +8,9 @@ export const verifyWebhook = (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
-console.log("Webhook verification request received");
-console.log(req.query);
-  if (
-    mode === "subscribe" &&
-    token === VERIFY_TOKEN
-  ) {
+  console.log("Webhook verification request received");
+  console.log(req.query);
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
     console.log("Webhook verified");
     return res.status(200).send(challenge);
   }
@@ -24,9 +21,7 @@ console.log(req.query);
 // Receive Instagram messages
 export const receiveWebhook = async (req, res) => {
   try {
-    console.log(
-      JSON.stringify(req.body, null, 2)
-    );
+    console.log(JSON.stringify(req.body, null, 2));
 
     const entry = req.body.entry?.[0];
     const messaging = entry?.messaging?.[0];
@@ -35,33 +30,37 @@ export const receiveWebhook = async (req, res) => {
       return res.sendStatus(200);
     }
 
-    const text =
-      messaging.message.text.trim();
+    const text = messaging.message.text.trim();
 
     console.log("Message:", text);
 
-    const session =
-      await VerificationSession.findOne({
-        code: text,
-        status: "pending",
-      });
+    const session = await VerificationSession.findOne({
+      code: text,
+      status: "pending",
+    });
 
     if (!session) {
       console.log("No verification session found");
       return res.sendStatus(200);
     }
 
-    console.log(
-      "Verification code matched."
-    );
-
+    console.log("Verification code matched.");
     // Next step:
     // Fetch Instagram profile
     // Create / Update user
     // Generate JWT
 
-    return res.sendStatus(200);
+    const senderId = messaging.sender.id;
 
+    const response = await fetch(
+      `https://graph.instagram.com/${senderId}?fields=id,username,name&access_token=${process.env.INSTAGRAM_ACCESS_TOKEN_LOGIN}`,
+    );
+
+    const profile = await response.json();
+
+    console.log(profile);
+
+    return res.sendStatus(200);
   } catch (error) {
     console.error(error);
 
