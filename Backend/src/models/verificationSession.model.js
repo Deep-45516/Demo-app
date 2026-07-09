@@ -6,46 +6,47 @@ const verificationSessionSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      index: true
+      index: true,
     },
 
     enteredUsername: {
       type: String,
       required: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
     },
 
     status: {
       type: String,
       enum: ["pending", "verified", "expired"],
-      default: "pending"
+      default: "pending",
     },
 
     instagramScopedId: {
       type: String,
-      default: null
+      default: null,
     },
 
     expiresAt: {
       type: Date,
-      required: true
-    }
+      required: true,
+    },
+    verifiedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
 // Automatically remove expired sessions
 verificationSessionSchema.index(
   { expiresAt: 1 },
   {
-    expireAfterSeconds: 0
-  }
+    expireAfterSeconds: 0,
+  },
 );
 
-export default mongoose.model(
-  "VerificationSession",
-  verificationSessionSchema
-);
+export default mongoose.model("VerificationSession", verificationSessionSchema);

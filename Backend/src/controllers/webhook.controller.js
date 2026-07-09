@@ -60,6 +60,52 @@ export const receiveWebhook = async (req, res) => {
 
     console.log(profile);
 
+    if (profile.error) {
+      console.error(profile.error);
+      return res.sendStatus(200);
+    }
+    // Verify the entered username matches the sender's Instagram account
+    if (
+      session.enteredUsername.toLowerCase() !== profile.username.toLowerCase()
+    ) {
+      console.log(
+        `Username mismatch. Entered: ${session.enteredUsername}, Actual: ${profile.username}`,
+      );
+
+      return res.sendStatus(200);
+    }
+
+    // Find existing user
+    let user = await User.findOne({
+      instagramScopedId: profile.id,
+    });
+
+    // Create user if it doesn't exist
+    if (!user) {
+      user = await User.create({
+        instagramScopedId: profile.id,
+        instagramUsername: profile.username,
+        instagramName: profile.name,
+        instagramVerified: true,
+      });
+    } else {
+      // Update existing user
+      user.instagramUsername = profile.username;
+      user.instagramName = profile.name;
+      user.instagramVerified = true;
+
+      await user.save();
+    }
+
+    // Mark verification session as completed
+    session.status = "verified";
+    session.instagramScopedId = profile.id;
+    session.verifiedAt = new Date();
+
+    await session.save();
+
+    console.log(`${profile.username} verified successfully.`);
+
     return res.sendStatus(200);
   } catch (error) {
     console.error(error);
