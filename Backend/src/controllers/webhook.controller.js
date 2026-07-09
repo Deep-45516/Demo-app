@@ -1,7 +1,5 @@
 import VerificationSession from "../models/verificationSession.model.js";
 import User from "../models/user.model.js";
-import { generateToken } from "./auth.controller.js";
-
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
 // Verify webhook during Meta setup
@@ -78,11 +76,11 @@ export const receiveWebhook = async (req, res) => {
 
     // Find existing user
     let user = await User.findOne({
-  $or: [
-    { instagramScopedId: profile.id },
-    { instagramUsername: profile.username.toLowerCase() },
-  ],
-});
+      $or: [
+        { instagramScopedId: profile.id },
+        { instagramUsername: profile.username.toLowerCase() },
+      ],
+    });
 
     // Create user if it doesn't exist
     if (!user) {
@@ -100,16 +98,22 @@ export const receiveWebhook = async (req, res) => {
 
       await user.save();
     }
-    const token = generateToken(user);
-
 
     // Mark verification session as completed
     session.userId = user._id;
     session.status = "verified";
-    // session.instagramScopedId = profile.id;
+    session.instagramScopedId = profile.id;
     session.verifiedAt = new Date();
 
     await session.save();
+    const savedSession = await VerificationSession.findById(session._id);
+
+    console.log(savedSession);
+    console.log("Saving session...");
+    console.log({
+      userId: user._id,
+      status: session.status,
+    });
 
     console.log(`${profile.username} verified successfully.`);
 

@@ -4,6 +4,7 @@ import {
   googleLogin,
   getMe,
 } from "../controllers/auth.controller.js";
+import { getVerificationStatus } from "../controllers/instagramAuth.controller.js";
 
 import { verifyToken } from "../middlewares/auth.middleware.js";
 import {

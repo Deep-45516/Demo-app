@@ -2,6 +2,8 @@ import VerificationSession from "../models/verificationSession.model.js";
 import { generateVerificationCode } from "../utils/generateVerificationCode.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import User from "../models/user.model.js";
+import { generateToken } from "./auth.controller.js";
 
 export const startInstagramVerification = asyncHandler(
   async (req, res) => {
@@ -45,27 +47,51 @@ asyncHandler(async (req,res)=>{
 
     const session =
     await VerificationSession.findById(sessionId);
+    if (!session) {
+  return res.status(404).json(
+    new ApiResponse(
+      404,
+      null,
+      "Verification session not found"
+    )
+  );
+}
 
-    if(!session){
-        return res.status(404).json(
-            new ApiResponse(
-                404,
-                null,
-                "Session not found"
-            )
-        );
-    }
+ if (session.status !== "verified") {
+  return res.json(
+    new ApiResponse(
+      200,
+      {
+        status: session.status,
+      },
+      "Waiting for verification"
+    )
+  );
+}
 
+const user = await User.findById(session.userId);
 
-    return res.json(
-        new ApiResponse(
-            200,
-            {
-                status: session.status,
-                token: session.token
-            },
-            "OK"
-        )
-    );
+if (!user) {
+  return res.status(404).json(
+    new ApiResponse(
+      404,
+      null,
+      "User not found"
+    )
+  );
+}
+
+const token = generateToken(user);
+
+return res.json(
+  new ApiResponse(
+    200,
+    {
+      status: "verified",
+      token,
+    },
+    "Verification completed"
+  )
+);
 
 });

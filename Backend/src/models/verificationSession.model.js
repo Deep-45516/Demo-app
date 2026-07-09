@@ -44,11 +44,6 @@ userId: {
   ref: "User",
   default: null,
 },
-
-verifiedAt: {
-  type: Date,
-  default: null,
-},
   },
   {
     timestamps: true,
