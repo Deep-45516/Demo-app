@@ -305,4 +305,9 @@ const getMe = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
-export { adminLogin, googleLogin, getMe };
+export {
+    adminLogin,
+    googleLogin,
+    getMe,
+    generateToken
+};

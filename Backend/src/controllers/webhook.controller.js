@@ -1,5 +1,6 @@
 import VerificationSession from "../models/verificationSession.model.js";
 import User from "../models/user.model.js";
+import { generateToken } from "./auth.controller.js";
 
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
@@ -99,10 +100,13 @@ export const receiveWebhook = async (req, res) => {
 
       await user.save();
     }
+    const token = generateToken(user);
+
 
     // Mark verification session as completed
+    session.userId = user._id;
     session.status = "verified";
-    session.instagramScopedId = profile.id;
+    // session.instagramScopedId = profile.id;
     session.verifiedAt = new Date();
 
     await session.save();

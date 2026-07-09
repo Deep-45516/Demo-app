@@ -23,5 +23,8 @@ router.post("/google", googleLogin);
 router.post("/instagram/start",
   startInstagramVerification,
 );
-
+router.get(
+"/instagram/status/:sessionId",
+getVerificationStatus
+);
 export default router;

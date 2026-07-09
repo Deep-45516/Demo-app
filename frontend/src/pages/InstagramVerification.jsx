@@ -26,11 +26,11 @@ export default function InstagramVerification() {
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         alert(data.message || "Verification failed.");
         return;
       }
+      const sessionId = data.data.sessionId;
 
       const code = data.data.code;
 
@@ -45,14 +45,11 @@ export default function InstagramVerification() {
       const businessUsername = "wit_confessions.26";
 
       // Open Instagram DM
-      window.open(
-        `https://ig.me/m/${businessUsername}`,
-        "_blank"
-      );
+      window.open(`https://ig.me/m/${businessUsername}`, "_blank");
 
       // Show instructions
       alert(
-`✅ Verification code copied successfully!
+        `✅ Verification code copied successfully!
 
 Next Steps:
 
@@ -62,8 +59,39 @@ Next Steps:
 4. Send the message.
 5. Come back to this page.
 
-Your account will be verified automatically once we receive the message.`
+Your account will be verified automatically once we receive the message.`,
       );
+      let interval;
+
+      const timeout = setTimeout(
+        () => {
+          clearInterval(interval);
+          alert("Verification timed out. Please try again.");
+        },
+        5 * 60 * 1000,
+      );
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch(
+            `${API}/api/v1/auth/instagram/status/${sessionId}`,
+          );
+
+          const data = await res.json();
+
+          if (data?.data?.status === "verified") {
+            clearInterval(interval);
+            clearTimeout(timeout);
+
+            localStorage.setItem("token", data.data.token);
+
+            window.location.href = "/";
+          }
+        } catch (err) {
+          console.error(err);
+          clearInterval(interval);
+          clearTimeout(timeout);
+        }
+      }, 2000);
     } catch (err) {
       console.error(err);
       alert("Something went wrong. Please try again.");
@@ -85,10 +113,7 @@ Your account will be verified automatically once we receive the message.`
       <br />
       <br />
 
-      <button
-        onClick={verify}
-        disabled={loading}
-      >
+      <button onClick={verify} disabled={loading}>
         {loading ? "Generating..." : "Verify"}
       </button>
     </div>

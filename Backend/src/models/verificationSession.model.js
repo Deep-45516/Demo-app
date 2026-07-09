@@ -35,6 +35,20 @@ const verificationSessionSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    token: {
+    type: String,
+    default: null
+},
+userId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+},
+
+verifiedAt: {
+  type: Date,
+  default: null,
+},
   },
   {
     timestamps: true,
