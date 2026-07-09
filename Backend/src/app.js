@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import instagramRouter from "./routes/instagram.route.js";
+import webhookRouter from "./routes/webhook.route.js";
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use("/api/v1/confessions", confessionRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/healthcheck", healthRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/webhook", webhookRouter);
 
 export default app;

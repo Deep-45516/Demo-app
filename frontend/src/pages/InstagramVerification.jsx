@@ -8,52 +8,68 @@ export default function InstagramVerification() {
 
   const verify = async () => {
     if (!username.trim()) {
-      alert("Enter Instagram username");
+      alert("Please enter your Instagram username.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `${API}/api/v1/auth/instagram/start`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-          }),
+      const res = await fetch(`${API}/api/v1/auth/instagram/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          username: username.trim(),
+        }),
+      });
 
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message);
+        alert(data.message || "Verification failed.");
         return;
       }
 
       const code = data.data.code;
 
-      // TODO: replace with your Professional account username
+      // Copy verification code automatically
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch (err) {
+        console.error("Clipboard Error:", err);
+      }
+
+      // Your Professional Instagram username
       const businessUsername = "wit_confessions.26";
 
-      const message = encodeURIComponent(
-        `ConfessionVault Verification\n\n${code}`,
+      // Open Instagram DM
+      window.open(
+        `https://ig.me/m/${businessUsername}`,
+        "_blank"
       );
 
-      window.open(
-        `https://ig.me/m/${businessUsername}?text=${message}`,
-        "_blank",
+      // Show instructions
+      alert(
+`✅ Verification code copied successfully!
+
+Next Steps:
+
+1. Instagram has been opened.
+2. Open the chat with @${businessUsername}.
+3. Paste the copied verification code.
+4. Send the message.
+5. Come back to this page.
+
+Your account will be verified automatically once we receive the message.`
       );
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -73,9 +89,7 @@ export default function InstagramVerification() {
         onClick={verify}
         disabled={loading}
       >
-        {loading
-          ? "Generating..."
-          : "Verify"}
+        {loading ? "Generating..." : "Verify"}
       </button>
     </div>
   );
