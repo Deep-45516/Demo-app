@@ -77,8 +77,11 @@ export const receiveWebhook = async (req, res) => {
 
     // Find existing user
     let user = await User.findOne({
-      instagramScopedId: profile.id,
-    });
+  $or: [
+    { instagramScopedId: profile.id },
+    { instagramUsername: profile.username.toLowerCase() },
+  ],
+});
 
     // Create user if it doesn't exist
     if (!user) {

@@ -21,7 +21,7 @@ const verificationSessionSchema = new mongoose.Schema(
       enum: ["pending", "verified", "expired"],
       default: "pending",
     },
-
+    //permanent identifier
     instagramScopedId: {
       type: String,
       default: null,
