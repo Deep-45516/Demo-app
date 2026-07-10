@@ -30,9 +30,20 @@ export const receiveWebhook = async (req, res) => {
     }
 
     const text = messaging.message.text.trim();
+    console.log("Received code:", text);
 
     console.log("Message:", text);
+const pendingSessions = await VerificationSession.find({
+  status: "pending",
+});
 
+console.log(
+  "Pending sessions:",
+  pendingSessions.map((s) => ({
+    code: s.code,
+    username: s.enteredUsername,
+  }))
+);
     const session = await VerificationSession.findOne({
       code: text,
       status: "pending",
@@ -86,13 +97,13 @@ export const receiveWebhook = async (req, res) => {
     if (!user) {
       user = await User.create({
         instagramScopedId: profile.id,
-        instagramUsername: profile.username,
+        instagramUsername: profile.username.toLowerCase(),
         instagramName: profile.name,
         instagramVerified: true,
       });
     } else {
       // Update existing user
-      user.instagramUsername = profile.username;
+      user.instagramUsername = profile.username.toLowerCase();
       user.instagramName = profile.name;
       user.instagramVerified = true;
 
