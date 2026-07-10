@@ -6,6 +6,7 @@ import User from "../models/user.model.js";
 import { generateToken } from "./auth.controller.js";
 
 export const startInstagramVerification = asyncHandler(
+  console.log("NEW VERSION RUNNING");
   async (req, res) => {
     const { username } = req.body;
     const enteredUsername = username.trim().toLowerCase();
