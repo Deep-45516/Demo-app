@@ -4,104 +4,95 @@ import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import User from "../models/user.model.js";
 import { generateToken } from "./auth.controller.js";
+/*Receive username->Expire old sessions->Generate code->Create VerificationSession->Return sessionId + code*/
+//this create session & code and send code to frontend user 
+export const startInstagramVerification = asyncHandler(async (req, res) => {
+  console.log("NEW VERSION RUNNING");
+  const { username } = req.body;
+  const enteredUsername = username.trim().toLowerCase();
+  // Expire any existing pending sessions for the same username
+  // this session validate the user 
 
-export const startInstagramVerification = asyncHandler(
-  async (req, res) => {
-    console.log("NEW VERSION RUNNING");
-    const { username } = req.body;
-    const enteredUsername = username.trim().toLowerCase();
-await VerificationSession.updateMany(
+  await VerificationSession.updateMany(
     {
-        enteredUsername,
-        status:"pending"
+      enteredUsername,
+      status: "pending",
     },
     {
-        status:"expired"
-    }
-);
-    const code = generateVerificationCode();
+      status: "expired",
+    },
+  );
+  // Generate a new verification code and create a new session
+  const code = generateVerificationCode();
 
-    const session = await VerificationSession.create({
-      enteredUsername: username.trim().toLowerCase(),
-      code,
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
-    });
+  const session = await VerificationSession.create({
+    enteredUsername: username.trim().toLowerCase(),
+    code,
+    expiresAt: new Date(Date.now() + 15 * 60 * 1000),// 15 minutes from now
+  });
 
-    return res.status(201).json(
-      new ApiResponse(
-        201,
-        {
-          sessionId: session._id,
-          code,
-        },
-        "Verification session created",
-      ),
-    );
-  },
-);
+  return res.status(201).json(
+    new ApiResponse(
+      201,
+      {
+        sessionId: session._id,
+        code,
+      },
+      "Verification session created",
+    ),
+  );
+});
 /*
 This endpoint only checks
-
 Pending?
-
 Verified?
-
 JWT?
-
 No webhook logic here, just checking the status of the verification session and returning it to the frontend. The frontend can then decide what to do next based on the status.
  */
-export const getVerificationStatus =
-asyncHandler(async (req,res)=>{
+//This function is used by frontend polling.
+/*Frontend->GET /status/:sessionId→
+Find VerificationSession→Verified?→
+No → return pending
+→Yes→Find User→Generate JWT→Return Token */
 
-    const { sessionId } = req.params;
+export const getVerificationStatus = asyncHandler(async (req, res) => {
+  const { sessionId } = req.params;
 
-    const session =
-    await VerificationSession.findById(sessionId);
-    if (!session) {
-  return res.status(404).json(
-    new ApiResponse(
-      404,
-      null,
-      "Verification session not found"
-    )
-  );
-}
+  const session = await VerificationSession.findById(sessionId);
+  if (!session) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Verification session not found"));
+  }
 
- if (session.status !== "verified") {
+  if (session.status !== "verified") {
+    return res.json(
+      new ApiResponse(
+        200,
+        {
+          status: session.status,
+        },
+        "Waiting for verification",
+      ),
+    );
+  }
+//find by seesion id which is 
+  const user = await User.findById(session.userId);
+
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, null, "User not found"));
+  }
+
+  const token = generateToken(user);
+
   return res.json(
     new ApiResponse(
       200,
       {
-        status: session.status,
+        status: "verified",
+        token,
       },
-      "Waiting for verification"
-    )
+      "Verification completed",
+    ),
   );
-}
-
-const user = await User.findById(session.userId);
-
-if (!user) {
-  return res.status(404).json(
-    new ApiResponse(
-      404,
-      null,
-      "User not found"
-    )
-  );
-}
-
-const token = generateToken(user);
-
-return res.json(
-  new ApiResponse(
-    200,
-    {
-      status: "verified",
-      token,
-    },
-    "Verification completed"
-  )
-);
-
 });

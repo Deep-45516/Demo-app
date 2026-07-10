@@ -3,8 +3,8 @@ import cors from "cors";
 import instagramRouter from "./routes/instagram.route.js";
 import webhookRouter from "./routes/webhook.route.js";
 
-const app = express();
-app.set("trust proxy", 1);
+const app = express();//creates the Express application instance.
+app.set("trust proxy", 1);//trust request come from render for each ip address can send linmited req per min / sec i.e rate limiting
 
 // middlewares
 app.use(

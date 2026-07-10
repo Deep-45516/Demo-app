@@ -14,6 +14,7 @@ router.get("/", verifyWebhook);
 // Receive Instagram events
 router.post(
   "/",
+  // verifyMetaSignature,
   receiveWebhook
 );
 
