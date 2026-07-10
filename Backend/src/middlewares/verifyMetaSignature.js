@@ -10,6 +10,9 @@ export default function verifyMetaSignature(
   if (!signature) {
     return res.sendStatus(401);
   }
+  console.log("Header Signature:", signature);
+console.log("App Secret Exists:", !!process.env.META_APP_SECRET);
+console.log("Raw Body Exists:", !!req.rawBody);
 
   const expected =
     "sha256=" +
@@ -20,10 +23,12 @@ export default function verifyMetaSignature(
       )
       .update(req.rawBody)
       .digest("hex");
+      console.log("Expected:", expected);
 
   if (signature !== expected) {
+    console.log("❌ Signature mismatch");
     return res.sendStatus(401);
   }
-
+  console.log("✅ Signature verified");
   next();
 }
