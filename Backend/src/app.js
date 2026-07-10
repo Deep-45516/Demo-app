@@ -6,7 +6,13 @@ import webhookRouter from "./routes/webhook.route.js";
 const app = express();
 
 // middlewares
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://sayitfreely.vercel.app"],
@@ -14,7 +20,6 @@ app.use(
   }),
 );
 app.use(express.urlencoded({ extended: true }));
-
 // test route
 app.get("/", (req, res) => {
   res.send("Backend working 🚀");

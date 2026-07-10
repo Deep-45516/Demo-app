@@ -3,6 +3,8 @@ import {
   verifyWebhook,
   receiveWebhook,
 } from "../controllers/webhook.controller.js";
+import verifyMetaSignature from "../middlewares/verifyMetaSignature.js";
+
 
 const router = Router();
 
@@ -10,6 +12,10 @@ const router = Router();
 router.get("/", verifyWebhook);
 
 // Receive Instagram events
-router.post("/", receiveWebhook);
+router.post(
+  "/",
+  verifyMetaSignature,
+  receiveWebhook
+);
 
 export default router;

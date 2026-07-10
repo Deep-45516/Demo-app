@@ -8,7 +8,10 @@ import { generateToken } from "./auth.controller.js";
 export const startInstagramVerification = asyncHandler(
   async (req, res) => {
     const { username } = req.body;
-
+    await VerificationSession.deleteMany({
+  enteredUsername: username.trim().toLowerCase(),
+  status: "pending",
+});
     const code = generateVerificationCode();
 
     const session = await VerificationSession.create({
