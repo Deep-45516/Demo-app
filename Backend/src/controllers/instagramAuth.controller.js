@@ -8,6 +8,7 @@ import { generateToken } from "./auth.controller.js";
 export const startInstagramVerification = asyncHandler(
   async (req, res) => {
     const { username } = req.body;
+    const enteredUsername = username.trim().toLowerCase();
 await VerificationSession.updateMany(
     {
         enteredUsername,
@@ -20,8 +21,8 @@ await VerificationSession.updateMany(
     const code = generateVerificationCode();
 
     const session = await VerificationSession.create({
-      code,
       enteredUsername: username.trim().toLowerCase(),
+      code,
       expiresAt: new Date(Date.now() + 15 * 60 * 1000),
     });
 

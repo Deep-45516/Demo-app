@@ -4,6 +4,7 @@ import instagramRouter from "./routes/instagram.route.js";
 import webhookRouter from "./routes/webhook.route.js";
 
 const app = express();
+app.set("trust proxy", 1);
 
 // middlewares
 app.use(
