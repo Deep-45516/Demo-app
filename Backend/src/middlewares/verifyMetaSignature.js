@@ -13,7 +13,7 @@ export default function verifyMetaSignature(
   console.log("Header Signature:", signature);
 console.log("App Secret Exists:", !!process.env.META_APP_SECRET);
 console.log("Raw Body Exists:", !!req.rawBody);
-
+console.log(process.env.META_APP_SECRET.length);
   const expected =
     "sha256=" +
     crypto
@@ -28,7 +28,6 @@ console.log("Raw Body Exists:", !!req.rawBody);
   if (signature !== expected) {
     console.log("❌ Signature mismatch");
     console.log(req.rawBody.toString("utf8"));
-    console.log(process.env.META_APP_SECRET.length);
     return res.sendStatus(401);
   }
   console.log("✅ Signature verified");
