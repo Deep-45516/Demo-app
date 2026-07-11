@@ -27,6 +27,7 @@ console.log("Raw Body Exists:", !!req.rawBody);
 
   if (signature !== expected) {
     console.log("❌ Signature mismatch");
+    console.log(req.rawBody.toString("utf8"));
     return res.sendStatus(401);
   }
   console.log("✅ Signature verified");
