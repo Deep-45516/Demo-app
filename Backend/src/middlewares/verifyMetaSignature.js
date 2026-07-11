@@ -11,9 +11,10 @@ export default function verifyMetaSignature(req, res, next) {
   console.log("Raw Body Exists:", !!req.rawBody);
   console.log(process.env.META_APP_SECRET.length);
   console.log(
-  "App Secret starts with:",
-  process.env.META_APP_SECRET.slice(0, 6)
-);
+    "App Secret starts with:",
+    process.env.META_APP_SECRET.slice(0, 6),
+  );
+  console.log(req.headers);
   const expected =
     "sha256=" +
     crypto
