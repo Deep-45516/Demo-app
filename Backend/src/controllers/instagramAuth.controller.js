@@ -8,11 +8,11 @@ import { generateToken } from "./auth.controller.js";
 //this create session & code and send code to frontend user 
 export const startInstagramVerification = asyncHandler(async (req, res) => {
   console.log("NEW VERSION RUNNING");
-  const { username } = req.body;
+  const { username } = req.body;//take username from frontend user
   const enteredUsername = username.trim().toLowerCase();
-  // Expire any existing pending sessions for the same username
+  // Expire any existing pending sessions for the same username,This ensures  only one pending session exists for that username at any time.but if user is already verified then it will not create new session and return error message to user that is "already verified" check this code in .if pending session exists then it will expire the old session and create new session for that user.
   // this session validate the user 
-
+//update many will update all the pending sessions (i.e 1 only) for that username to expired status.
   await VerificationSession.updateMany(
     {
       enteredUsername,
@@ -24,7 +24,7 @@ export const startInstagramVerification = asyncHandler(async (req, res) => {
   );
   // Generate a new verification code and create a new session
   const code = generateVerificationCode();
-
+//this will create new session for that user with code and expire time of 15 minutes from now.
   const session = await VerificationSession.create({
     enteredUsername: username.trim().toLowerCase(),
     code,
@@ -43,18 +43,18 @@ export const startInstagramVerification = asyncHandler(async (req, res) => {
   );
 });
 /*
+//This function is used by frontend polling.
+//just checking status of verification session and return it to frontend. Frontend will decide what to do next based on status.
 This endpoint only checks
 Pending?
 Verified?
 JWT?
-No webhook logic here, just checking the status of the verification session and returning it to the frontend. The frontend can then decide what to do next based on the status.
+No webhook logic here
  */
-//This function is used by frontend polling.
 /*Frontend->GET /status/:sessionId→
 Find VerificationSession→Verified?→
 No → return pending
 →Yes→Find User→Generate JWT→Return Token */
-
 export const getVerificationStatus = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
 

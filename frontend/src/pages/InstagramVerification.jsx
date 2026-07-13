@@ -37,14 +37,22 @@ export default function InstagramVerification() {
           }),
         }
       );
-
+//convert json to js object
+/*{
+  statusCode: 201,
+  data: {
+    sessionId: "...",
+    code: "CV-8D4DE2B2"
+  },
+  message: "Verification session created"
+} */
       const data = await res.json();
-
+//check status code is 201 or not 
       if (!res.ok) {
         alert(data.message || "Verification failed.");
         return;
       }
-
+//this is js destructuring,instead of const sessionId = data.data.sessionId; const code = data.data.code;
       const { sessionId, code } = data.data;
       console.log(sessionId);
 
@@ -56,24 +64,18 @@ export default function InstagramVerification() {
       }
 
       const businessUsername = "wit_confessions.26";
+alert(`✅ Code copied!
+  
+Opening Instagram...
 
+Check you're on @${username}, send the code, and come back.`);
       // Open Instagram DM
       window.open(
         `https://ig.me/m/${businessUsername}`,
         "_blank"
       );
 
-      alert(`✅ Verification code copied!
-
-Next Steps:
-
-1. Instagram has been opened.
-2. Open the chat with @${businessUsername}.
-3. Paste the copied verification code.
-4. Send the message.
-5. Return to this page.
-
-Verification will happen automatically.`);
+      
 
       // Stop after 5 minutes
       timeoutRef.current = setTimeout(() => {
