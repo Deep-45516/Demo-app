@@ -66,10 +66,15 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    college: {
+      type: String,
+      default: "WIT_SOLAPUR",
+      index: true,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export default mongoose.model("User", userSchema);

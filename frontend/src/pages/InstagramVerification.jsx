@@ -106,6 +106,14 @@ We are waiting for you...`);
             alert(data.message || "Verification failed.");
             return;
           }
+          if (data.data.status === "username_mismatch") {
+  clearInterval(intervalRef.current);
+  clearTimeout(timeoutRef.current);
+
+  alert(data.data.error);
+
+  return;
+}
 
           if (data.data.status === "verified") {
             clearInterval(intervalRef.current);
@@ -118,7 +126,7 @@ We are waiting for you...`);
 
             alert("Instagram verified successfully!");
 
-            window.location.href = "/anonymous";
+            window.location.replace() = "/anonymous";
             // window.location.reload();//reload the page to reflect the new authentication state
           }
         } catch (err) {

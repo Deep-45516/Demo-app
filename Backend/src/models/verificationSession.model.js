@@ -18,8 +18,12 @@ const verificationSessionSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["pending", "verified", "expired"],
+      enum: ["pending", "verified", "expired", "username_mismatch"],
       default: "pending",
+    },
+    lastError: {
+      type: String,
+      default: null,
     },
     //permanent identifier
     instagramScopedId: {
@@ -36,14 +40,14 @@ const verificationSessionSchema = new mongoose.Schema(
       default: null,
     },
     token: {
-    type: String,
-    default: null
-},
-userId: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User",
-  default: null,
-},
+      type: String,
+      default: null,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   },
   {
     timestamps: true,

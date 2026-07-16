@@ -84,14 +84,21 @@ export const receiveWebhook = async (req, res) => {
     }
     // Verify the entered username matches the sender's Instagram account
     if (
-      session.enteredUsername.toLowerCase() !== profile.username.toLowerCase()
-    ) {
-      console.log(
-        `Username mismatch. Entered: ${session.enteredUsername}, Actual: ${profile.username}`,
-      );
+  session.enteredUsername.toLowerCase() !== profile.username.toLowerCase()
+) {
+  console.log(
+    `Username mismatch. Entered: ${session.enteredUsername}, Actual: ${profile.username}`,
+  );
 
-      return res.sendStatus(200);
-    }
+  session.status = "username_mismatch";
+
+  session.lastError =
+    `You entered @${session.enteredUsername} but sent the verification code from @${profile.username}.`;
+
+  await session.save();
+
+  return res.sendStatus(200);
+}
 
     // Find existing user
     let user = await User.findOne({
