@@ -22,6 +22,7 @@ Opening Instagram...</h2>
         <li>Send it.</li>
       </ol>
       <button onClick={onCopy}>Copy Again</button>{" "}
+      <p>Instagram opens in {countdown}...</p>
       <button onClick={onOpenInstagram}>Open Instagram</button>{" "}
       {/* <button onClick={onSent}>I've sent the message</button> */}
     </div>

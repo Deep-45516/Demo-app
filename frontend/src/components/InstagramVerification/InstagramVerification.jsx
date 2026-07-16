@@ -183,8 +183,19 @@ export default function InstagramVerification() {
       }
 //open DM
       // openInstagram();
-
+const [countdown, setCountdown] = useState(5);
       setStep("instructions");
+      setCountdown(5);
+
+const countdownInterval = setInterval(() => {
+  setCountdown((prev) => {
+    if (prev <= 1) {
+      clearInterval(countdownInterval);
+      return 0;
+    }
+    return prev - 1;
+  });
+}, 1000);
       // Give React time to render the instructions
 setTimeout(() => {
   openInstagram();
@@ -192,7 +203,7 @@ setTimeout(() => {
   setStep("waiting");
 
   startPolling();
-}, 800);
+}, 5000);
     } catch (err) {
       console.error(err);
 
@@ -219,6 +230,7 @@ setTimeout(() => {
           code={code}
           onCopy={copyCode}
           onOpenInstagram={openInstagram}
+          countdown={countdown}
           // onSent={startPolling}
         />
       )}
