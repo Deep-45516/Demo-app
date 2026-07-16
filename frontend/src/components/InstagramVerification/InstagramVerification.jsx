@@ -98,8 +98,6 @@ export default function InstagramVerification() {
           }
 
           setAnonymousName(meData.data.anonymousProfile.anonymousName);
-          setAnonymousName(meData.data.anonymousProfile.anonymousName);
-
           setStep("verified");
         }
       } catch (err) {
@@ -190,9 +188,6 @@ export default function InstagramVerification() {
       // Give React time to render the instructions
       setTimeout(() => {
         openInstagram();
-
-        setStep("waiting");
-
         startPolling(sessionId);
       }, 5000);
     } catch (err) {
