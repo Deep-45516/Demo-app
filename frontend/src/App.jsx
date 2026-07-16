@@ -11,7 +11,6 @@ function App() {
 
       <Route path="/admin" element={<Admin />} />
       <Route path="/instagram" element={<InstagramVerification />} />
-      <Route path="/anonymous" element={<AnonymousIdentity />} />
     </Routes>
   );
 }
