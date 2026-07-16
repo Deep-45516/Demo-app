@@ -5,7 +5,12 @@ const API = import.meta.env.VITE_BACKEND_URL;
 export default function InstagramVerification() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
-
+//useRef is used to store mutable values that do not cause a re-render when updated, it save values that we want to use later.
+// setInterval() runs the same code again and again after a fixed time.
+// Here, it checks the verification status every 2 seconds.
+// setTimeout() runs the code only once after a fixed time.
+// Here, it stops the verification process after 5 minutes.
+// We store their IDs in useRef so we can stop them later using clearInterval() and clearTimeout().
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
 
@@ -64,18 +69,17 @@ export default function InstagramVerification() {
       }
 
       const businessUsername = "wit_confessions.26";
-alert(`✅ Code copied!
-  
+alert(`${code}✅ Code copied!
+
 Opening Instagram...
 
-Check you're on @${username}, send the code, and come back.`);
+Check you're on @${username}, send the code, and come back. 
+We are waiting for you...`);
       // Open Instagram DM
       window.open(
         `https://ig.me/m/${businessUsername}`,
         "_blank"
-      );
-
-      
+      );//blank means open in new tab & self means open in same tab
 
       // Stop after 5 minutes
       timeoutRef.current = setTimeout(() => {
@@ -114,7 +118,8 @@ Check you're on @${username}, send the code, and come back.`);
 
             alert("Instagram verified successfully!");
 
-            window.location.reload();
+            window.location.href = "/anonymous";
+            // window.location.reload();//reload the page to reflect the new authentication state
           }
         } catch (err) {
           console.error(err);

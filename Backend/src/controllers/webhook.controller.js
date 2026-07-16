@@ -1,5 +1,6 @@
 import VerificationSession from "../models/verificationSession.model.js";
 import User from "../models/user.model.js";
+import { createAnonymousProfile } from "../services/anonymousProfile.service.js";
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
 // Verify webhook during Meta setup
@@ -17,9 +18,10 @@ export const verifyWebhook = (req, res) => {
   return res.sendStatus(403);
 };
 
-// Receive Instagram messages
+// already Receive Instagram messages and now we can trust the webhook sender that it is come from meta
 export const receiveWebhook = async (req, res) => {
   try {
+    //console
     console.log(JSON.stringify(req.body, null, 2));
 
     const entry = req.body.entry?.[0];
@@ -33,17 +35,17 @@ export const receiveWebhook = async (req, res) => {
     console.log("Received code:", text);
 
     console.log("Message:", text);
-const pendingSessions = await VerificationSession.find({
-  status: "pending",
-});
+    const pendingSessions = await VerificationSession.find({
+      status: "pending",
+    });
 
-console.log(
-  "Pending sessions:",
-  pendingSessions.map((s) => ({
-    code: s.code,
-    username: s.enteredUsername,
-  }))
-);
+    console.log(
+      "Pending sessions:",
+      pendingSessions.map((s) => ({
+        code: s.code,
+        username: s.enteredUsername,
+      })),
+    );
     const session = await VerificationSession.findOne({
       code: text,
       status: "pending",
@@ -65,6 +67,12 @@ console.log(
     const response = await fetch(
       `https://graph.instagram.com/${senderId}?fields=id,username,name&access_token=${process.env.INSTAGRAM_ACCESS_TOKEN_LOGIN}`,
     );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Instagram Graph API error:", response.status, errorText);
+      return res.sendStatus(200);
+    }
 
     const profile = await response.json();
 
@@ -109,6 +117,12 @@ console.log(
 
       await user.save();
     }
+    //give anonomous identity attch to that user_.id, anonomous identity also has its own id
+    const anonymousProfile = await createAnonymousProfile(user._id);
+
+console.log(
+  `Anonymous profile created: ${anonymousProfile.anonymousName}`
+);
 
     // Mark verification session as completed
     session.userId = user._id;

@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-errors.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { OAuth2Client } from "google-auth-library";
+import AnonymousProfile from "../models/anonymousProfile.model.js";
 // import { sendEmail } from "../utils/sendEmail.js";
 
 //client is a Google authentication helper for my app tocheck google login credentials
@@ -300,9 +301,21 @@ So getMe() means:
 "Tell me who is currently logged in."
 */
 const getMe = asyncHandler(async (req, res) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, "User fetched successfully"));
+  const anonymousProfile = await AnonymousProfile.findOne({
+    userId: req.user._id,
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        user: req.user,
+        anonymousProfile,
+        onboardingCompleted: !!anonymousProfile,
+      },
+      "User fetched successfully"
+    )
+  );
 });
 
 export {
