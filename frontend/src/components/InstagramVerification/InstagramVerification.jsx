@@ -25,6 +25,7 @@ export default function InstagramVerification() {
 
   const [error, setError] = useState("");
   const [anonymousName, setAnonymousName] = useState("");
+  const [countdown, setCountdown] = useState(5);
 
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -37,10 +38,7 @@ export default function InstagramVerification() {
   }, []);
 
   const openInstagram = () => {
-    window.open(
-      `https://ig.me/m/${BUSINESS_USERNAME}`,
-      "_blank"
-    );
+    window.open(`https://ig.me/m/${BUSINESS_USERNAME}`, "_blank");
   };
 
   const copyCode = async () => {
@@ -57,7 +55,7 @@ export default function InstagramVerification() {
     intervalRef.current = setInterval(async () => {
       try {
         const res = await fetch(
-          `${API}/api/v1/auth/instagram/status/${sessionId}`
+          `${API}/api/v1/auth/instagram/status/${sessionId}`,
         );
 
         const data = await res.json();
@@ -84,25 +82,17 @@ export default function InstagramVerification() {
           clearInterval(intervalRef.current);
           clearTimeout(timeoutRef.current);
 
-          localStorage.setItem(
-            "token",
-            data.data.token
-          );
+          localStorage.setItem("token", data.data.token);
 
-          const meRes = await fetch(
-            `${API}/api/v1/auth/me`,
-            {
-              headers: {
-                Authorization: `Bearer ${data.data.token}`,
-              },
-            }
-          );
+          const meRes = await fetch(`${API}/api/v1/auth/me`, {
+            headers: {
+              Authorization: `Bearer ${data.data.token}`,
+            },
+          });
 
           const meData = await meRes.json();
 
-          setAnonymousName(
-            meData.data.anonymousProfile.anonymousName
-          );
+          setAnonymousName(meData.data.anonymousProfile.anonymousName);
 
           setStep("verified");
         }
@@ -112,23 +102,24 @@ export default function InstagramVerification() {
         clearInterval(intervalRef.current);
         clearTimeout(timeoutRef.current);
 
-        setError(
-          "Unable to contact the server. Please try again."
-        );
+        setError("Unable to contact the server. Please try again.");
 
         setStep("error");
       }
     }, 2000);
 
-    timeoutRef.current = setTimeout(() => {
-      clearInterval(intervalRef.current);
+    timeoutRef.current = setTimeout(
+      () => {
+        clearInterval(intervalRef.current);
 
-      setError(
-        "Verification expired. Please generate a new verification code."
-      );
+        setError(
+          "Verification expired. Please generate a new verification code.",
+        );
 
-      setStep("error");
-    }, 5 * 60 * 1000);
+        setStep("error");
+      },
+      5 * 60 * 1000,
+    );
   };
 
   const verify = async () => {
@@ -140,20 +131,17 @@ export default function InstagramVerification() {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `${API}/api/v1/auth/instagram/start`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: username.trim(),
-          }),
-        }
-      );
-//convert json to js object
-/*{
+      const res = await fetch(`${API}/api/v1/auth/instagram/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+        }),
+      });
+      //convert json to js object
+      /*{
   statusCode: 201,
   data: {
     sessionId: "...",
@@ -162,48 +150,45 @@ export default function InstagramVerification() {
   message: "Verification session created"
 } */
       const data = await res.json();
-//check status code is 201 or not 
+      //check status code is 201 or not
       if (!res.ok) {
         alert(data.message || "Verification failed.");
         return;
       }
-//this is js destructuring,instead of const sessionId = data.data.sessionId; const code = data.data.code;
-      const {
-        sessionId,
-        code,
-      } = data.data;
+      //this is js destructuring,instead of const sessionId = data.data.sessionId; const code = data.data.code;
+      const { sessionId, code } = data.data;
 
       setSessionId(sessionId);
       setCode(code);
-// Copy verification code
+      // Copy verification code
       try {
         await navigator.clipboard.writeText(code);
       } catch (err) {
         console.error(err);
       }
-//open DM
+      //open DM
       // openInstagram();
-const [countdown, setCountdown] = useState(5);
+      
       setStep("instructions");
       setCountdown(5);
 
-const countdownInterval = setInterval(() => {
-  setCountdown((prev) => {
-    if (prev <= 1) {
-      clearInterval(countdownInterval);
-      return 0;
-    }
-    return prev - 1;
-  });
-}, 1000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
       // Give React time to render the instructions
-setTimeout(() => {
-  openInstagram();
+      setTimeout(() => {
+        openInstagram();
 
-  setStep("waiting");
+        setStep("waiting");
 
-  startPolling();
-}, 5000);
+        startPolling();
+      }, 5000);
     } catch (err) {
       console.error(err);
 
@@ -235,9 +220,7 @@ setTimeout(() => {
         />
       )}
 
-      {step === "waiting" && (
-        <VerificationWaiting />
-      )}
+      {step === "waiting" && <VerificationWaiting />}
 
       {step === "error" && (
         <VerificationError
@@ -249,9 +232,7 @@ setTimeout(() => {
       {step === "verified" && (
         <VerificationSuccess
           anonymousName={anonymousName}
-          onContinue={() =>
-            window.location.replace("/")
-          }
+          onContinue={() => window.location.replace("/")}
         />
       )}
     </div>

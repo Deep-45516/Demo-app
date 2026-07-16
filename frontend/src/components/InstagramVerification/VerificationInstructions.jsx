@@ -6,11 +6,10 @@ export default function VerificationInstructions({
 }) {
   return (
     <div>
-      <h2>Almost there 🎉
-
-We've copied your verification code.
-
-Opening Instagram...</h2>
+      <h2>
+        Almost there 🎉 We've copied your verification code. Opening
+        Instagram...
+      </h2>
       <h1>{code}</h1>
       <p>✅ Copied to your clipboard.</p>
       <p>Make sure you're logged into</p>
