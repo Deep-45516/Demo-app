@@ -3,11 +3,14 @@ export default function VerificationInstructions({
   code,
   onCopy,
   onOpenInstagram,
-  onSent,
 }) {
   return (
     <div>
-      <h2>Verification Code</h2>
+      <h2>Almost there 🎉
+
+We've copied your verification code.
+
+Opening Instagram...</h2>
       <h1>{code}</h1>
       <p>✅ Copied to your clipboard.</p>
       <p>Make sure you're logged into</p>
@@ -20,7 +23,7 @@ export default function VerificationInstructions({
       </ol>
       <button onClick={onCopy}>Copy Again</button>{" "}
       <button onClick={onOpenInstagram}>Open Instagram</button>{" "}
-      <button onClick={onSent}>I've sent the message</button>
+      {/* <button onClick={onSent}>I've sent the message</button> */}
     </div>
   );
 }

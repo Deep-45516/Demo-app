@@ -182,9 +182,17 @@ export default function InstagramVerification() {
         console.error(err);
       }
 //open DM
-      openInstagram();
+      // openInstagram();
 
       setStep("instructions");
+      // Give React time to render the instructions
+setTimeout(() => {
+  openInstagram();
+
+  setStep("waiting");
+
+  startPolling();
+}, 800);
     } catch (err) {
       console.error(err);
 
@@ -211,7 +219,7 @@ export default function InstagramVerification() {
           code={code}
           onCopy={copyCode}
           onOpenInstagram={openInstagram}
-          onSent={startPolling}
+          // onSent={startPolling}
         />
       )}
 
