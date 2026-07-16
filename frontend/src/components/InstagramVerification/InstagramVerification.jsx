@@ -91,7 +91,13 @@ export default function InstagramVerification() {
           });
 
           const meData = await meRes.json();
+          if (!meData.data.anonymousProfile) {
+            setError("Unable to load anonymous profile.");
+            setStep("error");
+            return;
+          }
 
+          setAnonymousName(meData.data.anonymousProfile.anonymousName);
           setAnonymousName(meData.data.anonymousProfile.anonymousName);
 
           setStep("verified");
@@ -168,7 +174,7 @@ export default function InstagramVerification() {
       }
       //open DM
       // openInstagram();
-      
+
       setStep("instructions");
       setCountdown(5);
 
