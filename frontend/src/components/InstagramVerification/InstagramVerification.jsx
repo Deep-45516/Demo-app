@@ -49,7 +49,7 @@ export default function InstagramVerification() {
     }
   };
 
-  const startPolling = () => {
+  const startPolling = (sessionId) => {
     setStep("waiting");
 
     intervalRef.current = setInterval(async () => {
@@ -193,7 +193,7 @@ export default function InstagramVerification() {
 
         setStep("waiting");
 
-        startPolling();
+        startPolling(sessionId);
       }, 5000);
     } catch (err) {
       console.error(err);
