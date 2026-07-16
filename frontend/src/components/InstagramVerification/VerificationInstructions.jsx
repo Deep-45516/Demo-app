@@ -3,6 +3,7 @@ export default function VerificationInstructions({
   code,
   onCopy,
   onOpenInstagram,
+  countdown,
 }) {
   return (
     <div>
