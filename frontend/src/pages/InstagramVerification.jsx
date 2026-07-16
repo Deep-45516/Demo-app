@@ -126,7 +126,7 @@ We are waiting for you...`);
 
             alert("Instagram verified successfully!");
 
-            window.location.replace() = "/anonymous";
+            window.location.replace("/anonymous");
             // window.location.reload();//reload the page to reflect the new authentication state
           }
         } catch (err) {
