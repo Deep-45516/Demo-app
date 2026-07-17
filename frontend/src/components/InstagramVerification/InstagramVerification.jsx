@@ -26,6 +26,7 @@ export default function InstagramVerification() {
   const [error, setError] = useState("");
   const [anonymousName, setAnonymousName] = useState("");
   const [countdown, setCountdown] = useState(5);
+  const countdownRef = useRef(null);
 
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -33,6 +34,7 @@ export default function InstagramVerification() {
   useEffect(() => {
     return () => {
       clearInterval(intervalRef.current);
+      clearInterval(countdownRef.current);
       clearTimeout(timeoutRef.current);
     };
   }, []);
@@ -176,10 +178,10 @@ export default function InstagramVerification() {
       setStep("instructions");
       setCountdown(5);
 
-      const countdownInterval = setInterval(() => {
+      countdownRef.current = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
-            clearInterval(countdownInterval);
+            clearInterval(countdownRef.current);
             return 0;
           }
           return prev - 1;

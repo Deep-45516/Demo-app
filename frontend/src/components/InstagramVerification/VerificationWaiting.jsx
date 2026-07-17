@@ -3,13 +3,9 @@ export default function VerificationWaiting() {
     <div>
       <h2>Waiting for Verification...</h2>
 
-      <p>
-        We are waiting for your Instagram message.
-      </p>
+      <p>We are waiting for your Instagram message.</p>
 
-      <p>
-        Don't close this page.
-      </p>
+      <p>Don't close this page.</p>
     </div>
   );
 }
