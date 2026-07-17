@@ -301,25 +301,23 @@ So getMe() means:
 "Tell me who is currently logged in."
 */
 const getMe = asyncHandler(async (req, res) => {
-  console.log(req.user);
-console.log(req.user.id);
-console.log(req.user._id);
-  const anonymousProfile = await AnonymousProfile.findOne({
-    userId: req.user._id,
-  });
-  console.log("anonymousProfile =", anonymousProfile);
+  const user = await User.findById(req.user.id);
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        user: req.user,
-        anonymousProfile,
-        onboardingCompleted: !!anonymousProfile,
-      },
-      "User fetched successfully"
-    )
-  );
+const anonymousProfile = await AnonymousProfile.findOne({
+  userId: user._id,
+});
+
+return res.status(200).json(
+  new ApiResponse(
+    200,
+    {
+      user,
+      anonymousProfile,
+      onboardingCompleted: !!anonymousProfile,
+    },
+    "User fetched successfully"
+  )
+);
 });
 
 export {

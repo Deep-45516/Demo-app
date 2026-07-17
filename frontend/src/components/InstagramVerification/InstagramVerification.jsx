@@ -91,14 +91,16 @@ export default function InstagramVerification() {
           clearTimeout(timeoutRef.current);
 
           localStorage.setItem("token", data.data.token);
-
+console.log("Verification response:", data);
+console.log("Token:", data.data.token);
           const meRes = await fetch(`${API}/api/v1/auth/me`, {
             headers: {
               Authorization: `Bearer ${data.data.token}`,
             },
           });
-
+console.log("Status:", meRes.status);
           const meData = await meRes.json();
+          console.log("Response:", meData);
           if (!meData.data.anonymousProfile) {
             setError("Unable to load anonymous profile.");
             setStep("error");
