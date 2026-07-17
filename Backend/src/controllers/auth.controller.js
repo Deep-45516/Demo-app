@@ -307,6 +307,7 @@ console.log(req.user._id);
   const anonymousProfile = await AnonymousProfile.findOne({
     userId: req.user._id,
   });
+  console.log("anonymousProfile =", anonymousProfile);
 
   return res.status(200).json(
     new ApiResponse(
