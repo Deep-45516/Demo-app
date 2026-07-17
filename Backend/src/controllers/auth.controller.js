@@ -301,6 +301,9 @@ So getMe() means:
 "Tell me who is currently logged in."
 */
 const getMe = asyncHandler(async (req, res) => {
+  console.log(req.user);
+console.log(req.user.id);
+console.log(req.user._id);
   const anonymousProfile = await AnonymousProfile.findOne({
     userId: req.user._id,
   });
