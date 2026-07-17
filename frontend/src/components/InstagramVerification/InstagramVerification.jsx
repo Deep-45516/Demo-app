@@ -40,8 +40,14 @@ export default function InstagramVerification() {
   }, []);
 
   const openInstagram = () => {
-    window.open(`https://ig.me/m/${BUSINESS_USERNAME}`, "_blank");
-  };
+  // Try opening the Instagram app
+  window.location.href = `instagram://user?username=${BUSINESS_USERNAME}`;
+
+  // Fallback to web after a short delay
+  setTimeout(() => {
+    window.location.href = `https://ig.me/m/${BUSINESS_USERNAME}`;
+  }, 1200);
+};
 
   const copyCode = async () => {
     try {
