@@ -10,17 +10,22 @@ export const createAnonymousProfile = async (userId) => {
   }
 
   let anonymousName;
-  let nameExists = true;
+  let nameExists = true;//true becuz below loop should run atleast once
+  /*Generate name
+↓
+Already taken?
+Yes → Generate another
+No → Stop */
 
   // Retry until we find a unique name
   while (nameExists) {
     anonymousName = generateAnonymousName();
-
+//just like .findOne but exists only check if doc is exists(more efficient here)
     nameExists = await AnonymousProfile.exists({
       anonymousName,
     });
   }
-
+//creates AnonymousProfile with that userId,anonymous name,other feild as default
   const profile = await AnonymousProfile.create({
     userId,
     anonymousName,

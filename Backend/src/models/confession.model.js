@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 const confessionSchema = new mongoose.Schema(
   {
     user: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User",
-  required: true
-},
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     to: {
       type: String,
       default: "Someone",
@@ -17,6 +17,49 @@ const confessionSchema = new mongoose.Schema(
       default: "Unknown",
       trim: true,
     },
+    senderUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    senderAnonymousProfile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AnonymousProfile",
+      required: true,
+    },
+
+    recipientUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    //to display
+    recipientInstagramUsername: {
+      type: String,
+      required: true,
+    },
+    //to display
+    senderAnonymousName: {
+      type: String,
+      required: true,
+    },
+    deliveryStatus: {
+      type: String,
+      enum: ["sent", "seen"],
+      default: "sent",
+    },
+    recipientAction: {
+      type: String,
+      enum: ["pending", "curious", "not_interested"],
+      default: "pending",
+    },
+    visibility: {
+      type: String,
+      enum: ["private", "anonymous", "public"],
+      default: "private",
+    },
+
     message: {
       type: String,
       required: true,
@@ -55,9 +98,9 @@ const confessionSchema = new mongoose.Schema(
       default: null,
     },
     postError: {
-  type: String,
-  default: null
-}
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true },
 );

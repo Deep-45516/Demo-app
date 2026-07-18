@@ -8,12 +8,14 @@ import{ postConfessionToInstagram } from "../utils/postConfessionToInstagram.js"
 import { verifyAdmin, verifyToken } from "../middlewares/auth.middleware.js";
 import { sendAdminNotification } from
 "../utils/sendAdminNotification.js";
+import User from "../models/user.model.js";
+import AnonymousProfile from "../models/anonymousProfile.model.js";
 const router = Router();
 
 // CREATE CONFESSION
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { to, from, message } = req.body;;//basic take input from browser
+    const { recipientUsername, message } = req.body;;//basic take input from browser
     console.log(req.body);
      // 🔥 generate image
    
@@ -22,13 +24,38 @@ router.post("/", verifyToken, async (req, res) => {
    {
       throw new ApiError(400, "Message is required");
     }
+    const sender = await User.findById(req.user.id);
+
+if (!sender) {
+  throw new ApiError(404, "User not found");
+}
+
+const senderAnonymous = await AnonymousProfile.findOne({
+  userId: sender._id,
+});
+
+if (!senderAnonymous) {
+  throw new ApiError(400, "Complete onboarding first.");
+}
+
+const recipient = await User.findOne({
+  instagramUsername: recipientUsername.toLowerCase(),
+});
+
+if (!recipient) {
+  throw new ApiError(404, "Instagram user not found.");
+}
+
+if (recipient._id.equals(sender._id)) {
+  throw new ApiError(400, "You can't confess to yourself.");
+}
     // 1. generate image locally
     // 🔴 NEVER TRUST FRONTEND imageUrl so creat from backend
     //Hey backend, create image using this data 
-  const imagePaths = await generateImages({
-  to,
-  from,
-  message
+const imagePaths = await generateImages({
+  to: recipient.instagramUsername,
+  from: senderAnonymous.anonymousName,
+  message,
 });
 
   // 2. upload to firebase
@@ -46,15 +73,17 @@ router.post("/", verifyToken, async (req, res) => {
 
   // 3. save in DB
 const confession = await Confession.create({
-  to,
-  from,
+  senderUser: sender._id,
+  senderAnonymousProfile: senderAnonymous._id,
+  senderAnonymousName: senderAnonymous.anonymousName,
+  recipientUser: recipient._id,
+  recipientInstagramUsername: recipient.instagramUsername,
   message,
-  user: req.user.id,
-  imageUrls
+  imageUrls,
 });
   await sendAdminNotification({
   title: "New confession request",
-  body: `${confession.to || "Someone"} sent a confession`
+  body: `${confession.recipientInstagramUsername} received a confession`
 });
 
     // SUCCESS RESPONSE
