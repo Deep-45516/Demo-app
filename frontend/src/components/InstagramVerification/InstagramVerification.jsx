@@ -86,30 +86,38 @@ export default function InstagramVerification() {
           return;
         }
 
-        if (data.data.status === "verified") {
-          clearInterval(intervalRef.current);
-          clearTimeout(timeoutRef.current);
+if (data.data.status === "verified") {
+  clearInterval(intervalRef.current);
+  clearTimeout(timeoutRef.current);
 
-          localStorage.setItem("token", data.data.token);
-console.log("Verification response:", data);
-console.log("Token:", data.data.token);
-          const meRes = await fetch(`${API}/api/v1/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${data.data.token}`,
-            },
-          });
-console.log("Status:", meRes.status);
-          const meData = await meRes.json();
-          console.log("Response:", meData);
-          if (!meData.data.anonymousProfile) {
-            setError("Unable to load anonymous profile.");
-            setStep("error");
-            return;
-          }
+  localStorage.setItem("token", data.data.token);
 
-          setAnonymousName(meData.data.anonymousProfile.anonymousName);
-          setStep("verified");
-        }
+  const meRes = await fetch(`${API}/api/v1/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${data.data.token}`,
+    },
+  });
+
+  const meData = await meRes.json();
+
+  if (!meRes.ok) {
+    setError("Unable to load user.");
+    setStep("error");
+    return;
+  }
+
+  // ⭐ Save BOTH user and token
+  localStorage.setItem("user", JSON.stringify(meData.data.user));
+
+  if (!meData.data.anonymousProfile) {
+    setError("Unable to load anonymous profile.");
+    setStep("error");
+    return;
+  }
+
+  setAnonymousName(meData.data.anonymousProfile.anonymousName);
+  setStep("verified");
+}
       } catch (err) {
         console.error(err);
 
