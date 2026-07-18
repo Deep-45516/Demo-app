@@ -111,7 +111,7 @@ and the user's information.
 
         <button
           onClick={() => {
-            submitConfession(recipientUsername, message);
+            submitConfession(to, message);
           }}
         >
           Submit Confession

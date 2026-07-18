@@ -24,6 +24,12 @@ router.post("/", verifyToken, async (req, res) => {
    {
       throw new ApiError(400, "Message is required");
     }
+    if (
+  typeof recipientUsername !== "string" ||
+  recipientUsername.trim() === ""
+) {
+  throw new ApiError(400, "Recipient username is required.");
+}
     const sender = await User.findById(req.user.id);
     console.log("JWT User ID:", req.user.id);
 console.log("Sender:", sender);
@@ -41,7 +47,7 @@ if (!senderAnonymous) {
 }
 
 const recipient = await User.findOne({
-  instagramUsername: recipientUsername.toLowerCase(),
+  instagramUsername: recipientUsername.trim().toLowerCase(),
 });
 
 if (!recipient) {

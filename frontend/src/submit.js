@@ -4,11 +4,10 @@ export async function submitConfession(
   recipientUsername,
   message
 ) {
-  console.log({
-    to,
-    from,
-    message
-  });
+console.log({
+  recipientUsername,
+  message,
+});
   const token = localStorage.getItem("token");
 
   try {
