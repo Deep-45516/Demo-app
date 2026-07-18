@@ -25,6 +25,8 @@ router.post("/", verifyToken, async (req, res) => {
       throw new ApiError(400, "Message is required");
     }
     const sender = await User.findById(req.user.id);
+    console.log("JWT User ID:", req.user.id);
+console.log("Sender:", sender);
 
 if (!sender) {
   throw new ApiError(404, "User not found");
@@ -33,7 +35,7 @@ if (!sender) {
 const senderAnonymous = await AnonymousProfile.findOne({
   userId: sender._id,
 });
-
+console.log("Anonymous Profile:", senderAnonymous);
 if (!senderAnonymous) {
   throw new ApiError(400, "Complete onboarding first.");
 }
