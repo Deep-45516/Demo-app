@@ -1,8 +1,7 @@
 const API = import.meta.env.VITE_BACKEND_URL;
 
 export async function submitConfession(
-  to,
-  from,
+  recipientUsername,
   message
 ) {
   console.log({
@@ -19,11 +18,10 @@ export async function submitConfession(
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   },
-  body: JSON.stringify({
-    to,
-    from,
-    message,
-  }),
+body: JSON.stringify({
+  recipientUsername,
+  message,
+}),
 });
 
     const data = await res.json();
