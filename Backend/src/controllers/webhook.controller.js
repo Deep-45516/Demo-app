@@ -125,7 +125,13 @@ export const receiveWebhook = async (req, res) => {
       await user.save();
     }
     //give anonomous identity attch to that user_.id, anonomous identity also has its own id
-    const anonymousProfile = await createAnonymousProfile(user._id);
+    let anonymousProfile = await AnonymousProfile.findOne({
+  userId: user._id,
+});
+
+if (!anonymousProfile) {
+  anonymousProfile = await createAnonymousProfile(user._id);
+}
 
 console.log(
   `Anonymous profile created: ${anonymousProfile.anonymousName}`

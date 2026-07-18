@@ -2,21 +2,6 @@ import mongoose from "mongoose";
 
 const confessionSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    to: {
-      type: String,
-      default: "Someone",
-      trim: true,
-    },
-    from: {
-      type: String,
-      default: "Unknown",
-      trim: true,
-    },
     senderUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
