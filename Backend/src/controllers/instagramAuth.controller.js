@@ -16,12 +16,13 @@ export const startInstagramVerification = asyncHandler(async (req, res) => {
 });
 
 if (existingUser) {
-  return res.status(409).json(
-    new ApiResponse(
-      409,
-      null,
-      "This Instagram account is already verified."
-    )
+  const token = generateToken(existingUser);
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      alreadyVerified: true,
+      token,
+    }, "Already verified")
   );
 }
   // Expire any existing pending sessions for the same username,This ensures  only one pending session exists for that username at any time.but if user is already verified then it will not create new session and return error message to user that is "already verified" check this code in .if pending session exists then it will expire the old session and create new session for that user.

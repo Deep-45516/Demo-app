@@ -85,6 +85,21 @@ export default function InstagramVerification() {
           setStep("error");
           return;
         }
+        if (data.data?.alreadyVerified) {
+  localStorage.setItem("token", data.data.token);
+
+  const meRes = await fetch(`${API}/api/v1/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${data.data.token}`,
+    },
+  });
+
+  const meData = await meRes.json();
+  localStorage.setItem("user", JSON.stringify(meData.data.user));
+
+  window.location.replace("/");
+  return;
+}
 
 if (data.data.status === "verified") {
   clearInterval(intervalRef.current);

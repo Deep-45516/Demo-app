@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const confessionSchema = new mongoose.Schema(
   {
+    // ==========================
+    // Sender
+    // ==========================
     senderUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -14,45 +17,72 @@ const confessionSchema = new mongoose.Schema(
       required: true,
     },
 
+    senderAnonymousName: {
+      type: String,
+      required: true,
+    },
+
+    // ==========================
+    // Recipient
+    // ==========================
     recipientUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    //to display
+
     recipientInstagramUsername: {
       type: String,
       required: true,
     },
-    //to display
-    senderAnonymousName: {
+
+    // ==========================
+    // Confession Content
+    // ==========================
+    message: {
       type: String,
       required: true,
+      trim: true,
     },
+
+    imageUrls: {
+      type: [String],
+      default: [],
+    },
+
+    caption: {
+      type: String,
+      default: "Here is our next confession 👀",
+    },
+
+    // ==========================
+    // Recipient Interaction
+    // ==========================
     deliveryStatus: {
       type: String,
       enum: ["sent", "seen"],
       default: "sent",
     },
+
     recipientAction: {
       type: String,
       enum: ["pending", "curious", "not_interested"],
       default: "pending",
     },
+
     visibility: {
       type: String,
       enum: ["private", "anonymous", "public"],
       default: "private",
     },
 
-    message: {
+    // ==========================
+    // Admin Moderation
+    // ==========================
+    status: {
       type: String,
-      required: true,
-      trim: true,
-    },
-    imageUrls: {
-      type: [String],
-      default: [],
+      enum: ["pending", "approved", "rejected", "posted"],
+      default: "pending",
     },
 
     approvedAt: {
@@ -64,15 +94,10 @@ const confessionSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    caption: {
-      type: String,
-      default: "Here is our next confession 👀",
-    },
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected", "posted"],
-      default: "pending",
-    },
+
+    // ==========================
+    // Instagram Posting
+    // ==========================
     postedAt: {
       type: Date,
       default: null,
@@ -82,12 +107,15 @@ const confessionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+
     postError: {
       type: String,
       default: null,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  }
 );
 
 export default mongoose.model("Confession", confessionSchema);
