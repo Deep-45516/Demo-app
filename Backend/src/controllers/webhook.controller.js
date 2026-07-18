@@ -2,6 +2,7 @@ import VerificationSession from "../models/verificationSession.model.js";
 import User from "../models/user.model.js";
 import { createAnonymousProfile } from "../services/anonymousProfile.service.js";
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
+import AnonymousProfile from "../models/anonymousProfile.model.js";
 
 // Verify webhook during Meta setup
 export const verifyWebhook = (req, res) => {

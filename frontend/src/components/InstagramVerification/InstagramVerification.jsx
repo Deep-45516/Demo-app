@@ -85,7 +85,7 @@ export default function InstagramVerification() {
           setStep("error");
           return;
         }
-        if (data.data?.alreadyVerified) {
+    if (data.data?.alreadyVerified) {
   localStorage.setItem("token", data.data.token);
 
   const meRes = await fetch(`${API}/api/v1/auth/me`, {
@@ -95,8 +95,10 @@ export default function InstagramVerification() {
   });
 
   const meData = await meRes.json();
+
   localStorage.setItem("user", JSON.stringify(meData.data.user));
 
+  // Go straight to the confession page/home
   window.location.replace("/");
   return;
 }
