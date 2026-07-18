@@ -4,30 +4,35 @@ import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import User from "../models/user.model.js";
 import { generateToken } from "./auth.controller.js";
+import mongoose from "mongoose";
 /*Receive username->Expire old sessions->Generate code->Create VerificationSession->Return sessionId + code*/
-//this create session & code and send code to frontend user 
+//this create session & code and send code to frontend user
 export const startInstagramVerification = asyncHandler(async (req, res) => {
   console.log("NEW VERSION RUNNING");
-  const { username } = req.body;//take username from frontend user
+  const { username } = req.body; //take username from frontend user
   const enteredUsername = username.trim().toLowerCase();
   const existingUser = await User.findOne({
-  instagramUsername: enteredUsername,
-  instagramVerified: true,
-});
+    instagramUsername: enteredUsername,
+    instagramVerified: true,
+  });
 
-if (existingUser) {
-  const token = generateToken(existingUser);
+  if (existingUser) {
+    const token = generateToken(existingUser);
 
-  return res.status(200).json(
-    new ApiResponse(200, {
-      alreadyVerified: true,
-      token,
-    }, "Already verified")
-  );
-}
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          alreadyVerified: true,
+          token,
+        },
+        "Already verified",
+      ),
+    );
+  }
   // Expire any existing pending sessions for the same username,This ensures  only one pending session exists for that username at any time.but if user is already verified then it will not create new session and return error message to user that is "already verified" check this code in .if pending session exists then it will expire the old session and create new session for that user.
-  // this session validate the user 
-//update many will update all the pending sessions (i.e 1 only) for that username to expired status.
+  // this session validate the user
+  //update many will update all the pending sessions (i.e 1 only) for that username to expired status.
   await VerificationSession.updateMany(
     {
       enteredUsername,
@@ -39,11 +44,11 @@ if (existingUser) {
   );
   // Generate a new verification code and create a new session
   const code = generateVerificationCode();
-//this will create new session for that user with code and expire time of 15 minutes from now.
+  //this will create new session for that user with code and expire time of 15 minutes from now.
   const session = await VerificationSession.create({
     enteredUsername,
     code,
-    expiresAt: new Date(Date.now() + 15 * 60 * 1000),// 15 minutes from now
+    expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
   });
 
   return res.status(201).json(
@@ -72,7 +77,11 @@ No → return pending
 →Yes→Find User→Generate JWT→Return Token */
 export const getVerificationStatus = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
-
+  if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Invalid session id"));
+  }
   const session = await VerificationSession.findById(sessionId);
   if (!session) {
     return res
@@ -81,30 +90,30 @@ export const getVerificationStatus = asyncHandler(async (req, res) => {
   }
 
   if (session.status === "username_mismatch") {
-  return res.json(
-    new ApiResponse(
-      200,
-      {
-        status: session.status,
-        error: session.lastError,
-      },
-      "Verification failed"
-    )
-  );
-}
+    return res.json(
+      new ApiResponse(
+        200,
+        {
+          status: session.status,
+          error: session.lastError,
+        },
+        "Verification failed",
+      ),
+    );
+  }
 
-if (session.status !== "verified") {
-  return res.json(
-    new ApiResponse(
-      200,
-      {
-        status: session.status,
-      },
-      "Waiting for verification"
-    )
-  );
-}
-//find by seesion id which is 
+  if (session.status !== "verified") {
+    return res.json(
+      new ApiResponse(
+        200,
+        {
+          status: session.status,
+        },
+        "Waiting for verification",
+      ),
+    );
+  }
+  //find by seesion id which is
   const user = await User.findById(session.userId);
 
   if (!user) {

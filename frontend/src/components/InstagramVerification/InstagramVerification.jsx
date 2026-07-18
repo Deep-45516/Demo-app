@@ -194,6 +194,26 @@ if (data.data.status === "verified") {
         alert(data.message || "Verification failed.");
         return;
       }
+      // ⭐ EXISTING USER
+if (data.data?.alreadyVerified) {
+  localStorage.setItem("token", data.data.token);
+
+  const meRes = await fetch(`${API}/api/v1/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${data.data.token}`,
+    },
+  });
+  console.log("START RESPONSE:", data);
+console.log("alreadyVerified:", data.data?.alreadyVerified);
+
+  const meData = await meRes.json();
+
+  localStorage.setItem("user", JSON.stringify(meData.data.user));
+
+  window.location.replace("/");
+  return;   // <-- THIS IS CRITICAL
+}
+
       //this is js destructuring,instead of const sessionId = data.data.sessionId; const code = data.data.code;
       const { sessionId, code } = data.data;
 
