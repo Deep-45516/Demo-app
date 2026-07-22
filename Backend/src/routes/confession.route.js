@@ -10,6 +10,7 @@ import { sendAdminNotification } from
 "../utils/sendAdminNotification.js";
 import User from "../models/user.model.js";
 import AnonymousProfile from "../models/anonymousProfile.model.js";
+import { createPendingConfession } from "../services/pendingConfession.service.js";
 const router = Router();
 router.get(
   "/search-recipient",
@@ -67,7 +68,11 @@ router.get(
 // CREATE CONFESSION
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { recipientUsername, message } = req.body;;//basic take input from browser
+    const {
+  recipientUsername,
+  message,
+  allowPending = false,
+} = req.body;//basic take input from browser
     console.log(req.body);
      // 🔥 generate image
    
@@ -103,15 +108,43 @@ const recipient = await User.findOne({
 });
 
 if (!recipient) {
+
+  if (!allowPending) {
+    throw new ApiError(
+      404,
+      "Recipient not found."
+    );
+  }
+
+  // Generate images for the pending confession
+  const imagePaths = await generateImages({
+    to: recipientUsername,
+    from: senderAnonymous.anonymousName,
+    message,
+  });
+
+  const imageUrls = [];
+
+  for (const imagePath of imagePaths) {
+    imageUrls.push(
+      await uploadImage(imagePath)
+    );
+  }
+
   const pending = await createPendingConfession({
     senderUser: sender._id,
-    senderAnonymousProfile: senderAnonymous._id,
-    senderAnonymousName: senderAnonymous.anonymousName,
+
+    senderAnonymousProfile:
+      senderAnonymous._id,
+
+    senderAnonymousName:
+      senderAnonymous.anonymousName,
 
     recipientInstagramUsername:
       recipientUsername.trim().toLowerCase(),
 
     message,
+
     imageUrls,
   });
 
@@ -119,7 +152,7 @@ if (!recipient) {
     new ApiResponse(
       201,
       pending,
-      "Recipient hasn't joined yet. We'll deliver your confession if they join within 7 days."
+      "Recipient isn't registered yet. We'll deliver your confession if they join within 7 days."
     )
   );
 }

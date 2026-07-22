@@ -118,47 +118,48 @@ and the user's information.
 
         <label>Recipient Username</label>
 
-<input
-  type="text"
-  value={to}
-  onChange={(e) => {
-    setTo(e.target.value);
-    setRecipientStatus(null);
-    setAllowPending(false);
+        <input
+          type="text"
+          value={to}
+          onChange={(e) => {
+            setTo(e.target.value);
+            setRecipientStatus(null);
+            setAllowPending(false);
+          }}
+        />
+<p
+  style={{
+    color: "#666",
+    fontSize: "14px",
+    marginBottom: "8px",
   }}
-/>
-
-<button
-  onClick={verifyRecipient}
-  disabled={checkingRecipient}
 >
-  {checkingRecipient
-    ? "Checking..."
-    : "Verify Recipient"}
-</button>
+  You must verify the recipient before sending a confession.
+</p>
+        <button onClick={verifyRecipient} disabled={checkingRecipient}>
+          {checkingRecipient ? "Checking..." : "Verify Recipient"}
+        </button>
 
-{recipientStatus?.exists && (
-  <p style={{ color: "green" }}>
-    ✅ Account Found
-  </p>
-)}
+        {recipientStatus?.exists && (
+          <p style={{ color: "green" }}>
+✅ Recipient verified.
+You can now send your confession.
+</p>
+        )}
 
-{recipientStatus &&
-  !recipientStatus.exists && (
-    <>
-      <p style={{ color: "orange" }}>
-        Recipient isn't on ConfessionVault.
-        We'll deliver it if they join within
-        7 days.
-      </p>
+        {recipientStatus && !recipientStatus.exists && (
+          <>
+            <p style={{ color: "orange" }}>
+⚠️ This user hasn't joined ConfessionVault yet.
 
-      <button
-        onClick={() => setAllowPending(true)}
-      >
-        Send Anyway
-      </button>
-    </>
-)}
+You can still send your confession.
+
+We'll securely store it for up to 7 days and automatically deliver it if they join.
+</p>
+
+            <button onClick={() => setAllowPending(true)}>Send Anyway</button>
+          </>
+        )}
 
         <label>Message</label>
 
@@ -174,21 +175,14 @@ and the user's information.
         <button onClick={downloadPages}>Download Pages</button>
 
         <button
-  disabled={
-    !recipientStatus ||
-    (!recipientStatus.exists &&
-      !allowPending)
-  }
-  onClick={() => {
-    submitConfession(
-      to,
-      message,
-      allowPending
-    );
-  }}
->
-  Submit Confession
-</button>
+          disabled={
+            !recipientStatus ||
+            checkingRecipient ||
+            (!recipientStatus.exists && !allowPending)
+          }
+        >
+          Submit Confession
+        </button>
       </div>
 
       <div className="preview-wrapper" id="previewWrapper" />

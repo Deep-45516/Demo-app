@@ -22,8 +22,8 @@ const pendingConfessionSchema = new mongoose.Schema(
     recipientInstagramUsername: {
       type: String,
       required: true,
-      lowercase: true,
       trim: true,
+      lowercase: true,
       index: true,
     },
 
@@ -37,23 +37,23 @@ const pendingConfessionSchema = new mongoose.Schema(
       default: [],
     },
 
+    delivered: {
+      type: Boolean,
+      default: false,
+    },
+
     expiresAt: {
       type: Date,
       required: true,
       expires: 0,
     },
-
-    delivered: {
-      type: Boolean,
-      default: false,
-    },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 export default mongoose.model(
   "PendingConfession",
-  pendingConfessionSchema,
+  pendingConfessionSchema
 );
