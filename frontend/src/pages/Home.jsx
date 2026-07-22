@@ -4,6 +4,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";
+import { searchRecipient } from "../searchRecipient.js";
 
 const API = import.meta.env.VITE_BACKEND_URL;
 
@@ -11,7 +12,9 @@ export default function Home() {
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
-
+  const [recipientStatus, setRecipientStatus] = useState(null);
+  const [allowPending, setAllowPending] = useState(false);
+  const [checkingRecipient, setCheckingRecipient] = useState(false);
   //Has this browser already logged into ConfessionVault?
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
@@ -26,6 +29,27 @@ export default function Home() {
       });
     });
   }, [to, from, message]);
+
+  const verifyRecipient = async () => {
+    if (!to.trim()) {
+      alert("Enter recipient username.");
+      return;
+    }
+
+    try {
+      setCheckingRecipient(true);
+
+      const result = await searchRecipient(to);
+
+      setRecipientStatus(result.data);
+
+      setAllowPending(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setCheckingRecipient(false);
+    }
+  };
 
   const logoutUser = () => {
     localStorage.removeItem("token");
@@ -92,9 +116,49 @@ and the user's information.
 
         <button onClick={logoutUser}>Logout</button>
 
-        <label>To</label>
+        <label>Recipient Username</label>
 
-        <textarea value={to} onChange={(e) => setTo(e.target.value)} />
+<input
+  type="text"
+  value={to}
+  onChange={(e) => {
+    setTo(e.target.value);
+    setRecipientStatus(null);
+    setAllowPending(false);
+  }}
+/>
+
+<button
+  onClick={verifyRecipient}
+  disabled={checkingRecipient}
+>
+  {checkingRecipient
+    ? "Checking..."
+    : "Verify Recipient"}
+</button>
+
+{recipientStatus?.exists && (
+  <p style={{ color: "green" }}>
+    ✅ Account Found
+  </p>
+)}
+
+{recipientStatus &&
+  !recipientStatus.exists && (
+    <>
+      <p style={{ color: "orange" }}>
+        Recipient isn't on ConfessionVault.
+        We'll deliver it if they join within
+        7 days.
+      </p>
+
+      <button
+        onClick={() => setAllowPending(true)}
+      >
+        Send Anyway
+      </button>
+    </>
+)}
 
         <label>Message</label>
 
@@ -110,12 +174,21 @@ and the user's information.
         <button onClick={downloadPages}>Download Pages</button>
 
         <button
-          onClick={() => {
-            submitConfession(to, message);
-          }}
-        >
-          Submit Confession
-        </button>
+  disabled={
+    !recipientStatus ||
+    (!recipientStatus.exists &&
+      !allowPending)
+  }
+  onClick={() => {
+    submitConfession(
+      to,
+      message,
+      allowPending
+    );
+  }}
+>
+  Submit Confession
+</button>
       </div>
 
       <div className="preview-wrapper" id="previewWrapper" />

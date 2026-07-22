@@ -2,7 +2,8 @@ const API = import.meta.env.VITE_BACKEND_URL;
 
 export async function submitConfession(
   recipientUsername,
-  message
+  message,
+  allowPending = false
 ) {
 console.log({
   recipientUsername,
@@ -20,6 +21,7 @@ console.log({
 body: JSON.stringify({
   recipientUsername,
   message,
+  allowPending,
 }),
 });
 

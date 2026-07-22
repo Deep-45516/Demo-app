@@ -11,7 +11,59 @@ import { sendAdminNotification } from
 import User from "../models/user.model.js";
 import AnonymousProfile from "../models/anonymousProfile.model.js";
 const router = Router();
+router.get(
+  "/search-recipient",
+  verifyToken,
+  async (req, res) => {
+    try {
+      const username = req.query.username
+        ?.trim()
+        .toLowerCase();
 
+      if (!username) {
+        throw new ApiError(
+          400,
+          "Username is required."
+        );
+      }
+
+      const user = await User.findOne({
+        instagramUsername: username,
+      }).select("instagramUsername");
+
+      if (!user) {
+        return res.status(200).json(
+          new ApiResponse(
+            200,
+            {
+              exists: false,
+            },
+            "User not found."
+          )
+        );
+      }
+
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          {
+            exists: true,
+            username: user.instagramUsername,
+          },
+          "User found."
+        )
+      );
+    } catch (error) {
+      return res.status(500).json(
+        new ApiResponse(
+          500,
+          null,
+          error.message
+        )
+      );
+    }
+  }
+);
 // CREATE CONFESSION
 router.post("/", verifyToken, async (req, res) => {
   try {
@@ -51,7 +103,25 @@ const recipient = await User.findOne({
 });
 
 if (!recipient) {
-  throw new ApiError(404, "Instagram user not found.");
+  const pending = await createPendingConfession({
+    senderUser: sender._id,
+    senderAnonymousProfile: senderAnonymous._id,
+    senderAnonymousName: senderAnonymous.anonymousName,
+
+    recipientInstagramUsername:
+      recipientUsername.trim().toLowerCase(),
+
+    message,
+    imageUrls,
+  });
+
+  return res.status(201).json(
+    new ApiResponse(
+      201,
+      pending,
+      "Recipient hasn't joined yet. We'll deliver your confession if they join within 7 days."
+    )
+  );
 }
 
 if (recipient._id.equals(sender._id)) {
