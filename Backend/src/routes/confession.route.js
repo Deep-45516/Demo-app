@@ -261,6 +261,54 @@ router.get("/pending",verifyAdmin, async (req, res) => {
 
 });
 
+// USER INBOX - RECEIVED + SENT SUMMARIES
+router.get("/inbox", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [received, sent] = await Promise.all([
+      Confession.find({
+        recipientUser: userId,
+      })
+        .select(
+          "_id senderAnonymousName recipientAction deliveryStatus createdAt"
+        )
+        .sort({ createdAt: -1 })
+        .lean(),
+
+      Confession.find({
+        senderUser: userId,
+      })
+        .select(
+          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
+        )
+        .sort({ createdAt: -1 })
+        .lean(),
+    ]);
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          received,
+          sent,
+        },
+        "Inbox fetched successfully."
+      )
+    );
+  } catch (error) {
+    console.error("INBOX ERROR:", error);
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message || "Unable to fetch inbox."
+      )
+    );
+  }
+});
+
 // GET ONE CONFESSION
 router.get("/:id", verifyToken, async (req, res) => {
   try {
@@ -548,54 +596,6 @@ router.get("/rejected/recent",verifyAdmin, async (req, res) => {
         error.message
       )
 
-    );
-  }
-});
-
-// USER INBOX - RECEIVED + SENT SUMMARIES
-router.get("/inbox", verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const [received, sent] = await Promise.all([
-      Confession.find({
-        recipientUser: userId,
-      })
-        .select(
-          "_id senderAnonymousName recipientAction deliveryStatus createdAt"
-        )
-        .sort({ createdAt: -1 })
-        .lean(),
-
-      Confession.find({
-        senderUser: userId,
-      })
-        .select(
-          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
-        )
-        .sort({ createdAt: -1 })
-        .lean(),
-    ]);
-
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        {
-          received,
-          sent,
-        },
-        "Inbox fetched successfully."
-      )
-    );
-  } catch (error) {
-    console.error("INBOX ERROR:", error);
-
-    return res.status(500).json(
-      new ApiResponse(
-        500,
-        null,
-        error.message || "Unable to fetch inbox."
-      )
     );
   }
 });
