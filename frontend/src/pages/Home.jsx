@@ -175,14 +175,21 @@ We'll securely store it for up to 7 days and automatically deliver it if they jo
         <button onClick={downloadPages}>Download Pages</button>
 
         <button
-          disabled={
-            !recipientStatus ||
-            checkingRecipient ||
-            (!recipientStatus.exists && !allowPending)
-          }
-        >
-          Submit Confession
-        </button>
+  disabled={
+    !recipientStatus ||
+    checkingRecipient ||
+    (!recipientStatus.exists && !allowPending)
+  }
+  onClick={() => {
+    submitConfession(
+      to,
+      message,
+      allowPending
+    );
+  }}
+>
+  Submit Confession
+</button>
       </div>
 
       <div className="preview-wrapper" id="previewWrapper" />
