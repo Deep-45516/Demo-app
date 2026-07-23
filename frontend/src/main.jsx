@@ -1,34 +1,20 @@
-import { Routes, Route } from "react-router-dom";
-
-import Home from "./pages/Home.jsx";
-import Admin from "./pages/Admin.jsx";
-import InstagramVerification from "./components/InstagramVerification/InstagramVerification.jsx";
-import Inbox from "./pages/Inbox.jsx";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import ConfessionDetails from "./pages/ConfessionDetails.jsx";
 
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
+import App from "./App";
+import "./index.css";
 
-      <Route path="/admin" element={<Admin />} />
-
-      <Route
-        path="/instagram"
-        element={<InstagramVerification />}
-      />
-
-      <Route
-        path="/inbox"
-        element={<Inbox />}
-      />
-
-      <Route
-        path="/confessions/:id"
-        element={<ConfessionDetails />}
-      />
-    </Routes>
-  );
-}
-
-export default App;
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <GoogleOAuthProvider
+      clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+    >
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </GoogleOAuthProvider>
+  </StrictMode>
+);
