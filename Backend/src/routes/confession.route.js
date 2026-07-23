@@ -509,12 +509,9 @@ router.get(
   "/received",
   verifyToken,
   asyncHandler(async (req, res) => {
-    console.log("JWT User:", req.user);
-console.log("User ID:", req.user.id);
-
-const confessions = await Confession.find({
-  recipientUser: req.user._id,
-})
+    const confessions = await Confession.find({
+      recipientUser: req.user.id,
+    })
       .sort({ createdAt: -1 })
       .lean();
 
@@ -532,24 +529,19 @@ router.get(
   "/sent",
   verifyToken,
   asyncHandler(async (req, res) => {
-    console.log("JWT:", req.user);
-
-    const all = await Confession.find();
-
-    console.log(
-      all.map(c => ({
-        senderUser: c.senderUser.toString(),
-        recipientUser: c.recipientUser?.toString(),
-      }))
-    );
-
     const confessions = await Confession.find({
       senderUser: req.user.id,
-    });
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
-    console.log("Matched:", confessions.length);
-
-    return res.json(confessions);
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confessions,
+        "Sent confessions fetched successfully."
+      )
+    );
   })
 );
 
