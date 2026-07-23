@@ -513,7 +513,7 @@ router.get(
 console.log("User ID:", req.user.id);
 
 const confessions = await Confession.find({
-  recipientUser: req.user.id,
+  recipientUser: req.user._id,
 })
       .sort({ createdAt: -1 })
       .lean();
@@ -536,7 +536,7 @@ router.get(
 console.log("User ID:", req.user.id);
 
 const confessions = await Confession.find({
-  senderUser: req.user.id,
+  senderUser: req.user._id,
 })
       .sort({ createdAt: -1 })
       .lean();
