@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Admin from "./pages/Admin.jsx";
 import InstagramVerification from "./components/InstagramVerification/InstagramVerification.jsx";
+import Inbox from "./pages/Inbox.jsx";
 
 function App() {
   return (
@@ -11,6 +12,10 @@ function App() {
 
       <Route path="/admin" element={<Admin />} />
       <Route path="/instagram" element={<InstagramVerification />} />
+      <Route
+    path="/inbox"
+    element={<Inbox />}
+/>
     </Routes>
   );
 }

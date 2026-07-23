@@ -503,4 +503,44 @@ router.get("/rejected/recent",verifyAdmin, async (req, res) => {
   }
 });
 
+router.get(
+  "/received",
+  verifyToken,
+  asyncHandler(async (req, res) => {
+    const confessions = await Confession.find({
+      recipientUser: req.user._id,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confessions,
+        "Received confessions fetched successfully."
+      )
+    );
+  })
+);
+
+router.get(
+  "/sent",
+  verifyToken,
+  asyncHandler(async (req, res) => {
+    const confessions = await Confession.find({
+      senderUser: req.user._id,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confessions,
+        "Sent confessions fetched successfully."
+      )
+    );
+  })
+);
+
 export default router;
