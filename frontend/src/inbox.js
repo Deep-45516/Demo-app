@@ -12,13 +12,21 @@ async function request(endpoint) {
     }
   );
 
-  return res.json();
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(
+      data.message || "Request failed."
+    );
+  }
+
+  return data;
 }
 
-export function getReceivedConfessions() {
-  return request("received");
+export function getInbox() {
+  return request("inbox");
 }
 
-export function getSentConfessions() {
-  return request("sent");
+export function getConfession(id) {
+  return request(id);
 }

@@ -1,86 +1,114 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import {
-  getReceivedConfessions,
-  getSentConfessions,
-} from "../inbox";
+import { getInbox } from "../inbox";
 
 export default function Inbox() {
+  const navigate = useNavigate();
+
   const [tab, setTab] = useState("received");
 
   const [received, setReceived] = useState([]);
-
   const [sent, setSent] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadInbox();
   }, []);
 
-async function loadInbox() {
-  const r = await getReceivedConfessions();
-  const s = await getSentConfessions();
+  async function loadInbox() {
+    try {
+      setLoading(true);
 
-  console.log("Received API:", r);
-  console.log("Sent API:", s);
+      const response = await getInbox();
 
-  setReceived(r.data || []);
-  setSent(s.data || []);
-}
+      setReceived(response.data.received || []);
+      setSent(response.data.sent || []);
+    } catch (error) {
+      console.error(error);
+      setError("Unable to load inbox.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const list =
-    tab === "received" ? received : sent;
+    tab === "received"
+      ? received
+      : sent;
+
+  if (loading) {
+    return <p>Loading inbox...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
-    <div>
-
+    <div style={{ padding: 30 }}>
       <h2>Inbox</h2>
 
       <button
-        onClick={() =>
-          setTab("received")
-        }
+        onClick={() => setTab("received")}
       >
-        Received
+        Received ({received.length})
       </button>
 
       <button
-        onClick={() =>
-          setTab("sent")
-        }
+        onClick={() => setTab("sent")}
       >
-        Sent
+        Sent ({sent.length})
       </button>
 
       <hr />
 
-      {list.map((c) => (
+      {list.length === 0 && (
+        <p>
+          No {tab} confessions yet.
+        </p>
+      )}
+
+      {list.map((confession) => (
         <div
-          key={c._id}
+          key={confession._id}
+          onClick={() =>
+            navigate(
+              `/confessions/${confession._id}`
+            )
+          }
           style={{
-            border: "1px solid gray",
-            marginBottom: 20,
+            border: "1px solid #555",
             padding: 15,
+            marginBottom: 10,
+            cursor: "pointer",
           }}
         >
+          <strong>
+            {tab === "received"
+              ? confession.senderAnonymousName
+              : `@${confession.recipientInstagramUsername}`}
+          </strong>
+
           <p>
-
-            <strong>
-              {tab === "received"
-                ? c.senderAnonymousName
-                : c.recipientInstagramUsername}
-            </strong>
-
+            {new Date(
+              confession.createdAt
+            ).toLocaleString()}
           </p>
 
-          <p>{c.message}</p>
+          {tab === "received" && (
+            <small>
+              {confession.recipientAction}
+            </small>
+          )}
 
-          {c.imageUrls?.map((url) => (
-            <img
-              key={url}
-              src={url}
-              width={250}
-            />
-          ))}
+          {tab === "sent" && (
+            <small>
+              {confession.deliveryStatus}
+            </small>
+          )}
         </div>
       ))}
     </div>

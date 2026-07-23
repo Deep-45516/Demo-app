@@ -261,7 +261,54 @@ router.get("/pending",verifyAdmin, async (req, res) => {
 
 });
 
+// GET ONE CONFESSION
+router.get("/:id", verifyToken, async (req, res) => {
+  try {
+    const confession = await Confession.findById(req.params.id).lean();
 
+    if (!confession) {
+      throw new ApiError(404, "Confession not found.");
+    }
+
+    const userId = req.user.id;
+
+    const isSender =
+      confession.senderUser.toString() === userId;
+
+    const isRecipient =
+      confession.recipientUser?.toString() === userId;
+
+    // SECURITY: nobody except sender/recipient can open it
+    if (!isSender && !isRecipient) {
+      throw new ApiError(
+        403,
+        "You are not allowed to view this confession."
+      );
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confession,
+        "Confession fetched successfully."
+      )
+    );
+  } catch (error) {
+    console.error("GET CONFESSION ERROR:", error);
+
+    if (error instanceof ApiError) {
+      return res.status(error.statuscode).json(error);
+    }
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message || "Unable to fetch confession."
+      )
+    );
+  }
+});
 //APPROVE CONFESSION
 router.patch("/:id/approve", verifyAdmin, async (req, res) => {
 
@@ -505,44 +552,52 @@ router.get("/rejected/recent",verifyAdmin, async (req, res) => {
   }
 });
 
-router.get(
-  "/received",
-  verifyToken,
-  asyncHandler(async (req, res) => {
-    const confessions = await Confession.find({
-      recipientUser: req.user.id,
-    })
-      .sort({ createdAt: -1 })
-      .lean();
+// USER INBOX - RECEIVED + SENT SUMMARIES
+router.get("/inbox", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [received, sent] = await Promise.all([
+      Confession.find({
+        recipientUser: userId,
+      })
+        .select(
+          "_id senderAnonymousName recipientAction deliveryStatus createdAt"
+        )
+        .sort({ createdAt: -1 })
+        .lean(),
+
+      Confession.find({
+        senderUser: userId,
+      })
+        .select(
+          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
+        )
+        .sort({ createdAt: -1 })
+        .lean(),
+    ]);
 
     return res.status(200).json(
       new ApiResponse(
         200,
-        confessions,
-        "Received confessions fetched successfully."
+        {
+          received,
+          sent,
+        },
+        "Inbox fetched successfully."
       )
     );
-  })
-);
+  } catch (error) {
+    console.error("INBOX ERROR:", error);
 
-router.get(
-  "/sent",
-  verifyToken,
-  asyncHandler(async (req, res) => {
-    const confessions = await Confession.find({
-      senderUser: req.user.id,
-    })
-      .sort({ createdAt: -1 })
-      .lean();
-
-    return res.status(200).json(
+    return res.status(500).json(
       new ApiResponse(
-        200,
-        confessions,
-        "Sent confessions fetched successfully."
+        500,
+        null,
+        error.message || "Unable to fetch inbox."
       )
     );
-  })
-);
+  }
+});
 
 export default router;
