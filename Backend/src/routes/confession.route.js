@@ -509,9 +509,12 @@ router.get(
   "/received",
   verifyToken,
   asyncHandler(async (req, res) => {
-    const confessions = await Confession.find({
-      recipientUser: req.user._id,
-    })
+    console.log("JWT User:", req.user);
+console.log("User ID:", req.user.id);
+
+const confessions = await Confession.find({
+  recipientUser: req.user.id,
+})
       .sort({ createdAt: -1 })
       .lean();
 
@@ -529,9 +532,12 @@ router.get(
   "/sent",
   verifyToken,
   asyncHandler(async (req, res) => {
-    const confessions = await Confession.find({
-      senderUser: req.user._id,
-    })
+    console.log("JWT User:", req.user);
+console.log("User ID:", req.user.id);
+
+const confessions = await Confession.find({
+  senderUser: req.user.id,
+})
       .sort({ createdAt: -1 })
       .lean();
 
