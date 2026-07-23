@@ -11,7 +11,8 @@ import { sendAdminNotification } from
 import User from "../models/user.model.js";
 import AnonymousProfile from "../models/anonymousProfile.model.js";
 import { createPendingConfession } from "../services/pendingConfession.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/async-handler.js";
+
 const router = Router();
 router.get(
   "/search-recipient",
