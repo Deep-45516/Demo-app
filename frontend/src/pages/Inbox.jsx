@@ -16,13 +16,16 @@ export default function Inbox() {
     loadInbox();
   }, []);
 
-  async function loadInbox() {
-    const r = await getReceivedConfessions();
-    const s = await getSentConfessions();
+async function loadInbox() {
+  const r = await getReceivedConfessions();
+  const s = await getSentConfessions();
 
-    setReceived(r.data || []);
-    setSent(s.data || []);
-  }
+  console.log("Received API:", r);
+  console.log("Sent API:", s);
+
+  setReceived(r.data || []);
+  setSent(s.data || []);
+}
 
   const list =
     tab === "received" ? received : sent;
