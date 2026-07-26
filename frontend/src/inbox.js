@@ -1,6 +1,6 @@
 const API = import.meta.env.VITE_BACKEND_URL;
 
-async function request(endpoint) {
+async function request(endpoint) {//this is helper which used for both below functionsgetInbox and getconfession
   const token = localStorage.getItem("token");
 
   const res = await fetch(
@@ -24,7 +24,7 @@ async function request(endpoint) {
 }
 
 export function getInbox() {
-  return request("inbox");
+  return request("inbox");//endpoint=inbox
 }
 
 export function getConfession(id) {

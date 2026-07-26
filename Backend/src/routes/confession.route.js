@@ -4,287 +4,290 @@ import { generateImages } from "../utils/generateImages.js";
 import { uploadImage } from "../utils/uploadTOFirebase.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-errors.js";
-import{ postConfessionToInstagram } from "../utils/postConfessionToInstagram.js";
+import { postConfessionToInstagram } from "../utils/postConfessionToInstagram.js";
 import { verifyAdmin, verifyToken } from "../middlewares/auth.middleware.js";
-import { sendAdminNotification } from
-"../utils/sendAdminNotification.js";
+import { sendAdminNotification } from "../utils/sendAdminNotification.js";
 import User from "../models/user.model.js";
 import AnonymousProfile from "../models/anonymousProfile.model.js";
 import { createPendingConfession } from "../services/pendingConfession.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
+/*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
-router.get(
-  "/search-recipient",
-  verifyToken,
-  async (req, res) => {
-    try {
-      const username = req.query.username
-        ?.trim()
-        .toLowerCase();
-
-      if (!username) {
-        throw new ApiError(
-          400,
-          "Username is required."
-        );
-      }
-
-      const user = await User.findOne({
-        instagramUsername: username,
-      }).select("instagramUsername");
-
-      if (!user) {
-        return res.status(200).json(
-          new ApiResponse(
-            200,
-            {
-              exists: false,
-            },
-            "User not found."
-          )
-        );
-      }
-
+router.get("/search-recipient", verifyToken, async (req, res) => {
+  try {
+    //frontend send query in api ?username=Deep_123 comes , take that from req.query.username
+    const username = req.query.username?.trim().toLowerCase();
+    //Never depend on frontend validation for security/correctness.
+    if (!username) {
+      throw new ApiError(400, "Username is required.");
+    }
+    //MongoDB, find ONE User document whose instagramUsername equals this username.
+    const user = await User.findOne({
+      instagramUsername: username,
+    }).select("instagramUsername");
+    //select says Only retrieve the field I need.
+    //Without .select(), MongoDB/Mongoose may return whole user document
+    if (!user) {
       return res.status(200).json(
         new ApiResponse(
-          200,
+          200, //not 404, becuz API req work perfectly,search result is false(200 is success)
           {
-            exists: true,
-            username: user.instagramUsername,
+            exists: false,
           },
-          "User found."
-        )
-      );
-    } catch (error) {
-      return res.status(500).json(
-        new ApiResponse(
-          500,
-          null,
-          error.message
-        )
+          "User not found.",
+        ),
       );
     }
+    /*Remember:
+findOne()
+returns null when nothing is found. in frontend */
+
+    return res.status(200).json(
+      new ApiResponse(
+        200, //sucess
+        {
+          //data
+          exists: true,
+          username: user.instagramUsername,
+        },
+        "User found.", //message
+      ), //standerd formate
+    );
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
-);
+});
 // CREATE CONFESSION
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const {
-  recipientUsername,
-  message,
-  allowPending = false,
-} = req.body;//basic take input from browser
+    const { recipientUsername, message, allowPending = false } = req.body; //basic take input from browser
     console.log(req.body);
-     // 🔥 generate image
-   
+    // 🔥 generate image
+
     // 🔴 BASIC VALIDATION
-    if (typeof message !== "string" || message.trim() === "")
-   {
+    if (typeof message !== "string" || message.trim() === "") {
       throw new ApiError(400, "Message is required");
     }
     if (
-  typeof recipientUsername !== "string" ||
-  recipientUsername.trim() === ""
-) {
-  throw new ApiError(400, "Recipient username is required.");
-}
+      typeof recipientUsername !== "string" ||
+      recipientUsername.trim() === ""
+    ) {
+      throw new ApiError(400, "Recipient username is required.");
+    }
+    //find sender
     const sender = await User.findById(req.user.id);
     console.log("JWT User ID:", req.user.id);
-console.log("Sender:", sender);
+    console.log("Sender:", sender);
 
-if (!sender) {
-  throw new ApiError(404, "User not found");
-}
+    if (!sender) {
+      throw new ApiError(404, "User not found");
+    }
+    //find sendes anonymous identity
+    const senderAnonymous = await AnonymousProfile.findOne({
+      userId: sender._id,
+    });
+    console.log("Anonymous Profile:", senderAnonymous);
+    if (!senderAnonymous) {
+      throw new ApiError(400, "Complete onboarding first.");
+    }
+    //find recipent in DB by instaUsername sended by sender
+    const recipient = await User.findOne({
+      instagramUsername: recipientUsername.trim().toLowerCase(),
+    });
+    /*Recipient doesn't exist
+        ↓
+Did sender click "Send Anyway"?
+        ↓
+ allowPending?
+    ↙         ↘
+ false       true
+   ↓           ↓
+STOP       create pending */
+    if (!recipient) {
+      //allow pending get true if user clicks on "send anyway"
+      if (!allowPending) {
+        throw new ApiError(404, "Recipient not found.");
+      }
 
-const senderAnonymous = await AnonymousProfile.findOne({
-  userId: sender._id,
-});
-console.log("Anonymous Profile:", senderAnonymous);
-if (!senderAnonymous) {
-  throw new ApiError(400, "Complete onboarding first.");
-}
+      // Generate images for the pending confession
+      const imagePaths = await generateImages({
+        to: recipientUsername,
+        from: senderAnonymous.anonymousName,
+        message,
+      }); /*[
+  "/temp/page1.jpg",
+  "/temp/page2.jpg"
+] */
 
-const recipient = await User.findOne({
-  instagramUsername: recipientUsername.trim().toLowerCase(),
-});
+      const imageUrls = [];
 
-if (!recipient) {
+      for (const imagePath of imagePaths) {
+        imageUrls.push(await uploadImage(imagePath));
+      } /*finally imageUrls = [
+   "https://firebase...page1.jpg",
+   "https://firebase...page2.jpg"
+]; */
+      //this are currently sequential like 1st then 2nd page
+      //pendingConfession.service.js, beuz we do not have pending user doc
+      const pending = await createPendingConfession({
+        //create DB doc for 7 days
+        senderUser: sender._id,
 
-  if (!allowPending) {
-    throw new ApiError(
-      404,
-      "Recipient not found."
-    );
-  }
+        senderAnonymousProfile: senderAnonymous._id,
 
-  // Generate images for the pending confession
-  const imagePaths = await generateImages({
-    to: recipientUsername,
-    from: senderAnonymous.anonymousName,
-    message,
-  });
+        senderAnonymousName: senderAnonymous.anonymousName,
 
-  const imageUrls = [];
+        recipientInstagramUsername: recipientUsername.trim().toLowerCase(),
 
-  for (const imagePath of imagePaths) {
-    imageUrls.push(
-      await uploadImage(imagePath)
-    );
-  }
+        message,
 
-  const pending = await createPendingConfession({
-    senderUser: sender._id,
+        imageUrls,
+      });
 
-    senderAnonymousProfile:
-      senderAnonymous._id,
+      return res
+        .status(201)
+        .json(
+          new ApiResponse(
+            201,
+            pending,
+            "Recipient isn't registered yet. We'll deliver your confession if they join within 7 days.",
+          ),
+        );
+    }
 
-    senderAnonymousName:
-      senderAnonymous.anonymousName,
-
-    recipientInstagramUsername:
-      recipientUsername.trim().toLowerCase(),
-
-    message,
-
-    imageUrls,
-  });
-
-  return res.status(201).json(
-    new ApiResponse(
-      201,
-      pending,
-      "Recipient isn't registered yet. We'll deliver your confession if they join within 7 days."
-    )
-  );
-}
-
-if (recipient._id.equals(sender._id)) {
-  throw new ApiError(400, "You can't confess to yourself.");
-}
+    if (recipient._id.equals(sender._id)) {
+      throw new ApiError(400, "You can't confess to yourself.");
+    }
+    /*Sender exists ✅
+AnonymousProfile exists ✅
+Recipient exists ✅
+Not sending to yourself ✅*/
     // 1. generate image locally
     // 🔴 NEVER TRUST FRONTEND imageUrl so creat from backend
-    //Hey backend, create image using this data 
-const imagePaths = await generateImages({
-  to: recipient.instagramUsername,
-  from: senderAnonymous.anonymousName,
-  message,
-});
+    //Hey backend, create image using this data
+    //create confession with sender anonomous and for recipent real insta id
+    const imagePaths = await generateImages({
+      to: recipient.instagramUsername,
+      from: senderAnonymous.anonymousName,
+      message,
+    }); /*[
+  "/temp/page1.jpg",
+  "/temp/page2.jpg"
+] */
 
-  // 2. upload to firebase
+    // 2. upload to firebase
     //const imageUrl = await uploadImage(imagePath, to);
     const imageUrls = [];
 
     for (const imagePath of imagePaths) {
-
-      const imageUrl =
-        await uploadImage(imagePath);
+      const imageUrl = await uploadImage(imagePath);
 
       imageUrls.push(imageUrl);
-       console.log("Uploaded:", imageUrl);
-    }
+      console.log("Uploaded:", imageUrl);
+    } /*finally imageUrls = [
+   "https://firebase...page1.jpg",
+   "https://firebase...page2.jpg"
+]; */
+    //this are currently sequential like 1st then 2nd page
 
-  // 3. save in DB
-const confession = await Confession.create({
-  senderUser: sender._id,
-  senderAnonymousProfile: senderAnonymous._id,
-  senderAnonymousName: senderAnonymous.anonymousName,
-  recipientUser: recipient._id,
-  recipientInstagramUsername: recipient.instagramUsername,
-  message,
-  imageUrls,
-});
-  await sendAdminNotification({
-  title: "New confession request",
-  body: `${confession.recipientInstagramUsername} received a confession`
-});
+    // 3. save in DB
+    const confession = await Confession.create({
+      senderUser: sender._id,
+      senderAnonymousProfile: senderAnonymous._id,
+      senderAnonymousName: senderAnonymous.anonymousName,
+      recipientUser: recipient._id,
+      recipientInstagramUsername: recipient.instagramUsername,
+      message,
+      imageUrls,
+    });
+    await sendAdminNotification({
+      title: "New confession request",
+      body: `${confession.recipientInstagramUsername} received a confession`,
+    });
 
     // SUCCESS RESPONSE
-    return res.status(201).json(
-      new ApiResponse(
-        201,
-        confession,
-        "Confession created successfully"
-      )
-    );
-
+    return res
+      .status(201)
+      .json(
+        new ApiResponse(201, confession, "Confession created successfully"),
+      );
   } catch (error) {
     console.error(error.stack);
     if (error instanceof ApiError) {
-      
       return res.status(error.statuscode).json(error);
     }
 
     // UNKNOWN ERROR
-    return res.status(500).json(
-      new ApiResponse(
-        500,
-        null,
-        error.message || "Something went wrong"
-      )
-    );
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Something went wrong"),
+      );
   }
 });
 
-
-
 //GET PENDING CONFESSIONS
-router.get("/pending",verifyAdmin, async (req, res) => {
-
+router.get("/pending", verifyAdmin, async (req, res) => {
   try {
+    const confessions = await Confession.find({
+      status: "pending",
+    }).sort({
+      createdAt: -1,
+    });
 
-    const confessions =
-      await Confession.find({
-        status: "pending"
-      }).sort({
-        createdAt: -1
-      });
-
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        confessions,
-        "Pending confessions fetched"
-      )
-    );
-
+    return res
+      .status(200)
+      .json(new ApiResponse(200, confessions, "Pending confessions fetched"));
   } catch (error) {
-
-    return res.status(500).json(
-      new ApiResponse(
-        500,
-        null,
-        error.message
-      )
-    );
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
-
 });
 
 // USER INBOX - RECEIVED + SENT SUMMARIES
+//inbox page only displays a summary,not confession
 router.get("/inbox", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
+    /*Confession 1
+senderUser = BBB
+recipientUser = AAA   ✅
 
+
+Confession 2
+senderUser = AAA
+recipientUser = CCC   ❌
+
+
+Confession 3
+senderUser = DDD
+recipientUser = AAA   ✅ */
     const [received, sent] = await Promise.all([
+      //promise run both query parellaly and give result , not wait 1 to complete and then next NO
       Confession.find({
-        recipientUser: userId,
-      })
+        recipientUser: userId, //this is recieved confessionss
+      }) //this finds the confession which has recipientUser as that user and shows senderanonymous name
         .select(
-          "_id senderAnonymousName recipientAction deliveryStatus createdAt"
+          "_id senderAnonymousName recipientAction deliveryStatus createdAt", //do not show entire confession yet
         )
         .sort({ createdAt: -1 })
         .lean(),
 
       Confession.find({
+        //this is sent confessions
         senderUser: userId,
       })
         .select(
-          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
+          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt",
         )
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1 })//Means sort by creation date,(-1 means decending order,new 1st)
         .lean(),
     ]);
+    /*Need to modify/save Mongoose document?
+→ normal document may be useful
+
+Just reading/displaying data?
+→ .lean() can be useful */
 
     return res.status(200).json(
       new ApiResponse(
@@ -293,22 +296,82 @@ router.get("/inbox", verifyToken, async (req, res) => {
           received,
           sent,
         },
-        "Inbox fetched successfully."
-      )
+        "Inbox fetched successfully.",
+      ),
     );
   } catch (error) {
     console.error("INBOX ERROR:", error);
+
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Unable to fetch inbox."),
+      );
+  }
+});
+// RECIPIENT RESPONDS TO CONFESSION
+router.patch("/:id/action", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body;
+
+    // Only these two actions are allowed
+    if (!["curious", "not_interested"].includes(action)) {
+      throw new ApiError(400, "Invalid recipient action.");
+    }
+
+    const confession = await Confession.findById(id);
+
+    if (!confession) {
+      throw new ApiError(404, "Confession not found.");
+    }
+
+    // Only recipient can respond
+    if (
+      confession.recipientUser.toString() !==
+      req.user.id.toString()
+    ) {
+      throw new ApiError(
+        403,
+        "Only the recipient can respond to this confession."
+      );
+    }
+
+    // Prevent changing decision repeatedly
+    if (confession.recipientAction !== "pending") {
+      throw new ApiError(
+        400,
+        "You have already responded to this confession."
+      );
+    }
+
+    confession.recipientAction = action;
+
+    await confession.save();
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confession,
+        "Response saved successfully."
+      )
+    );
+  } catch (error) {
+    console.error("CONFESSION ACTION ERROR:", error);
+
+    if (error instanceof ApiError) {
+      return res.status(error.statuscode).json(error);
+    }
 
     return res.status(500).json(
       new ApiResponse(
         500,
         null,
-        error.message || "Unable to fetch inbox."
+        error.message || "Something went wrong."
       )
     );
   }
 });
-
 // GET ONE CONFESSION
 router.get("/:id", verifyToken, async (req, res) => {
   try {
@@ -320,27 +383,20 @@ router.get("/:id", verifyToken, async (req, res) => {
 
     const userId = req.user.id;
 
-    const isSender =
-      confession.senderUser.toString() === userId;
+    const isSender = confession.senderUser.toString() === userId;
 
-    const isRecipient =
-      confession.recipientUser?.toString() === userId;
+    const isRecipient = confession.recipientUser?.toString() === userId;
 
     // SECURITY: nobody except sender/recipient can open it
     if (!isSender && !isRecipient) {
-      throw new ApiError(
-        403,
-        "You are not allowed to view this confession."
-      );
+      throw new ApiError(403, "You are not allowed to view this confession.");
     }
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        confession,
-        "Confession fetched successfully."
-      )
-    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, confession, "Confession fetched successfully."),
+      );
   } catch (error) {
     console.error("GET CONFESSION ERROR:", error);
 
@@ -348,255 +404,165 @@ router.get("/:id", verifyToken, async (req, res) => {
       return res.status(error.statuscode).json(error);
     }
 
-    return res.status(500).json(
-      new ApiResponse(
-        500,
-        null,
-        error.message || "Unable to fetch confession."
-      )
-    );
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(
+          500,
+          null,
+          error.message || "Unable to fetch confession.",
+        ),
+      );
   }
 });
 //APPROVE CONFESSION
 router.patch("/:id/approve", verifyAdmin, async (req, res) => {
-
   try {
-
     const { id } = req.params;
 
     const { caption } = req.body;
 
-    const confession =
-      await Confession.findByIdAndUpdate(
+    const confession = await Confession.findByIdAndUpdate(
+      id,
 
-        id,
+      {
+        status: "approved",
+        approvedAt: new Date(),
 
-        {
-          status: "approved",
-          approvedAt: new Date(),
+        caption: caption || "Here is our next confession 👀",
+      },
 
-          caption:
-            caption ||
-            "Here is our next confession 👀"
-        },
-
-        {
-  returnDocument: "after"
-}
-      );
-
-      try {
-  const postedConfession =
-    await postConfessionToInstagram(confession);
-
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      postedConfession,
-      "Confession approved and posted"
-    )
-  );
-
-} catch (error) {
-  confession.status = "approved";
-  confession.postError = error.message;
-  await confession.save();
-
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      confession,
-      "Confession approved but Instagram post failed"
-    )
-  );
-}
-
-  } catch (error) {
-    console.log("APPROVE ERROR:", error);
-    return res.status(500).json(
-      new ApiResponse(
-        500,
-        null,
-        error.message
-      )
+      {
+        returnDocument: "after",
+      },
     );
-  }
-
-});
-
-//REJECT CONFESSION
-router.patch("/:id/reject",verifyAdmin, async (req, res) => {
-
-  try {
-
-    const { id } = req.params;
-
-    const confession =
-      await Confession.findByIdAndUpdate(
-
-        id,
-
-        {
-          status: "rejected",
-          rejectedAt: new Date()
-        },
-
-        {
-  returnDocument: "after"
-}
-      );
-
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        confession,
-        "Confession rejected"
-      )
-    );
-
-  } catch (error) {
-
-    return res.status(500).json(
-      new ApiResponse(
-        500,
-        null,
-        error.message
-      )
-    );
-  }
-
-});
-
-router.patch(
-  "/:id/retry-post",
-  verifyAdmin,
-  async (req, res) => {
-    const confession =
-      await Confession.findById(req.params.id);
-
-    if (!confession) {
-      throw new ApiError(404, "Confession not found");
-    }
 
     try {
-      const posted =
-        await postConfessionToInstagram(confession);
+      const postedConfession = await postConfessionToInstagram(confession);
 
-      posted.postError = null;
-      await posted.save();
-
-      return res.status(200).json(
-        new ApiResponse(
-          200,
-          posted,
-          "Instagram post retried successfully"
-        )
-      );
-
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            postedConfession,
+            "Confession approved and posted",
+          ),
+        );
     } catch (error) {
+      confession.status = "approved";
       confession.postError = error.message;
       await confession.save();
 
-      return res.status(500).json(
-        new ApiResponse(
-          500,
-          confession,
-          "Instagram retry failed"
-        )
-      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            confession,
+            "Confession approved but Instagram post failed",
+          ),
+        );
     }
+  } catch (error) {
+    console.log("APPROVE ERROR:", error);
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
-);
+});
 
-// RECENT APPROVED
-router.get("/approved/recent",verifyAdmin, async (req, res) => {
+//REJECT CONFESSION
+router.patch("/:id/reject", verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const confession = await Confession.findByIdAndUpdate(
+      id,
+
+      {
+        status: "rejected",
+        rejectedAt: new Date(),
+      },
+
+      {
+        returnDocument: "after",
+      },
+    );
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, confession, "Confession rejected"));
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
+  }
+});
+
+router.patch("/:id/retry-post", verifyAdmin, async (req, res) => {
+  const confession = await Confession.findById(req.params.id);
+
+  if (!confession) {
+    throw new ApiError(404, "Confession not found");
+  }
 
   try {
+    const posted = await postConfessionToInstagram(confession);
 
-    const twoDaysAgo =
-      new Date(
-        Date.now() - 2 * 24 * 60 * 60 * 1000
+    posted.postError = null;
+    await posted.save();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, posted, "Instagram post retried successfully"),
       );
-
-    const confessions =
-      await Confession.find({
-
-        status: "approved",
-
-        approvedAt: {
-          $gte: twoDaysAgo
-        }
-
-      })
-      .sort({ approvedAt: -1 });
-
-    return res.status(200).json(
-
-      new ApiResponse(
-        200,
-        confessions,
-        "Recent approved confessions"
-      )
-
-    );
-
   } catch (error) {
+    confession.postError = error.message;
+    await confession.save();
 
-    return res.status(500).json(
+    return res
+      .status(500)
+      .json(new ApiResponse(500, confession, "Instagram retry failed"));
+  }
+});
 
-      new ApiResponse(
-        500,
-        null,
-        error.message
-      )
+// RECENT APPROVED
+router.get("/approved/recent", verifyAdmin, async (req, res) => {
+  try {
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
-    );
+    const confessions = await Confession.find({
+      status: "approved",
+
+      approvedAt: {
+        $gte: twoDaysAgo,
+      },
+    }).sort({ approvedAt: -1 });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, confessions, "Recent approved confessions"));
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
 
 // RECENT REJECTED
-router.get("/rejected/recent",verifyAdmin, async (req, res) => {
-
+router.get("/rejected/recent", verifyAdmin, async (req, res) => {
   try {
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
-    const twoDaysAgo =
-      new Date(
-        Date.now() - 2 * 24 * 60 * 60 * 1000
-      );
+    const confessions = await Confession.find({
+      status: "rejected",
 
-    const confessions =
-      await Confession.find({
+      rejectedAt: {
+        $gte: twoDaysAgo,
+      },
+    }).sort({ rejectedAt: -1 });
 
-        status: "rejected",
-
-        rejectedAt: {
-          $gte: twoDaysAgo
-        }
-
-      })
-      .sort({ rejectedAt: -1 });
-
-    return res.status(200).json(
-
-      new ApiResponse(
-        200,
-        confessions,
-        "Recent rejected confessions"
-      )
-
-    );
-
+    return res
+      .status(200)
+      .json(new ApiResponse(200, confessions, "Recent rejected confessions"));
   } catch (error) {
-
-    return res.status(500).json(
-
-      new ApiResponse(
-        500,
-        null,
-        error.message
-      )
-
-    );
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
 

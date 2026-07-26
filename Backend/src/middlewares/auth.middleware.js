@@ -30,7 +30,7 @@ export const verifyToken = (req, res, next) => {
     //So token is the second element of the array i.e. "eyJhbGc..." (index 1)
     const token = authHeader.split(" ")[1];
 
-    //Guard checks if the token was signed with the secret key or not.
+    //Guard checks if the token was signed with the secret koley or not.
     //Only the server knows this secret key.
     //If valid, jwt.verify() returns the payload (user id, email, role, expiry, etc.) in decoded.
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

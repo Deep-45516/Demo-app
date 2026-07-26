@@ -12,10 +12,14 @@ export default function Home() {
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
-  const [recipientStatus, setRecipientStatus] = useState(null);
-  const [allowPending, setAllowPending] = useState(false);
+  const [recipientStatus, setRecipientStatus] = useState(null); //null(we havent check is he registered or not,true(registered recipient),false(not registered))
+  const [allowPending, setAllowPending] = useState(false); //If recipient doesn't exist, did the sender explicitly choose "Send Anyway"?initialyy it is false , so no
   const [checkingRecipient, setCheckingRecipient] = useState(false);
   //Has this browser already logged into ConfessionVault?
+  /*If stored exists:
+Convert the JSON string back into an object.
+Otherwise:
+Return null. */
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
@@ -24,6 +28,7 @@ export default function Home() {
   //useeffect trigged when to, from, or message changes. It generates the pages for preview.
   useEffect(() => {
     document.fonts.ready.then(() => {
+      //this is promis(something that may finish letter then only "then" part will run)this load the font then go to requestAnimationFrame(() => {means roughly:Browser, run this right before your nextvisual repaint.and then generatePage
       requestAnimationFrame(() => {
         generatePages(to, from, message);
       });
@@ -40,15 +45,27 @@ export default function Home() {
       setCheckingRecipient(true);
 
       const result = await searchRecipient(to);
-
+      /*result = {
+  success: true,
+  data: {
+    exists: true,
+    username: "_dummy_2026"
+  }
+} */
       setRecipientStatus(result.data);
+      /*{recipientStatus?.exists && (
+  <p>✅ Recipient verified.</p>
+)} this becaomes true */
+      // After setRecipientStatus(), React re-renders.
+      // If recipientStatus.exists is true, this condition becomes true,
+      // so the "Recipient verified" message is displayed.
 
       setAllowPending(false);
     } catch (error) {
       console.error(error);
     } finally {
       setCheckingRecipient(false);
-    }
+    } //finally runs whether try succeeded or failed.this setcheckingrecipent bring back "checking..." to normal button
   };
 
   const logoutUser = () => {
@@ -122,40 +139,39 @@ and the user's information.
           type="text"
           value={to}
           onChange={(e) => {
+            // Recipient changed, so previous verification is no longer valid.
+            // Reset verification status and require the user to verify again.
             setTo(e.target.value);
             setRecipientStatus(null);
             setAllowPending(false);
           }}
         />
-<p
-  style={{
-    color: "#666",
-    fontSize: "14px",
-    marginBottom: "8px",
-  }}
->
-  You must verify the recipient before sending a confession.
-</p>
+        <p
+          style={{
+            color: "#666",
+            fontSize: "14px",
+            marginBottom: "8px",
+          }}
+        >
+          You must verify the recipient before sending a confession.
+        </p>
         <button onClick={verifyRecipient} disabled={checkingRecipient}>
           {checkingRecipient ? "Checking..." : "Verify Recipient"}
         </button>
 
         {recipientStatus?.exists && (
           <p style={{ color: "green" }}>
-✅ Recipient verified.
-You can now send your confession.
-</p>
+            ✅ Recipient verified. You can now send your confession.
+          </p>
         )}
 
         {recipientStatus && !recipientStatus.exists && (
           <>
             <p style={{ color: "orange" }}>
-⚠️ This user hasn't joined ConfessionVault yet.
-
-You can still send your confession.
-
-We'll securely store it for up to 7 days and automatically deliver it if they join.
-</p>
+              ⚠️ This user hasn't joined ConfessionVault yet. You can still send
+              your confession. We'll securely store it for up to 7 days and
+              automatically deliver it if they join.
+            </p>
 
             <button onClick={() => setAllowPending(true)}>Send Anyway</button>
           </>
@@ -175,21 +191,17 @@ We'll securely store it for up to 7 days and automatically deliver it if they jo
         <button onClick={downloadPages}>Download Pages</button>
 
         <button
-  disabled={
-    !recipientStatus ||
-    checkingRecipient ||
-    (!recipientStatus.exists && !allowPending)
-  }
-  onClick={() => {
-    submitConfession(
-      to,
-      message,
-      allowPending
-    );
-  }}
->
-  Submit Confession
-</button>
+          disabled={
+            !recipientStatus ||
+            checkingRecipient ||
+            (!recipientStatus.exists && !allowPending)
+          }
+          onClick={() => {
+            submitConfession(to, message, allowPending);
+          }}
+        >
+          Submit Confession
+        </button>
       </div>
 
       <div className="preview-wrapper" id="previewWrapper" />

@@ -2,19 +2,22 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { getConfession } from "../inbox";
+import { respondToConfession } from "../confessionActions";
 
 export default function ConfessionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [confession, setConfession] =
-    useState(null);
+  const [confession, setConfession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
+  // Current logged-in user
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser
+    ? JSON.parse(storedUser)
+    : null;
 
   useEffect(() => {
     loadConfession();
@@ -24,12 +27,12 @@ export default function ConfessionDetails() {
     try {
       setLoading(true);
 
-      const response =
-        await getConfession(id);
+      const response = await getConfession(id);
 
       setConfession(response.data);
     } catch (error) {
       console.error(error);
+
       setError(
         error.message ||
           "Unable to load confession."
@@ -39,11 +42,36 @@ export default function ConfessionDetails() {
     }
   }
 
+  async function handleAction(action) {
+    try {
+      setActionLoading(true);
+      setError("");
+
+      const response =
+        await respondToConfession(
+          confession._id,
+          action
+        );
+
+      // Backend returns updated confession
+      setConfession(response.data);
+    } catch (error) {
+      console.error(error);
+
+      setError(
+        error.message ||
+          "Unable to respond."
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
   if (loading) {
     return <p>Loading confession...</p>;
   }
 
-  if (error) {
+  if (error && !confession) {
     return <p>{error}</p>;
   }
 
@@ -51,9 +79,17 @@ export default function ConfessionDetails() {
     return <p>Confession not found.</p>;
   }
 
+  const isSender =
+    confession.senderUser === user?._id;
+
+  const isRecipient =
+    confession.recipientUser === user?._id;
+
   return (
     <div style={{ padding: 30 }}>
-      <button onClick={() => navigate("/inbox")}>
+      <button
+        onClick={() => navigate("/inbox")}
+      >
         ← Back to Inbox
       </button>
 
@@ -96,9 +132,104 @@ export default function ConfessionDetails() {
         ).toLocaleString()}
       </p>
 
-      <p>
-        Status: {confession.recipientAction}
-      </p>
+      {error && (
+        <p style={{ color: "red" }}>
+          {error}
+        </p>
+      )}
+
+      {/* RECIPIENT VIEW */}
+      {isRecipient && (
+        <div
+          style={{
+            marginTop: 30,
+            borderTop: "1px solid #ccc",
+            paddingTop: 20,
+          }}
+        >
+          <h3>Your Response</h3>
+
+          {confession.recipientAction ===
+            "pending" && (
+            <>
+              <p>
+                Are you curious about who sent
+                this confession?
+              </p>
+
+              <button
+                disabled={actionLoading}
+                onClick={() =>
+                  handleAction("curious")
+                }
+              >
+                👀 Curious
+              </button>
+
+              <button
+                disabled={actionLoading}
+                onClick={() =>
+                  handleAction(
+                    "not_interested"
+                  )
+                }
+                style={{ marginLeft: 10 }}
+              >
+                Not Interested
+              </button>
+            </>
+          )}
+
+          {confession.recipientAction ===
+            "curious" && (
+            <p>
+              👀 You said you're curious.
+            </p>
+          )}
+
+          {confession.recipientAction ===
+            "not_interested" && (
+            <p>
+              You're not interested in this
+              confession.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* SENDER VIEW */}
+      {isSender && (
+        <div
+          style={{
+            marginTop: 30,
+            borderTop: "1px solid #ccc",
+            paddingTop: 20,
+          }}
+        >
+          <h3>Recipient Response</h3>
+
+          {confession.recipientAction ===
+            "pending" && (
+            <p>
+              ⏳ Waiting for their response.
+            </p>
+          )}
+
+          {confession.recipientAction ===
+            "curious" && (
+            <p>
+              👀 They're curious about you.
+            </p>
+          )}
+
+          {confession.recipientAction ===
+            "not_interested" && (
+            <p>
+              They aren't interested.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
