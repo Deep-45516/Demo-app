@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import { verifyJWT } from "../utils/jwt.js";
 
 //Hello! Before you enter, show me your visitor pass.
 //does this person send authorisation header
@@ -33,7 +33,7 @@ export const verifyToken = (req, res, next) => {
     //Guard checks if the token was signed with the secret koley or not.
     //Only the server knows this secret key.
     //If valid, jwt.verify() returns the payload (user id, email, role, expiry, etc.) in decoded.
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = verifyJWT(token);
 
     //If everything is valid, store the user's info in req.user
     //so later we can access it like req.user.email from any middleware/controller.
