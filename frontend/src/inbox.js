@@ -1,13 +1,17 @@
 const API = import.meta.env.VITE_BACKEND_URL;
 
-async function request(endpoint) {//this is helper which used for both below functionsgetInbox and getconfession
+// Common API helper
+async function request(endpoint, options = {}) {
   const token = localStorage.getItem("token");
 
   const res = await fetch(
     `${API}/api/v1/confessions/${endpoint}`,
     {
+      ...options,
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        ...options.headers,
       },
     }
   );
@@ -24,9 +28,21 @@ async function request(endpoint) {//this is helper which used for both below fun
 }
 
 export function getInbox() {
-  return request("inbox");//endpoint=inbox
+  return request("inbox");
 }
 
 export function getConfession(id) {
   return request(id);
+}
+
+export function updateConfessionAction(
+  confessionId,
+  action
+) {
+  return request(`${confessionId}/action`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      action,
+    }),
+  });
 }

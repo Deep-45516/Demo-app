@@ -271,6 +271,7 @@ recipientUser = AAA   ✅ */
           "_id senderAnonymousName recipientAction deliveryStatus createdAt", //do not show entire confession yet
         )
         .sort({ createdAt: -1 })
+        .limit(50)
         .lean(),
 
       Confession.find({
@@ -281,6 +282,7 @@ recipientUser = AAA   ✅ */
           "_id recipientInstagramUsername recipientAction deliveryStatus createdAt",
         )
         .sort({ createdAt: -1 })//Means sort by creation date,(-1 means decending order,new 1st)
+        .limit(50)
         .lean(),
     ]);
     /*Need to modify/save Mongoose document?
@@ -315,50 +317,48 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
     const { id } = req.params;
     const { action } = req.body;
 
-    // Only these two actions are allowed
+    // Allow only valid actions
     if (!["curious", "not_interested"].includes(action)) {
-      throw new ApiError(400, "Invalid recipient action.");
-    }
-
-    const confession = await Confession.findById(id);
-
-    if (!confession) {
-      throw new ApiError(404, "Confession not found.");
-    }
-
-    // Only recipient can respond
-    if (
-      confession.recipientUser.toString() !==
-      req.user.id.toString()
-    ) {
-      throw new ApiError(
-        403,
-        "Only the recipient can respond to this confession."
-      );
-    }
-
-    // Prevent changing decision repeatedly
-    if (confession.recipientAction !== "pending") {
       throw new ApiError(
         400,
-        "You have already responded to this confession."
+        "Invalid confession action."
       );
     }
 
-    confession.recipientAction = action;
+    // Find + update only if recipient and still pending
+    const confession = await Confession.findOneAndUpdate(
+      {
+        _id: id,
+        recipientUser: req.user.id,
+        recipientAction: "pending",
+      },
+      {
+        recipientAction: action,
+      },
+      {
+        returnDocument: "after",
+      }
+    );
 
-    await confession.save();
+    if (!confession) {
+      throw new ApiError(
+        403,
+        "You are not allowed to update this confession, or you have already responded."
+      );
+    }
 
     return res.status(200).json(
       new ApiResponse(
         200,
         confession,
-        "Response saved successfully."
+        `Confession marked as ${action}.`
       )
     );
+
   } catch (error) {
     console.error("CONFESSION ACTION ERROR:", error);
 
+    // Check if error is specifically an ApiError instance
     if (error instanceof ApiError) {
       return res.status(error.statuscode).json(error);
     }

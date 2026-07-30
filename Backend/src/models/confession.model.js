@@ -117,5 +117,16 @@ const confessionSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+// Fast Received inbox
+confessionSchema.index({
+  recipientUser: 1,
+  createdAt: -1,
+});
+
+// Fast Sent inbox
+confessionSchema.index({
+  senderUser: 1,
+  createdAt: -1,
+});
 
 export default mongoose.model("Confession", confessionSchema);

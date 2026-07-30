@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { getConfession } from "../inbox";
-import { respondToConfession } from "../confessionActions";
+import {
+  getConfession,
+  updateConfessionAction,
+} from "../inbox";
 
 export default function ConfessionDetails() {
   const { id } = useParams();
@@ -15,6 +17,7 @@ export default function ConfessionDetails() {
 
   // Current logged-in user
   const storedUser = localStorage.getItem("user");
+
   const user = storedUser
     ? JSON.parse(storedUser)
     : null;
@@ -26,6 +29,7 @@ export default function ConfessionDetails() {
   async function loadConfession() {
     try {
       setLoading(true);
+      setError("");
 
       const response = await getConfession(id);
 
@@ -43,18 +47,22 @@ export default function ConfessionDetails() {
   }
 
   async function handleAction(action) {
+    if (!confession) return;
+
     try {
       setActionLoading(true);
       setError("");
 
       const response =
-        await respondToConfession(
+        await updateConfessionAction(
           confession._id,
           action
         );
 
-      // Backend returns updated confession
+      // Update React state immediately.
+      // No page reload and no second GET request.
       setConfession(response.data);
+
     } catch (error) {
       console.error(error);
 
@@ -79,6 +87,8 @@ export default function ConfessionDetails() {
     return <p>Confession not found.</p>;
   }
 
+  // These checks are for UI only.
+  // Backend authorization is the real security.
   const isSender =
     confession.senderUser === user?._id;
 
@@ -138,7 +148,10 @@ export default function ConfessionDetails() {
         </p>
       )}
 
-      {/* RECIPIENT VIEW */}
+      {/* =========================
+          RECIPIENT VIEW
+          ========================= */}
+
       {isRecipient && (
         <div
           style={{
@@ -163,7 +176,9 @@ export default function ConfessionDetails() {
                   handleAction("curious")
                 }
               >
-                👀 Curious
+                {actionLoading
+                  ? "Updating..."
+                  : "👀 Curious"}
               </button>
 
               <button
@@ -173,9 +188,13 @@ export default function ConfessionDetails() {
                     "not_interested"
                   )
                 }
-                style={{ marginLeft: 10 }}
+                style={{
+                  marginLeft: 10,
+                }}
               >
-                Not Interested
+                {actionLoading
+                  ? "Updating..."
+                  : "Not Interested"}
               </button>
             </>
           )}
@@ -197,7 +216,10 @@ export default function ConfessionDetails() {
         </div>
       )}
 
-      {/* SENDER VIEW */}
+      {/* =========================
+          SENDER VIEW
+          ========================= */}
+
       {isSender && (
         <div
           style={{
