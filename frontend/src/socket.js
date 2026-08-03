@@ -8,9 +8,11 @@ let socket = null;
 
 export function connectSocket() {
   console.log("connectSocket called");
-    if (socket?.connected) {
+
+  if (socket) {
     return socket;
   }
+
   const token = localStorage.getItem("token");
 
   if (!token) return null;
@@ -22,15 +24,20 @@ export function connectSocket() {
   });
 
   socket.on("connect", () => {
-    console.log("✅ Connected to socket:", socket.id);
+    console.log(
+      "✅ Connected:",
+      socket.id
+    );
   });
 
   socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected");
+    console.log(
+      "❌ Disconnected"
+    );
   });
 
-  socket.on("connect_error", (error) => {
-    console.error("🚨 Socket connection failed:", error.message);
+  socket.on("connect_error", (err) => {
+    console.error(err.message);
   });
 
   return socket;
