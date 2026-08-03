@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getInbox } from "../inbox";
+import {
+  subscribeToNewConfession,
+  unsubscribeFromNewConfession,
+} from "../socket";
 
 export default function Inbox() {
   const navigate = useNavigate();
@@ -16,6 +20,22 @@ export default function Inbox() {
 
   useEffect(() => {
     loadInbox();
+    function handleNewConfession(data) {
+  console.log(
+    "Realtime event received:",
+    data
+  );
+}
+
+subscribeToNewConfession(
+  handleNewConfession
+);
+
+return () => {
+  unsubscribeFromNewConfession(
+    handleNewConfession
+  );
+};
   }, []);
 
   async function loadInbox() {

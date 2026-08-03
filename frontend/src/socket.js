@@ -45,3 +45,16 @@ export function disconnectSocket() {
     socket = null;
   }
 }
+
+//instead of writing socket.on(..) we use this as a helper sunscribeToNewConfession
+export function subscribeToNewConfession(callback) {
+  if (!socket) return;
+
+  socket.on("new-confession", callback);
+}
+
+export function unsubscribeFromNewConfession(callback) {
+  if (!socket) return;
+
+  socket.off("new-confession", callback);
+}
