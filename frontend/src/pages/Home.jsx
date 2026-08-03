@@ -5,6 +5,7 @@ import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";
 import { searchRecipient } from "../searchRecipient.js";
+import { connectSocket, disconnectSocket } from "../socket";
 
 const API = import.meta.env.VITE_BACKEND_URL;
 
@@ -25,6 +26,12 @@ Return null. */
     return stored ? JSON.parse(stored) : null;
   });
 
+  //this connect the user to socketwhen login,(always connected to socket)
+useEffect(() => {
+  if (!user) return;
+
+  connectSocket();
+}, [user]);
   //useeffect trigged when to, from, or message changes. It generates the pages for preview.
   useEffect(() => {
     document.fonts.ready.then(() => {
@@ -68,11 +75,14 @@ Return null. */
     } //finally runs whether try succeeded or failed.this setcheckingrecipent bring back "checking..." to normal button
   };
 
-  const logoutUser = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.reload();
-  };
+ const logoutUser = () => {
+  disconnectSocket();
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  window.location.reload();
+};
 
   if (!user) {
     return (
@@ -107,11 +117,13 @@ and the user's information.
                   alert(data.message);
                   return;
                 }
+localStorage.setItem("token", data.data.token);
+localStorage.setItem("user", JSON.stringify(data.data.user));
 
-                localStorage.setItem("token", data.data.token);
-                localStorage.setItem("user", JSON.stringify(data.data.user));
+// Create socket connection immediately
+connectSocket();
 
-                window.location.reload();
+window.location.reload();
               } catch (err) {
                 console.error(err);
                 alert("Login failed");
