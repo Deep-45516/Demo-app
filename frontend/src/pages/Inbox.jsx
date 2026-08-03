@@ -20,11 +20,13 @@ export default function Inbox() {
 
   useEffect(() => {
     loadInbox();
-    function handleNewConfession(data) {
-  console.log(
-    "Realtime event received:",
-    data
-  );
+async function handleNewConfession(data) {
+  console.log("🔥 EVENT");
+  console.log(data);
+
+  await loadInbox();
+
+  console.log("🔥 Inbox Reloaded");
 }
 
 subscribeToNewConfession(
