@@ -210,6 +210,9 @@ io.to(`user:${recipient._id}`).emit(
     confessionId: confession._id,
   }
 );
+console.log(
+  `Emitted new-confession to room user:${recipient._id}`
+);
     await sendAdminNotification({
       title: "New confession request",
       body: `${confession.recipientInstagramUsername} received a confession`,
