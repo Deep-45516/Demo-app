@@ -27,11 +27,11 @@ Return null. */
   });
 
   //this connect the user to socketwhen login,(always connected to socket)
-useEffect(() => {
-  if (!user) return;
+// useEffect(() => {
+//   if (!user) return;
 
-  connectSocket();
-}, [user]);
+//   connectSocket();
+// }, [user]);
   //useeffect trigged when to, from, or message changes. It generates the pages for preview.
   useEffect(() => {
     document.fonts.ready.then(() => {
@@ -76,7 +76,7 @@ useEffect(() => {
   };
 
  const logoutUser = () => {
-  disconnectSocket();
+  // disconnectSocket();
 
   localStorage.removeItem("token");
   localStorage.removeItem("user");

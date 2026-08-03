@@ -7,6 +7,7 @@ const API = import.meta.env.VITE_BACKEND_URL;
 let socket = null;
 
 export function connectSocket() {
+  console.log("connectSocket called");
     if (socket?.connected) {
     return socket;
   }
@@ -48,9 +49,10 @@ export function disconnectSocket() {
 
 //instead of writing socket.on(..) we use this as a helper sunscribeToNewConfession
 export function subscribeToNewConfession(callback) {
-  if (!socket) return;
-
-  socket.on("new-confession", callback);
+  const currentSocket = connectSocket();
+  if (!currentSocket) return;
+  console.log("Subscribing to new-confession");
+  currentSocket.on("new-confession", callback);
 }
 
 export function unsubscribeFromNewConfession(callback) {

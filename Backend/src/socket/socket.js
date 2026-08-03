@@ -60,6 +60,9 @@ console.log(
 joined room:
 user:${socket.user._id}`
 );
+ socket.onAny((event, ...args) => {
+    console.log("Received Event:", event, args);
+  });
 
     socket.on("disconnect", () => {
       console.log(
