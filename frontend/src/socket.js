@@ -49,6 +49,7 @@ export function disconnectSocket() {
 
 //instead of writing socket.on(..) we use this as a helper sunscribeToNewConfession
 export function subscribeToNewConfession(callback) {
+  console.log("Listener attached");
   const currentSocket = connectSocket();
   if (!currentSocket) return;
   console.log("Subscribing to new-confession");
