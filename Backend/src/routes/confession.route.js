@@ -202,13 +202,11 @@ Not sending to yourself ✅*/
       message,
       imageUrls,
     });
-    const io = getIO();
+import { notifyNewConfession } from "../socket/socketNotifier.js";
 
-io.to(`user:${recipient._id}`).emit(
-  "new-confession",
-  {
-    confessionId: confession._id,
-  }
+notifyNewConfession(
+    recipient._id,
+    confession
 );
 console.log(
   `Emitted new-confession to room user:${recipient._id}`

@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 // Express handles HTTP requests
 // Socket.IO also needs access to the underlying HTTP server.
+//express->HTTP Server<-Socket.io
 const httpServer = http.createServer(app);
 
 // Attach Socket.IO to the SAME server.
