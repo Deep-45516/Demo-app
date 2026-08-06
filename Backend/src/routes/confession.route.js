@@ -12,6 +12,7 @@ import AnonymousProfile from "../models/anonymousProfile.model.js";
 import { createPendingConfession } from "../services/pendingConfession.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { getIO } from "../socket/socket.js";
+import { notifyNewConfession } from "../socket/socketNotifier.js";
 
 /*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
@@ -202,7 +203,7 @@ Not sending to yourself ✅*/
       message,
       imageUrls,
     });
-import { notifyNewConfession } from "../socket/socketNotifier.js";
+
 
 notifyNewConfession(
     recipient._id,
