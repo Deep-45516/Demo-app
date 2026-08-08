@@ -2,26 +2,30 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
-    confession: {
+    // Conversation this message belongs to.
+    conversationId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Confession",
+      ref: "Conversation",
       required: true,
-      // index: true,
     },
 
-    sender: {
+    // User who sent this particular message.
+    senderUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    message: {
+    // Actual message content.
+    text: {
       type: String,
       required: true,
       trim: true,
       maxlength: 2000,
     },
 
+    // null = not seen yet.
+    // Date = recipient has seen it.
     seenAt: {
       type: Date,
       default: null,
@@ -32,12 +36,12 @@ const messageSchema = new mongoose.Schema(
   }
 );
 
-// Fast:
-// messages for confession ABC
-// ordered oldest → newest
+// Main chat query:
+// "Give me messages for this conversation,
+// newest/oldest in the required order."
 messageSchema.index({
-  confession: 1,
-  createdAt: 1,
+  conversationId: 1,
+  createdAt: -1,
 });
 
 export default mongoose.model(
