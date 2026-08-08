@@ -13,6 +13,7 @@ import { createPendingConfession } from "../services/pendingConfession.service.j
 import { asyncHandler } from "../utils/async-handler.js";
 import { getIO } from "../socket/socket.js";
 import { notifyNewConfession } from "../socket/socketNotifier.js";
+import Conversation from "../models/conversation.model.js";
 
 /*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
@@ -328,7 +329,7 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
     const { id } = req.params;
     const { action } = req.body;
 
-    // Allow only valid actions
+    // Only these two responses are allowed.
     if (!["curious", "not_interested"].includes(action)) {
       throw new ApiError(
         400,
@@ -336,7 +337,8 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
       );
     }
 
-    // Find + update only if recipient and still pending
+    // Only the actual recipient of this confession
+    // is allowed to respond to it.
     const confession = await Confession.findOneAndUpdate(
       {
         _id: id,
@@ -358,6 +360,28 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
       );
     }
 
+    // A conversation is created only when the recipient
+    // chooses "curious".
+    if (action === "curious") {
+      await Conversation.findOneAndUpdate(
+        {
+          confessionId: confession._id,
+        },
+        {
+          $setOnInsert: {
+            confessionId: confession._id,
+            senderUser: confession.senderUser,
+            recipientUser: confession.recipientUser,
+            status: "active",
+          },
+        },
+        {
+          upsert: true,
+          new: true,
+        }
+      );
+    }
+
     return res.status(200).json(
       new ApiResponse(
         200,
@@ -367,18 +391,23 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
     );
 
   } catch (error) {
-    console.error("CONFESSION ACTION ERROR:", error);
+    console.error(
+      "CONFESSION ACTION ERROR:",
+      error
+    );
 
-    // Check if error is specifically an ApiError instance
     if (error instanceof ApiError) {
-      return res.status(error.statuscode).json(error);
+      return res
+        .status(error.statuscode)
+        .json(error);
     }
 
     return res.status(500).json(
       new ApiResponse(
         500,
         null,
-        error.message || "Something went wrong."
+        error.message ||
+          "Something went wrong."
       )
     );
   }
