@@ -3,8 +3,8 @@ import cors from "cors";
 import instagramRouter from "./routes/instagram.route.js";
 import webhookRouter from "./routes/webhook.route.js";
 
-const app = express();//creates the Express application instance.
-app.set("trust proxy", 1);//trust request come from render for each ip address can send linmited req per min / sec i.e rate limiting
+const app = express(); //creates the Express application instance.
+app.set("trust proxy", 1); //trust request come from render for each ip address can send linmited req per min / sec i.e rate limiting
 
 // middlewares
 app.use(
@@ -12,7 +12,7 @@ app.use(
     verify: (req, res, buf) => {
       req.rawBody = buf;
     },
-  })
+  }),
 );
 app.use(
   cors({
@@ -30,6 +30,7 @@ app.get("/", (req, res) => {
 import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/healthcheck.route.js";
 import confessionRouter from "./routes/confession.route.js";
+import chatRouter from "./routes/chat.route.js";
 
 import notificationRouter from "./routes/notification.route.js";
 app.use("/api/v1/instagram", instagramRouter);
@@ -38,5 +39,5 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/healthcheck", healthRouter);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/webhook", webhookRouter);
-
+app.use("/api/v1/chat", chatRouter);
 export default app;
