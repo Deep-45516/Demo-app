@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { moderateMessage } from "./moderation.service.js";
@@ -303,9 +304,9 @@ export async function getMessages(
   };
 }
 
-export async function getConversations(
-  userId
-) {
+export async function getConversations(userId) {
+  const userObjectId =
+    new mongoose.Types.ObjectId(userId);
   const conversations =
     await Conversation.aggregate([
       // ----------------------------------
@@ -315,8 +316,8 @@ export async function getConversations(
         $match: {
           status: "active",
           $or: [
-            { senderUser: userId },
-            { recipientUser: userId },
+            { senderUser: userObjectId },
+            { recipientUser: userObjectId },
           ],
         },
       },
