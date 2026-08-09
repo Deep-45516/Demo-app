@@ -2,13 +2,18 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { moderateMessage } from "./moderation.service.js";
 
+/*
+  Sends a new chat message.
+
+  Socket.IO is NOT involved here.
+  This is the core database operation.
+*/
 export async function sendMessage(
   conversationId,
   userId,
   text
 ) {
-  // Find the conversation and make sure
-  // the current user is one of its participants.
+  // Make sure the user belongs to this conversation.
   const conversation =
     await Conversation.findOne({
       _id: conversationId,
@@ -29,7 +34,7 @@ export async function sendMessage(
     throw error;
   }
 
-  // Local zero-cost moderation.
+  // Check message content before saving it.
   const moderation =
     moderateMessage(text);
 
@@ -43,8 +48,7 @@ export async function sendMessage(
     throw error;
   }
 
-  // Save the message FIRST.
-  // Socket notification will happen later.
+  // Save the message first.
   const message = await Message.create({
     conversationId:
       conversation._id,
@@ -61,4 +65,240 @@ export async function sendMessage(
   await conversation.save();
 
   return message;
+}
+
+
+/*
+  Gets messages belonging to a conversation.
+
+  Cursor pagination is used instead of page numbers.
+
+  First request:
+    get latest messages
+
+  Next request:
+    send the cursor returned by the
+    previous request and get older messages.
+*/
+export async function getMessages(
+  conversationId,
+  userId,
+  cursor = null,
+  limit = 20
+) {
+  // ----------------------------------
+  // 1. Verify conversation access
+  // ----------------------------------
+
+  const conversation =
+    await Conversation.findOne({
+      _id: conversationId,
+      $or: [
+        { senderUser: userId },
+        { recipientUser: userId },
+      ],
+    }).lean();
+
+  if (!conversation) {
+    const error = new Error(
+      "Conversation not found or access denied."
+    );
+
+    error.statusCode = 403;
+
+    throw error;
+  }
+
+
+  // ----------------------------------
+  // 2. Keep limit under our control
+  // ----------------------------------
+
+  limit = Number(limit) || 20;
+
+  // Never allow a client to request
+  // thousands of messages at once.
+  limit = Math.min(
+    Math.max(limit, 1),
+    50
+  );
+
+
+  // ----------------------------------
+  // 3. Build MongoDB query
+  // ----------------------------------
+
+  const query = {
+    conversationId:
+      conversation._id,
+  };
+
+
+  /*
+    If there is a cursor, decode it.
+
+    Cursor contains:
+
+    {
+      createdAt,
+      id
+    }
+
+    This lets us say:
+
+    "Give me messages older than THIS
+     exact message."
+  */
+  if (cursor) {
+    let decodedCursor;
+
+    try {
+      decodedCursor =
+        JSON.parse(
+          Buffer.from(
+            cursor,
+            "base64url"
+          ).toString("utf8")
+        );
+    } catch {
+      const error = new Error(
+        "Invalid pagination cursor."
+      );
+
+      error.statusCode = 400;
+
+      throw error;
+    }
+
+    const cursorDate =
+      new Date(decodedCursor.createdAt);
+
+    if (
+      !decodedCursor.id ||
+      Number.isNaN(cursorDate.getTime())
+    ) {
+      const error = new Error(
+        "Invalid pagination cursor."
+      );
+
+      error.statusCode = 400;
+
+      throw error;
+    }
+
+    /*
+      Messages are sorted:
+
+      createdAt DESC
+      _id DESC
+
+      So we ask MongoDB for messages
+      older than the cursor.
+
+      _id is used as a tie-breaker when
+      two messages have the same timestamp.
+    */
+    query.$or = [
+      {
+        createdAt: {
+          $lt: cursorDate,
+        },
+      },
+      {
+        createdAt: cursorDate,
+        _id: {
+          $lt: decodedCursor.id,
+        },
+      },
+    ];
+  }
+
+
+  // ----------------------------------
+  // 4. Get one extra message
+  // ----------------------------------
+
+  /*
+    If user asks for 20 messages,
+    we fetch 21.
+
+    Why?
+
+    If we receive 21:
+
+      first 20 → send to frontend
+      21st      → proves more exist
+
+    Therefore:
+
+      hasMore = true
+  */
+
+  const messages =
+    await Message.find(query)
+      .sort({
+        createdAt: -1,
+        _id: -1,
+      })
+      .limit(limit + 1)
+      .lean();
+
+
+  const hasMore =
+    messages.length > limit;
+
+
+  // Remove the extra message.
+  if (hasMore) {
+    messages.pop();
+  }
+
+
+  /*
+    Database gives newest → oldest:
+
+      20
+      19
+      18
+      ...
+
+    Chat UI normally wants:
+
+      1
+      2
+      3
+      ...
+
+    So reverse before sending.
+  */
+  messages.reverse();
+
+
+  // ----------------------------------
+  // 5. Create next cursor
+  // ----------------------------------
+
+  let nextCursor = null;
+
+  if (hasMore && messages.length > 0) {
+    const oldestMessage =
+      messages[0];
+
+    nextCursor =
+      Buffer.from(
+        JSON.stringify({
+          createdAt:
+            oldestMessage.createdAt,
+          id:
+            oldestMessage._id,
+        })
+      ).toString("base64url");
+  }
+
+
+  return {
+    messages,
+    nextCursor,
+    hasMore,
+  };
 }
