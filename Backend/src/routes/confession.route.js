@@ -336,7 +336,11 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
         "Invalid confession action."
       );
     }
-
+console.log("ACTION DEBUG:", {
+  confessionId: id,
+  loggedInUser: req.user.id,
+  action,
+});
     // Only the actual recipient of this confession
     // is allowed to respond to it.
     const confession = await Confession.findOneAndUpdate(
