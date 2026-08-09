@@ -1,8 +1,8 @@
 import {
   sendMessage,
   getMessages,
+  getConversations,
 } from "../services/chat.service.js";
-
 
 export const createMessage =
   async (req, res) => {
@@ -102,6 +102,36 @@ export const getConversationMessages =
         message:
           error.message ||
           "Unable to load messages.",
+      });
+    }
+  };
+
+  export const getConversationList =
+  async (req, res) => {
+    try {
+      const conversations =
+        await getConversations(
+          req.user.id
+        );
+
+      return res.status(200).json({
+        success: true,
+        data: conversations,
+        message:
+          "Conversations fetched successfully.",
+      });
+
+    } catch (error) {
+      console.error(
+        "GET CONVERSATIONS ERROR:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          error.message ||
+          "Unable to load conversations.",
       });
     }
   };

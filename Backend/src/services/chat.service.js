@@ -302,3 +302,121 @@ export async function getMessages(
     hasMore,
   };
 }
+
+export async function getConversations(
+  userId
+) {
+  const conversations =
+    await Conversation.aggregate([
+      // ----------------------------------
+      // 1. Only conversations of this user
+      // ----------------------------------
+      {
+        $match: {
+          status: "active",
+          $or: [
+            { senderUser: userId },
+            { recipientUser: userId },
+          ],
+        },
+      },
+
+      // ----------------------------------
+      // 2. Newest conversation first
+      // ----------------------------------
+      {
+        $sort: {
+          lastMessageAt: -1,
+          _id: -1,
+        },
+      },
+
+      // ----------------------------------
+      // 3. Get confession information
+      // ----------------------------------
+      {
+        $lookup: {
+          from: "confessions",
+          localField: "confessionId",
+          foreignField: "_id",
+          as: "confession",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$confession",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // ----------------------------------
+      // 4. Get the latest message
+      // ----------------------------------
+      {
+        $lookup: {
+          from: "messages",
+          let: {
+            conversationId: "$_id",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [
+                    "$conversationId",
+                    "$$conversationId",
+                  ],
+                },
+              },
+            },
+            {
+              $sort: {
+                createdAt: -1,
+                _id: -1,
+              },
+            },
+            {
+              $limit: 1,
+            },
+          ],
+          as: "lastMessage",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$lastMessage",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // ----------------------------------
+      // 5. Return only what the chat list needs
+      // ----------------------------------
+      {
+        $project: {
+          _id: 1,
+          confessionId: 1,
+          status: 1,
+          lastMessageAt: 1,
+
+          lastMessage: {
+            _id: "$lastMessage._id",
+            text: "$lastMessage.text",
+            senderUser: "$lastMessage.senderUser",
+            createdAt: "$lastMessage.createdAt",
+          },
+
+          // Don't expose the sender's real identity.
+          senderAnonymousName:
+            "$confession.senderAnonymousName",
+
+          recipientInstagramUsername:
+            "$confession.recipientInstagramUsername",
+        },
+      },
+    ]);
+
+  return conversations;
+}

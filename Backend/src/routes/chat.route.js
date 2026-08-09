@@ -7,10 +7,19 @@ import {
 import {
   createMessage,
   getConversationMessages,
+  getConversationList,
 } from "../controllers/chat.controller.js";
 
 const router =
   express.Router();
+
+
+// Get user's conversation list
+router.get(
+  "/conversations",
+  verifyToken,
+  getConversationList
+);
 
 
 // Send a message
@@ -27,6 +36,7 @@ router.get(
   verifyToken,
   getConversationMessages
 );
+
 
 
 export default router;
