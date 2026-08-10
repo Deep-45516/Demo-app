@@ -142,7 +142,6 @@ export default function Inbox() {
     }}
   >
     <strong>
-      //conversation.recipientInstagramUsername
       {conversation.displayName}
     </strong>
 
