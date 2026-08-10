@@ -415,6 +415,7 @@ console.log("ACTION DEBUG:", {
       )
     );
   }
+
 });
 // GET ONE CONFESSION
 router.get("/:id", verifyToken, async (req, res) => {
@@ -451,15 +452,17 @@ router.get("/:id", verifyToken, async (req, res) => {
     ],
   }).select("_id").lean();
 
-   new ApiResponse(
-  200,
-  {
-    ...confession,
-    conversationId:
-      conversation?._id || null,
-  },
-  "Confession fetched successfully."
-)
+return res.status(200).json(
+  new ApiResponse(
+    200,
+    {
+      ...confession,
+      conversationId:
+        conversation?._id || null,
+    },
+    "Confession fetched successfully."
+  )
+);
 
 
   } catch (error) {
