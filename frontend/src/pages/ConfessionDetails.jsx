@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  getConfession,
-  updateConfessionAction,
-} from "../inbox";
+import { getConfession, updateConfessionAction } from "../inbox";
 
 export default function ConfessionDetails() {
   const { id } = useParams();
@@ -14,13 +11,12 @@ export default function ConfessionDetails() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
+  const [conversationId, setConversationId] = useState(null);
 
   // Current logged-in user
   const storedUser = localStorage.getItem("user");
 
-  const user = storedUser
-    ? JSON.parse(storedUser)
-    : null;
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
   useEffect(() => {
     loadConfession();
@@ -34,13 +30,14 @@ export default function ConfessionDetails() {
       const response = await getConfession(id);
 
       setConfession(response.data);
+
+setConversationId(
+  response.data.conversationId || null
+);
     } catch (error) {
       console.error(error);
 
-      setError(
-        error.message ||
-          "Unable to load confession."
-      );
+      setError(error.message || "Unable to load confession.");
     } finally {
       setLoading(false);
     }
@@ -53,23 +50,15 @@ export default function ConfessionDetails() {
       setActionLoading(true);
       setError("");
 
-      const response =
-        await updateConfessionAction(
-          confession._id,
-          action
-        );
+      const response = await updateConfessionAction(confession._id, action);
 
       // Update React state immediately.
       // No page reload and no second GET request.
       setConfession(response.data);
-
     } catch (error) {
       console.error(error);
 
-      setError(
-        error.message ||
-          "Unable to respond."
-      );
+      setError(error.message || "Unable to respond.");
     } finally {
       setActionLoading(false);
     }
@@ -89,34 +78,22 @@ export default function ConfessionDetails() {
 
   // These checks are for UI only.
   // Backend authorization is the real security.
-  const isSender =
-    confession.senderUser === user?._id;
+  const isSender = confession.senderUser === user?._id;
 
-  const isRecipient =
-    confession.recipientUser === user?._id;
+  const isRecipient = confession.recipientUser === user?._id;
 
   return (
     <div style={{ padding: 30 }}>
-      <button
-        onClick={() => navigate("/inbox")}
-      >
-        ← Back to Inbox
-      </button>
+      <button onClick={() => navigate("/inbox")}>← Back to Inbox</button>
 
       <h2>Confession</h2>
 
       <p>
-        From:{" "}
-        <strong>
-          {confession.senderAnonymousName}
-        </strong>
+        From: <strong>{confession.senderAnonymousName}</strong>
       </p>
 
       <p>
-        To:{" "}
-        <strong>
-          @{confession.recipientInstagramUsername}
-        </strong>
+        To: <strong>@{confession.recipientInstagramUsername}</strong>
       </p>
 
       <p>{confession.message}</p>
@@ -135,18 +112,9 @@ export default function ConfessionDetails() {
         />
       ))}
 
-      <p>
-        Sent:{" "}
-        {new Date(
-          confession.createdAt
-        ).toLocaleString()}
-      </p>
+      <p>Sent: {new Date(confession.createdAt).toLocaleString()}</p>
 
-      {error && (
-        <p style={{ color: "red" }}>
-          {error}
-        </p>
-      )}
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       {/* =========================
           RECIPIENT VIEW
@@ -162,56 +130,52 @@ export default function ConfessionDetails() {
         >
           <h3>Your Response</h3>
 
-          {confession.recipientAction ===
-            "pending" && (
+          {confession.recipientAction === "pending" && (
             <>
-              <p>
-                Are you curious about who sent
-                this confession?
-              </p>
+              <p>Are you curious about who sent this confession?</p>
 
               <button
                 disabled={actionLoading}
-                onClick={() =>
-                  handleAction("curious")
-                }
+                onClick={() => handleAction("curious")}
               >
-                {actionLoading
-                  ? "Updating..."
-                  : "👀 Curious"}
+                {actionLoading ? "Updating..." : "👀 Curious"}
               </button>
 
               <button
                 disabled={actionLoading}
-                onClick={() =>
-                  handleAction(
-                    "not_interested"
-                  )
-                }
+                onClick={() => handleAction("not_interested")}
                 style={{
                   marginLeft: 10,
                 }}
               >
-                {actionLoading
-                  ? "Updating..."
-                  : "Not Interested"}
+                {actionLoading ? "Updating..." : "Not Interested"}
               </button>
             </>
           )}
 
           {confession.recipientAction ===
-            "curious" && (
-            <p>
-              👀 You said you're curious.
-            </p>
-          )}
+  "curious" && (
+  <>
+    <p>
+      👀 You said you're curious.
+    </p>
 
-          {confession.recipientAction ===
-            "not_interested" && (
-            <p>
-              You're not interested in this
-              confession.
-            </p>
+    {conversationId && (
+      <button
+        onClick={() =>
+          navigate(
+            `/chat/${conversationId}`
+          )
+        }
+      >
+        💬 Continue Conversation
+      </button>
+    )}
+  </>
+)}
+
+          {confession.recipientAction === "not_interested" && (
+            <p>You're not interested in this confession.</p>
           )}
         </div>
       )}
@@ -230,25 +194,33 @@ export default function ConfessionDetails() {
         >
           <h3>Recipient Response</h3>
 
-          {confession.recipientAction ===
-            "pending" && (
-            <p>
-              ⏳ Waiting for their response.
-            </p>
+          {confession.recipientAction === "pending" && (
+            <p>⏳ Waiting for their response.</p>
           )}
 
           {confession.recipientAction ===
-            "curious" && (
-            <p>
-              👀 They're curious about you.
-            </p>
-          )}
+  "curious" && (
+  <>
+    <p>
+      👀 They're curious about you.
+    </p>
 
-          {confession.recipientAction ===
-            "not_interested" && (
-            <p>
-              They aren't interested.
-            </p>
+    {conversationId && (
+      <button
+        onClick={() =>
+          navigate(
+            `/chat/${conversationId}`
+          )
+        }
+      >
+        💬 Continue Conversation
+      </button>
+    )}
+  </>
+)}
+
+          {confession.recipientAction === "not_interested" && (
+            <p>They aren't interested.</p>
           )}
         </div>
       )}

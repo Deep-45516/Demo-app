@@ -435,12 +435,31 @@ router.get("/:id", verifyToken, async (req, res) => {
     if (!isSender && !isRecipient) {
       throw new ApiError(403, "You are not allowed to view this confession.");
     }
+    const conversation =
+  await Conversation.findOne({
+    confessionId: confession._id,
+    status: "active",
+    $or: [
+      {
+        senderUser: confession.senderUser,
+        recipientUser: confession.recipientUser,
+      },
+      {
+        senderUser: confession.recipientUser,
+        recipientUser: confession.senderUser,
+      },
+    ],
+  }).select("_id").lean();
 
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(200, confession, "Confession fetched successfully."),
-      );
+   new ApiResponse(
+  200,
+  {
+    ...confession,
+    conversationId:
+      conversation?._id || null,
+  },
+  "Confession fetched successfully."
+)
   } catch (error) {
     console.error("GET CONFESSION ERROR:", error);
 
