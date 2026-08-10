@@ -307,10 +307,11 @@ export async function getMessages(
 export async function getConversations(userId) {
   const userObjectId =
     new mongoose.Types.ObjectId(userId);
+
   const conversations =
     await Conversation.aggregate([
       // ----------------------------------
-      // 1. Only conversations of this user
+      // 1. Only this user's conversations
       // ----------------------------------
       {
         $match: {
@@ -333,7 +334,7 @@ export async function getConversations(userId) {
       },
 
       // ----------------------------------
-      // 3. Get confession information
+      // 3. Get original confession
       // ----------------------------------
       {
         $lookup: {
@@ -352,7 +353,7 @@ export async function getConversations(userId) {
       },
 
       // ----------------------------------
-      // 4. Get the latest message
+      // 4. Get latest message
       // ----------------------------------
       {
         $lookup: {
@@ -385,15 +386,34 @@ export async function getConversations(userId) {
         },
       },
 
+      // ----------------------------------
+      // 5. Convert array to object/null
+      // ----------------------------------
       {
-        $unwind: {
-          path: "$lastMessage",
-          preserveNullAndEmptyArrays: true,
+        $set: {
+          lastMessage: {
+            $cond: [
+              {
+                $gt: [
+                  { $size: "$lastMessage" },
+                  0,
+                ],
+              },
+              {
+                $arrayElemAt: [
+                  "$lastMessage",
+                  0,
+                ],
+              },
+              null,
+            ],
+          },
         },
       },
 
       // ----------------------------------
-      // 5. Return only what the chat list needs
+      // 6. Decide what identity THIS USER
+      //    is allowed to see.
       // ----------------------------------
       {
         $project: {
@@ -403,18 +423,60 @@ export async function getConversations(userId) {
           lastMessageAt: 1,
 
           lastMessage: {
-            _id: "$lastMessage._id",
-            text: "$lastMessage.text",
-            senderUser: "$lastMessage.senderUser",
-            createdAt: "$lastMessage.createdAt",
+            $cond: [
+              { $ne: ["$lastMessage", null] },
+              {
+                _id: "$lastMessage._id",
+                text: "$lastMessage.text",
+                senderUser:
+                  "$lastMessage.senderUser",
+                createdAt:
+                  "$lastMessage.createdAt",
+              },
+              null,
+            ],
           },
 
-          // Don't expose the sender's real identity.
-          senderAnonymousName:
-            "$confession.senderAnonymousName",
+          /*
+            If current user is the SENDER:
+              show recipient's Instagram username.
 
-          recipientInstagramUsername:
-            "$confession.recipientInstagramUsername",
+            If current user is the RECIPIENT:
+              show sender's anonymous name.
+
+            We NEVER expose the sender's real
+            Instagram identity here.
+          */
+          displayName: {
+            $cond: [
+              {
+                $eq: [
+                  "$senderUser",
+                  userObjectId,
+                ],
+              },
+              {
+                $concat: [
+                  "@",
+                  "$confession.recipientInstagramUsername",
+                ],
+              },
+              "$confession.senderAnonymousName",
+            ],
+          },
+
+          displayType: {
+            $cond: [
+              {
+                $eq: [
+                  "$senderUser",
+                  userObjectId,
+                ],
+              },
+              "instagram",
+              "anonymous",
+            ],
+          },
         },
       },
     ]);

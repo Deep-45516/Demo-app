@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getConversations } from "../chat/chat.js";
 
 import { getInbox } from "../inbox";
 import {
@@ -17,27 +18,25 @@ export default function Inbox() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [conversations, setConversations] = useState([]);
 
   useEffect(() => {
     loadInbox();
-async function handleNewConfession(data) {
-  console.log("🔥 EVENT");
-  console.log(data);
+    loadConversations();
+    async function handleNewConfession(data) {
+      console.log("🔥 EVENT");
+      console.log(data);
 
-  await loadInbox();
+      await loadInbox();
 
-  console.log("🔥 Inbox Reloaded");
-}
+      console.log("🔥 Inbox Reloaded");
+    }
 
-subscribeToNewConfession(
-  handleNewConfession
-);
+    subscribeToNewConfession(handleNewConfession);
 
-return () => {
-  unsubscribeFromNewConfession(
-    handleNewConfession
-  );
-};
+    return () => {
+      unsubscribeFromNewConfession(handleNewConfession);
+    };
   }, []);
 
   async function loadInbox() {
@@ -55,11 +54,23 @@ return () => {
       setLoading(false);
     }
   }
+  async function loadConversations() {
+  try {
+    const response =
+      await getConversations();
 
-  const list =
-    tab === "received"
-      ? received
-      : sent;
+    setConversations(
+      response.data || []
+    );
+  } catch (error) {
+    console.error(
+      "Unable to load conversations:",
+      error
+    );
+  }
+}
+
+  const list = tab === "received" ? received : sent;
 
   if (loading) {
     return <p>Loading inbox...</p>;
@@ -73,34 +84,20 @@ return () => {
     <div style={{ padding: 30 }}>
       <h2>Inbox</h2>
 
-      <button
-        onClick={() => setTab("received")}
-      >
+      <button onClick={() => setTab("received")}>
         Received ({received.length})
       </button>
 
-      <button
-        onClick={() => setTab("sent")}
-      >
-        Sent ({sent.length})
-      </button>
+      <button onClick={() => setTab("sent")}>Sent ({sent.length})</button>
 
       <hr />
 
-      {list.length === 0 && (
-        <p>
-          No {tab} confessions yet.
-        </p>
-      )}
+      {list.length === 0 && <p>No {tab} confessions yet.</p>}
 
       {list.map((confession) => (
         <div
           key={confession._id}
-          onClick={() =>
-            navigate(
-              `/confessions/${confession._id}`
-            )
-          }
+          onClick={() => navigate(`/confessions/${confession._id}`)}
           style={{
             border: "1px solid #555",
             padding: 15,
@@ -114,25 +111,56 @@ return () => {
               : `@${confession.recipientInstagramUsername}`}
           </strong>
 
-          <p>
-            {new Date(
-              confession.createdAt
-            ).toLocaleString()}
-          </p>
+          <p>{new Date(confession.createdAt).toLocaleString()}</p>
 
-          {tab === "received" && (
-            <small>
-              {confession.recipientAction}
-            </small>
-          )}
+          {tab === "received" && <small>{confession.recipientAction}</small>}
 
-          {tab === "sent" && (
-            <small>
-              {confession.deliveryStatus}
-            </small>
-          )}
+          {tab === "sent" && <small>{confession.deliveryStatus}</small>}
         </div>
       ))}
+      <hr />
+
+<h2>Chats</h2>
+
+{conversations.length === 0 && (
+  <p>No active chats.</p>
+)}
+
+{conversations.map((conversation) => (
+  <div
+    key={conversation._id}
+    onClick={() =>
+      navigate(
+        `/chat/${conversation._id}`
+      )
+    }
+    style={{
+      border: "1px solid #555",
+      padding: 15,
+      marginBottom: 10,
+      cursor: "pointer",
+    }}
+  >
+    <strong>
+      //conversation.recipientInstagramUsername
+      {conversation.displayName}
+    </strong>
+
+    <p>
+      {conversation.lastMessage?.text ||
+        "No messages yet"}
+    </p>
+
+    {conversation.lastMessageAt && (
+      <small>
+        {new Date(
+          conversation.lastMessageAt
+        ).toLocaleString()}
+      </small>
+    )}
+  </div>
+))}
     </div>
+    
   );
 }
