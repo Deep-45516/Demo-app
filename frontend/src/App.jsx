@@ -9,6 +9,7 @@ import Admin from "./pages/Admin.jsx";
 import InstagramVerification from "./components/InstagramVerification/InstagramVerification.jsx";
 import Inbox from "./pages/Inbox.jsx";
 import ConfessionDetails from "./pages/ConfessionDetails.jsx";
+import Chat from "./pages/Chat.jsx";
 
 function App() {
   useEffect(() => {
@@ -42,7 +43,14 @@ function App() {
         path="/confessions/:id"
         element={<ConfessionDetails />}
       />
+
+      <Route
+  path="/chat/:conversationId"
+  element={<Chat />}
+/>
     </Routes>
+
+    
   );
 }
 
