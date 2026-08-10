@@ -26,19 +26,28 @@ export default function ConfessionDetails() {
     try {
       setLoading(true);
       setError("");
-
+      console.log("1. Loading confession:", id);
       const response = await getConfession(id);
+       console.log("2. API response:", response);
 
       setConfession(response.data);
 
 setConversationId(
   response.data.conversationId || null
 );
+console.log(
+      "3. Confession loaded:",
+      response.data
+    );
     } catch (error) {
-      console.error(error);
+       console.error(
+      "CONFESSION LOAD ERROR:",
+      error
+    );
 
       setError(error.message || "Unable to load confession.");
     } finally {
+      console.log("4. Loading finished");
       setLoading(false);
     }
   }

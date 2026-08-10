@@ -460,6 +460,8 @@ router.get("/:id", verifyToken, async (req, res) => {
   },
   "Confession fetched successfully."
 )
+
+
   } catch (error) {
     console.error("GET CONFESSION ERROR:", error);
 
