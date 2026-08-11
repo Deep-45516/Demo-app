@@ -118,7 +118,7 @@ export default function Inbox() {
           {tab === "sent" && <small>{confession.deliveryStatus}</small>}
         </div>
       ))}
-      <hr />
+      {/* <hr />
 
 <h2>Chats</h2>
 
@@ -158,7 +158,7 @@ export default function Inbox() {
       </small>
     )}
   </div>
-))}
+))} */}
     </div>
     
   );
