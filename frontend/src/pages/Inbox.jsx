@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getConversations } from "../chat/chat.js";
+// import { getConversations } from "../chat/chat.js";
 
 import { getInbox } from "../inbox";
 import {
@@ -18,7 +18,7 @@ export default function Inbox() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [conversations, setConversations] = useState([]);
+  // const [conversations, setConversations] = useState([]);
 
   useEffect(() => {
     loadInbox();
@@ -54,21 +54,21 @@ export default function Inbox() {
       setLoading(false);
     }
   }
-  async function loadConversations() {
-  try {
-    const response =
-      await getConversations();
+//   async function loadConversations() {
+//   try {
+//     const response =
+//       await getConversations();
 
-    setConversations(
-      response.data || []
-    );
-  } catch (error) {
-    console.error(
-      "Unable to load conversations:",
-      error
-    );
-  }
-}
+//     setConversations(
+//       response.data || []
+//     );
+//   } catch (error) {
+//     console.error(
+//       "Unable to load conversations:",
+//       error
+//     );
+//   }
+// }
 
   const list = tab === "received" ? received : sent;
 
