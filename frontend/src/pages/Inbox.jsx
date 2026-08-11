@@ -22,7 +22,7 @@ export default function Inbox() {
 
   useEffect(() => {
     loadInbox();
-    loadConversations();
+    // loadConversations();
     async function handleNewConfession(data) {
       console.log("🔥 EVENT");
       console.log(data);
