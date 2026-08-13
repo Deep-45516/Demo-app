@@ -15,6 +15,7 @@ const router =
 
 
 // Get user's conversation list
+//give me my conversation
 router.get(
   "/conversations",
   verifyToken,
@@ -22,7 +23,7 @@ router.get(
 );
 
 
-// Send a message
+// Send this message to chat
 router.post(
   "/:conversationId/messages",
   verifyToken,
@@ -30,7 +31,7 @@ router.post(
 );
 
 
-// Get messages
+// Give me messages from this chat
 router.get(
   "/:conversationId/messages",
   verifyToken,

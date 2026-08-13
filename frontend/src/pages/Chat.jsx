@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
 import {
   getMessages,
   sendMessage,
 } from "../chat/chat.js";
+
+import {
+  getSocket,
+  connectSocket,
+} from "../socket";
+
 
 export default function Chat() {
   const { conversationId } =
@@ -25,9 +30,52 @@ export default function Chat() {
   const [error, setError] =
     useState("");
 
-  useEffect(() => {
-    loadMessages();
-  }, [conversationId]);
+useEffect(() => {
+  loadMessages();
+
+  const socket =
+    getSocket() || connectSocket();
+
+  if (!socket) return;
+
+  function handleNewMessage(data) {
+    const message = data.message;
+
+    if (
+      message.conversationId !==
+      conversationId
+    ) {
+      return;
+    }
+
+    setMessages((current) => {
+      // Prevent duplicate message
+      const alreadyExists =
+        current.some(
+          (item) =>
+            item._id === message._id
+        );
+
+      if (alreadyExists) {
+        return current;
+      }
+
+      return [...current, message];
+    });
+  }
+
+  socket.on(
+    "new-message",
+    handleNewMessage
+  );
+
+  return () => {
+    socket.off(
+      "new-message",
+      handleNewMessage
+    );
+  };
+}, [conversationId]);
 
 
   async function loadMessages() {

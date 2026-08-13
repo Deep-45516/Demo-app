@@ -3,6 +3,9 @@ import {
   getMessages,
   getConversations,
 } from "../services/chat.service.js";
+import {
+  notifyNewMessage,
+} from "../services/chatNotification.service.js";
 
 export const createMessage =
   async (req, res) => {
@@ -30,13 +33,27 @@ export const createMessage =
             "Message is too long.",
         });
       }
-
-      const message =
-        await sendMessage(
-          conversationId,
-          req.user.id,
-          text
-        );
+//The controller sends three things to the service:
+      const {
+  message,
+  conversation,
+} = await sendMessage(
+  conversationId,
+  req.user.id,//user comes from verifyToken->verify JWT->return USERID
+  text
+);
+try {
+  notifyNewMessage(
+    conversation,
+    message,
+    req.user.id
+  );
+} catch (socketError) {
+  console.error(
+    "MESSAGE SOCKET NOTIFICATION ERROR:",
+    socketError
+  );
+}
 
       return res.status(201).json({
         success: true,
@@ -72,8 +89,10 @@ export const getConversationMessages =
       const {
         cursor,
         limit,
-      } = req.query;
+      } = req.query;//brovideed from frontend maybe
 
+      //take message from DB which have same conversationID,that user
+      //call function getmessage() from chat.service.js
       const result =
         await getMessages(
           conversationId,

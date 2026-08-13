@@ -14,15 +14,15 @@ export async function sendMessage(
   userId,
   text
 ) {
-  // Make sure the user belongs to this conversation.
+  // Make sure the user belongs to this conversation.make this 3 checks,to find that right conversation from DB to send message
   const conversation =
     await Conversation.findOne({
-      _id: conversationId,
-      status: "active",
+      _id: conversationId,//match the conversationID
+      status: "active",//active convo only get new messges
       $or: [
         { senderUser: userId },
         { recipientUser: userId },
-      ],
+      ],//the user who made this req should either of these 2
     });
 
   if (!conversation) {
@@ -35,7 +35,7 @@ export async function sendMessage(
     throw error;
   }
 
-  // Check message content before saving it.
+  // Check message content before saving it.moderation.service.js
   const moderation =
     moderateMessage(text);
 
@@ -49,7 +49,7 @@ export async function sendMessage(
     throw error;
   }
 
-  // Save the message first.
+  // Save the message first, mongoDB gets new message Document
   const message = await Message.create({
     conversationId:
       conversation._id,
@@ -59,13 +59,16 @@ export async function sendMessage(
     text: text.trim(),
   });
 
-  // Update conversation metadata.
+  // Update conversation mongoDB Conversation.
   conversation.lastMessageAt =
-    message.createdAt;
+    message.createdAt;//lastMessage used to check recent conversation ,use in inbox
 
-  await conversation.save();
+  await conversation.save();//MongoDB updates the Conversation.
 
-  return message;
+  return {
+  message,
+  conversation,
+};
 }
 
 
@@ -90,7 +93,7 @@ export async function getMessages(
   // ----------------------------------
   // 1. Verify conversation access
   // ----------------------------------
-
+//here no need to check satus of conversation : active
   const conversation =
     await Conversation.findOne({
       _id: conversationId,
@@ -99,7 +102,7 @@ export async function getMessages(
         { recipientUser: userId },
       ],
     }).lean();
-
+//lean means Give me a plain JavaScript object instead of a full Mongoose document , we only need ConversationId
   if (!conversation) {
     const error = new Error(
       "Conversation not found or access denied."
@@ -137,18 +140,16 @@ export async function getMessages(
 
   /*
     If there is a cursor, decode it.
-
     Cursor contains:
-
     {
       createdAt,
       id
     }
-
     This lets us say:
-
     "Give me messages older than THIS
      exact message."
+     Suppose two messages have exactly the same
+     so newest created AT is not enough,so we check newest _id first
   */
   if (cursor) {
     let decodedCursor;
@@ -199,6 +200,8 @@ export async function getMessages(
       _id is used as a tie-breaker when
       two messages have the same timestamp.
     */
+
+      //for getting older messages
     query.$or = [
       {
         createdAt: {
@@ -303,7 +306,7 @@ export async function getMessages(
     hasMore,
   };
 }
-
+//we used MongoDB Aggregation here
 export async function getConversations(userId) {
   const userObjectId =
     new mongoose.Types.ObjectId(userId);
@@ -344,7 +347,7 @@ export async function getConversations(userId) {
           as: "confession",
         },
       },
-
+//means the conversation won't automatically disappear if the confession is missing.
       {
         $unwind: {
           path: "$confession",
