@@ -270,28 +270,6 @@ setRemainingMessages(
     </button>
   </form>
 )}
-        <input
-          value={text}
-          onChange={(event) =>
-            setText(event.target.value)
-          }
-          placeholder="Type a message..."
-          disabled={sending}
-          style={{
-            flex: 1,
-            padding: 10,
-          }}
-        />
-
-        <button
-          type="submit"
-          disabled={sending}
-        >
-          {sending
-            ? "Sending..."
-            : "Send"}
-        </button>
-      </form>
     </div>
   );
 }

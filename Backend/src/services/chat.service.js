@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { moderateMessage } from "./moderation.service.js";
-import { CHAT_MAX_MESSAGES } from "../Rules/chatBox.rule.js";
+import { CHAT_MAX_MESSAGES } from "../rules/chatBox.rule.js";
 
 /*
   Sends a new chat message.
