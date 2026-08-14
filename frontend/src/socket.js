@@ -74,13 +74,17 @@ export function unsubscribeFromNewConfession(callback) {
 
 
 export function subscribeToConfessionUpdated(callback) {
-  console.log("Listener attached: confession-updated");
+  console.log(
+    "Listener attached: confession-updated"
+  );
 
   const currentSocket = connectSocket();
 
   if (!currentSocket) return;
 
-  console.log("Subscribing to confession-updated");
+  console.log(
+    "Subscribing to confession-updated"
+  );
 
   currentSocket.on(
     "confession-updated",

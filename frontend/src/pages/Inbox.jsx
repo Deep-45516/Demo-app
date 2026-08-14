@@ -33,25 +33,36 @@ export default function Inbox() {
 
       console.log("🔥 Inbox Reloaded");
     }
-    function handleConfessionUpdated(data) {
-  console.log("🔥 CONFESSION UPDATED:", data);
+function handleConfessionUpdated(data) {
+  console.log(
+    "🔥 INBOX CONFESSION UPDATED:",
+    data
+  );
 
   setSent((current) =>
     current.map((confession) => {
-      if (confession._id !== data.confessionId) {
+      if (
+        confession._id !==
+        data.confessionId
+      ) {
         return confession;
       }
 
       return {
         ...confession,
-        recipientAction: data.recipientAction,
-        conversationId: data.conversationId,
+        recipientAction:
+          data.recipientAction,
+        conversationId:
+          data.conversationId,
       };
     })
   );
 }
 
     subscribeToNewConfession(handleNewConfession);
+    subscribeToConfessionUpdated(
+  handleConfessionUpdated
+);
 
     return () => {
       unsubscribeFromNewConfession(handleNewConfession);
