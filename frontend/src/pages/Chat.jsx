@@ -30,6 +30,9 @@ export default function Chat() {
   const [error, setError] =
     useState("");
 
+  const [remainingMessages, setRemainingMessages] =
+  useState(null);
+
 useEffect(() => {
   loadMessages();
 
@@ -38,31 +41,36 @@ useEffect(() => {
 
   if (!socket) return;
 
-  function handleNewMessage(data) {
-    const message = data.message;
+function handleNewMessage(data) {
+  const message = data.message;
 
-    if (
-      message.conversationId !==
-      conversationId
-    ) {
-      return;
+  if (
+    message.conversationId !==
+    conversationId
+  ) {
+    return;
+  }
+
+  setMessages((current) => {
+    const alreadyExists =
+      current.some(
+        (item) =>
+          item._id === message._id
+      );
+
+    if (alreadyExists) {
+      return current;
     }
 
-    setMessages((current) => {
-      // Prevent duplicate message
-      const alreadyExists =
-        current.some(
-          (item) =>
-            item._id === message._id
-        );
+    setRemainingMessages((remaining) =>
+      remaining === null
+        ? remaining
+        : Math.max(remaining - 1, 0)
+    );
 
-      if (alreadyExists) {
-        return current;
-      }
-
-      return [...current, message];
-    });
-  }
+    return [...current, message];
+  });
+}
 
   socket.on(
     "new-message",
@@ -78,32 +86,36 @@ useEffect(() => {
 }, [conversationId]);
 
 
-  async function loadMessages() {
-    try {
-      setLoading(true);
-      setError("");
+ async function loadMessages() {
+  try {
+    setLoading(true);
+    setError("");
 
-      const response =
-        await getMessages(
-          conversationId
-        );
-
-      setMessages(
-        response.data.messages || []
+    const response =
+      await getMessages(
+        conversationId
       );
 
-    } catch (error) {
-      console.error(error);
+    setMessages(
+      response.data.messages || []
+    );
 
-      setError(
-        error.message ||
-        "Unable to load messages."
-      );
+    setRemainingMessages(
+      response.data.remainingMessages
+    );
 
-    } finally {
-      setLoading(false);
-    }
+  } catch (error) {
+    console.error(error);
+
+    setError(
+      error.message ||
+      "Unable to load messages."
+    );
+
+  } finally {
+    setLoading(false);
   }
+}
 
 
   async function handleSend(
@@ -131,12 +143,14 @@ useEffect(() => {
         Add the returned message
         directly to our UI.
       */
-      setMessages((current) => [
-        ...current,
-        response.data,
-      ]);
+setMessages((current) => [
+  ...current,
+  response.data.message,
+]);
 
-      setText("");
+setRemainingMessages(
+  response.data.remainingMessages
+);
 
     } catch (error) {
       console.error(error);
@@ -166,6 +180,17 @@ useEffect(() => {
       }}
     >
       <h2>Chat</h2>
+      {remainingMessages !== null &&
+  remainingMessages <= 4 &&
+  remainingMessages > 0 && (
+    <p>
+      {remainingMessages}{" "}
+      {remainingMessages === 1
+        ? "message"
+        : "messages"}{" "}
+      left in this conversation.
+    </p>
+  )}
 
       {error && (
         <p style={{ color: "red" }}>
@@ -212,13 +237,39 @@ useEffect(() => {
       </div>
 
 
-      <form
-        onSubmit={handleSend}
-        style={{
-          display: "flex",
-          gap: 10,
-        }}
-      >
+{remainingMessages === 0 ? (
+  <p>
+    This conversation has reached its limit.
+  </p>
+) : (
+  <form
+    onSubmit={handleSend}
+    style={{
+      display: "flex",
+      gap: 10,
+    }}
+  >
+    <input
+      value={text}
+      onChange={(event) =>
+        setText(event.target.value)
+      }
+      placeholder="Type a message..."
+      disabled={sending}
+      style={{
+        flex: 1,
+        padding: 10,
+      }}
+    />
+
+    <button
+      type="submit"
+      disabled={sending}
+    >
+      {sending ? "Sending..." : "Send"}
+    </button>
+  </form>
+)}
         <input
           value={text}
           onChange={(event) =>

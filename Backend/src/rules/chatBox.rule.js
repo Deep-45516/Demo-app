@@ -1,0 +1,5 @@
+export const CHAT_MAX_MESSAGES = 12;
+
+export const REVEAL_REQUEST_START_MESSAGE = 7;
+
+export const REVEAL_RESPONSE_HOURS = 24;

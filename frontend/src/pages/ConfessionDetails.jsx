@@ -162,22 +162,17 @@ console.log(
             </>
           )}
 
-          {confession.recipientAction ===
-  "curious" && (
+{confession.recipientAction === "curious" && (
   <>
-    <p>
-      👀 You said you're curious.
-    </p>
+    <p>👀 You said you're curious.</p>
 
     {conversationId && (
       <button
         onClick={() =>
-          navigate(
-            `/chat/${conversationId}`
-          )
+          navigate(`/chat/${conversationId}`)
         }
       >
-        💬 Continue Conversation
+        💬 Open Conversation
       </button>
     )}
   </>
