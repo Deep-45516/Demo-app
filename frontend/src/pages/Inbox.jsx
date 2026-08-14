@@ -152,9 +152,21 @@ function handleConfessionUpdated(data) {
 
           <p>{new Date(confession.createdAt).toLocaleString()}</p>
 
-          {tab === "received" && <small>{confession.recipientAction}</small>}
+          {tab === "received" && (
+  <small>
+    {confession.recipientAction}
+  </small>
+)}
 
-          {tab === "sent" && <small>{confession.deliveryStatus}</small>}
+{tab === "sent" && (
+  <small>
+    {confession.recipientAction === "curious"
+      ? "👀 Curious"
+      : confession.recipientAction === "not_interested"
+      ? "Not interested"
+      : "⏳ Waiting for response"}
+  </small>
+)}
         </div>
       ))}
       {/* <hr />
