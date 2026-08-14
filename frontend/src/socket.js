@@ -66,14 +66,6 @@ export function subscribeToNewConfession(callback) {
 export function unsubscribeFromNewConfession(callback) {
   if (!socket) return;
 
-  socket.off("new-confession", callback);
-}
-
-
-
-export function unsubscribeFromNewConfession(callback) {
-  if (!socket) return;
-
   socket.off(
     "new-confession",
     callback
