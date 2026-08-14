@@ -104,6 +104,15 @@ console.log(
       setError("");
 
       const response = await updateConfessionAction(confession._id, action);
+      console.log(
+  "ACTION RESPONSE:",
+  response.data
+);
+
+console.log(
+  "CONVERSATION ID:",
+  response.data.conversationId
+);
 
       // Update React state immediately.
       // No page reload and no second GET request.
