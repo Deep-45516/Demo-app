@@ -27,7 +27,24 @@ export function notifyConfessionUpdated(
 ) {
   const io = getIO();
 
-  io.to(`user:${userId}`).emit(
+  const room = `user:${userId}`;
+
+  console.log(
+    "🔥 CONFESSION UPDATE SOCKET:",
+    {
+      room,
+      confessionId,
+      recipientAction,
+      conversationId,
+    }
+  );
+
+  console.log(
+    "ROOM EXISTS:",
+    io.sockets.adapter.rooms.has(room)
+  );
+
+  io.to(room).emit(
     SOCKET_EVENTS.CONFESSION_UPDATED,
     {
       confessionId,
