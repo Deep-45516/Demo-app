@@ -37,7 +37,10 @@ const BLOCKED_PATTERNS = [
   },
 ];
 
-export function moderateMessage(text) {
+export function moderateMessage(
+  text,
+  blockedUsernames = []
+) {
   const normalizedText = text
     .toLowerCase()
     .trim();
@@ -60,6 +63,26 @@ export function moderateMessage(text) {
         allowed: false,
         reason:
           "This message contains language that is not allowed.",
+      };
+    }
+  }
+
+  for (const username of blockedUsernames) {
+    if (!username) continue;
+
+    const normalizedUsername =
+      username.toLowerCase().trim();
+
+    if (
+      normalizedUsername &&
+      normalizedText.includes(
+        normalizedUsername
+      )
+    ) {
+      return {
+        allowed: false,
+        reason:
+          "Let's keep identities anonymous for now. 👀",
       };
     }
   }

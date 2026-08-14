@@ -3,6 +3,7 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { moderateMessage } from "./moderation.service.js";
 import { CHAT_MAX_MESSAGES } from "../rules/chatBox.rule.js";
+import User from "../models/user.model.js";
 
 /*
   Sends a new chat message.
@@ -26,8 +27,27 @@ export async function sendMessage(conversationId, userId, text) {
     throw error;
   }
 
+
+  const users = await User.find({
+  _id: {
+    $in: [
+      conversation.senderUser,
+      conversation.recipientUser,
+    ],
+  },
+}).select("instagramUsername");
+
+const blockedUsernames =
+  users
+    .map((user) => user.instagramUsername)
+    .filter(Boolean);
+
   // Check message content before saving it.moderation.service.js
-  const moderation = moderateMessage(text);
+  const moderation =
+  moderateMessage(
+    text,
+    blockedUsernames
+  );
 
   if (!moderation.allowed) {
     const error = new Error(moderation.reason);
