@@ -331,6 +331,9 @@ export default function Chat() {
       setRevealLoading(false);
     }
   }
+  console.log("MESSAGE COUNT:", messages.length);
+console.log("REMAINING:", remainingMessages);
+console.log("REVEAL STATUS:", revealStatus);
 
 
   if (loading) {
@@ -427,8 +430,9 @@ export default function Chat() {
           REVEAL SECTION
           ========================= */}
 
-      {messages.length >= 7 &&
-        revealStatus === "none" && (
+      {remainingMessages !== null &&
+  remainingMessages <= 5 &&
+  revealStatus === "none" && (
           <div
             style={{
               marginBottom: 15,
