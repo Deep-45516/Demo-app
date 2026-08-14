@@ -68,3 +68,39 @@ export function unsubscribeFromNewConfession(callback) {
 
   socket.off("new-confession", callback);
 }
+
+
+
+export function unsubscribeFromNewConfession(callback) {
+  if (!socket) return;
+
+  socket.off(
+    "new-confession",
+    callback
+  );
+}
+
+
+export function subscribeToConfessionUpdated(callback) {
+  console.log("Listener attached: confession-updated");
+
+  const currentSocket = connectSocket();
+
+  if (!currentSocket) return;
+
+  console.log("Subscribing to confession-updated");
+
+  currentSocket.on(
+    "confession-updated",
+    callback
+  );
+}
+
+export function unsubscribeFromConfessionUpdated(callback) {
+  if (!socket) return;
+
+  socket.off(
+    "confession-updated",
+    callback
+  );
+}
