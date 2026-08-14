@@ -18,7 +18,6 @@ import {
 } from "../socket/socketNotifier.js";
 import Conversation from "../models/conversation.model.js";
 
-
 /*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
 router.get("/search-recipient", verifyToken, async (req, res) => {
@@ -209,14 +208,9 @@ Not sending to yourself ✅*/
       imageUrls,
     });
 
-
-notifyNewConfession(
-    recipient._id,
-    confession
-);
-console.log(
-  `Emitted new-confession to room user:${recipient._id}`
-);
+    notifyNewConfession(recipient._id, confession);
+    notifyNewConfession(confession.senderUser, confession);
+    console.log(`Emitted new-confession to room user:${recipient._id}`);
     await sendAdminNotification({
       title: "New confession request",
       body: `${confession.recipientInstagramUsername} received a confession`,
@@ -297,7 +291,7 @@ recipientUser = AAA   ✅ */
         .select(
           "_id recipientInstagramUsername recipientAction deliveryStatus createdAt",
         )
-        .sort({ createdAt: -1 })//Means sort by creation date,(-1 means decending order,new 1st)
+        .sort({ createdAt: -1 }) //Means sort by creation date,(-1 means decending order,new 1st)
         .limit(50)
         .lean(),
     ]);
@@ -335,16 +329,13 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
 
     // Only these two responses are allowed.
     if (!["curious", "not_interested"].includes(action)) {
-      throw new ApiError(
-        400,
-        "Invalid confession action."
-      );
+      throw new ApiError(400, "Invalid confession action.");
     }
-console.log("ACTION DEBUG:", {
-  confessionId: id,
-  loggedInUser: req.user.id,
-  action,
-});
+    console.log("ACTION DEBUG:", {
+      confessionId: id,
+      loggedInUser: req.user.id,
+      action,
+    });
     // Only the actual recipient of this confession
     // is allowed to respond to it.
     const confession = await Confession.findOneAndUpdate(
@@ -358,13 +349,13 @@ console.log("ACTION DEBUG:", {
       },
       {
         returnDocument: "after",
-      }
+      },
     );
 
     if (!confession) {
       throw new ApiError(
         403,
-        "You are not allowed to update this confession, or you have already responded."
+        "You are not allowed to update this confession, or you have already responded.",
       );
     }
 
@@ -372,70 +363,58 @@ console.log("ACTION DEBUG:", {
     // chooses "curious".
     let conversationId = null;
 
-if (action === "curious") {
-  const conversation =
-    await Conversation.findOneAndUpdate(
-      {
-        confessionId: confession._id,
-      },
-      {
-        $setOnInsert: {
+    if (action === "curious") {
+      const conversation = await Conversation.findOneAndUpdate(
+        {
           confessionId: confession._id,
-          senderUser: confession.senderUser,
-          recipientUser: confession.recipientUser,
-          status: "active",
         },
-      },
-      {
-        upsert: true,
-        new: true,
-      }
-    );
+        {
+          $setOnInsert: {
+            confessionId: confession._id,
+            senderUser: confession.senderUser,
+            recipientUser: confession.recipientUser,
+            status: "active",
+          },
+        },
+        {
+          upsert: true,
+          new: true,
+        },
+      );
 
-  conversationId = conversation._id;
+      conversationId = conversation._id;
 
-notifyConfessionUpdated(
-  confession.senderUser,
-  confession._id,
-  confession.recipientAction,
-  conversationId
-);
-
-}
-
-return res.status(200).json(
-  new ApiResponse(
-    200,
-    {
-      ...confession.toObject(),
-      conversationId,
-    },
-    `Confession marked as ${action}.`
-  )
-);
-
-  } catch (error) {
-    console.error(
-      "CONFESSION ACTION ERROR:",
-      error
-    );
-
-    if (error instanceof ApiError) {
-      return res
-        .status(error.statuscode)
-        .json(error);
+      notifyConfessionUpdated(
+        confession.senderUser,
+        confession._id,
+        confession.recipientAction,
+        conversationId,
+      );
     }
 
-    return res.status(500).json(
+    return res.status(200).json(
       new ApiResponse(
-        500,
-        null,
-        error.message ||
-          "Something went wrong."
-      )
+        200,
+        {
+          ...confession.toObject(),
+          conversationId,
+        },
+        `Confession marked as ${action}.`,
+      ),
     );
-  }
+  } catch (error) {
+    console.error("CONFESSION ACTION ERROR:", error);
 
+    if (error instanceof ApiError) {
+      return res.status(error.statuscode).json(error);
+    }
+
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Something went wrong."),
+      );
+  }
 });
 // GET ONE CONFESSION
 router.get("/:id", verifyToken, async (req, res) => {
@@ -456,35 +435,33 @@ router.get("/:id", verifyToken, async (req, res) => {
     if (!isSender && !isRecipient) {
       throw new ApiError(403, "You are not allowed to view this confession.");
     }
-    const conversation =
-  await Conversation.findOne({
-    confessionId: confession._id,
-    status: "active",
-    $or: [
-      {
-        senderUser: confession.senderUser,
-        recipientUser: confession.recipientUser,
-      },
-      {
-        senderUser: confession.recipientUser,
-        recipientUser: confession.senderUser,
-      },
-    ],
-  }).select("_id").lean();
+    const conversation = await Conversation.findOne({
+      confessionId: confession._id,
+      status: "active",
+      $or: [
+        {
+          senderUser: confession.senderUser,
+          recipientUser: confession.recipientUser,
+        },
+        {
+          senderUser: confession.recipientUser,
+          recipientUser: confession.senderUser,
+        },
+      ],
+    })
+      .select("_id")
+      .lean();
 
-return res.status(200).json(
-  new ApiResponse(
-    200,
-    {
-      ...confession,
-      conversationId:
-        conversation?._id || null,
-    },
-    "Confession fetched successfully."
-  )
-);
-
-
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          ...confession,
+          conversationId: conversation?._id || null,
+        },
+        "Confession fetched successfully.",
+      ),
+    );
   } catch (error) {
     console.error("GET CONFESSION ERROR:", error);
 
