@@ -279,6 +279,12 @@ return {
   nextCursor,
   hasMore,
   remainingMessages,
+
+  revealStatus:
+    conversation.identityRevealStatus,
+
+  revealRequestedBy:
+    conversation.identityRevealRequestedBy,
 };
 }
 //we used MongoDB Aggregation here

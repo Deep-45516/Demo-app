@@ -222,9 +222,13 @@ export async function respondToReveal(
 
     await conversation.save();
 
-    return {
-      status: "none",
-    };
+     return {
+    status: "none",
+    otherUserId: getOtherUser(
+      conversation,
+      userId
+    ),
+  };
   }
 
   if (decision === "reveal") {
@@ -245,11 +249,15 @@ export async function respondToReveal(
 
     await conversation.save();
 
-    return {
-      status: "revealed",
-      revealedAt:
-        conversation.identityRevealedAt,
-    };
+     return {
+    status: "revealed",
+    revealedAt:
+      conversation.identityRevealedAt,
+    otherUserId: getOtherUser(
+      conversation,
+      userId
+    ),
+  };
   }
 
   const error = new Error(

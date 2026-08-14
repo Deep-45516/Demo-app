@@ -71,3 +71,29 @@ export function unsubscribeFromNewConfession(callback) {
     callback
   );
 }
+
+
+export function subscribeToRevealUpdated(
+  callback
+) {
+  const currentSocket =
+    connectSocket();
+
+  if (!currentSocket) return;
+
+  currentSocket.on(
+    "reveal-updated",
+    callback
+  );
+}
+
+export function unsubscribeFromRevealUpdated(
+  callback
+) {
+  if (!socket) return;
+
+  socket.off(
+    "reveal-updated",
+    callback
+  );
+}
