@@ -33,6 +33,8 @@ import confessionRouter from "./routes/confession.route.js";
 import chatRouter from "./routes/chat.route.js";
 
 import notificationRouter from "./routes/notification.route.js";
+import revealRouter from "./routes/reveal.route.js";
+
 app.use("/api/v1/instagram", instagramRouter);
 app.use("/api/v1/confessions", confessionRouter);
 app.use("/api/v1/auth", authRouter);
@@ -40,4 +42,8 @@ app.use("/api/v1/healthcheck", healthRouter);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/webhook", webhookRouter);
 app.use("/api/v1/chat", chatRouter);
+app.use(
+  "/api/v1/reveal",
+  revealRouter
+);
 export default app;

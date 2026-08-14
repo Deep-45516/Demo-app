@@ -36,6 +36,38 @@ const conversationSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    // Identity reveal state.
+identityRevealStatus: {
+  type: String,
+  enum: ["none", "pending", "revealed"],
+  default: "none",
+},
+
+// User who requested the reveal.
+identityRevealRequestedBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+},
+
+// When the request was created.
+identityRevealRequestedAt: {
+  type: Date,
+  default: null,
+},
+
+// Request expires after 24 hours.
+identityRevealExpiresAt: {
+  type: Date,
+  default: null,
+},
+
+// When both identities became visible.
+identityRevealedAt: {
+  type: Date,
+  default: null,
+},
   },
   {
     timestamps: true,

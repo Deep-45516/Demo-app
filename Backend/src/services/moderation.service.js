@@ -67,25 +67,7 @@ export function moderateMessage(
     }
   }
 
-  for (const username of blockedUsernames) {
-    if (!username) continue;
 
-    const normalizedUsername =
-      username.toLowerCase().trim();
-
-    if (
-      normalizedUsername &&
-      normalizedText.includes(
-        normalizedUsername
-      )
-    ) {
-      return {
-        allowed: false,
-        reason:
-          "Let's keep identities anonymous for now. 👀",
-      };
-    }
-  }
 
   for (const pattern of BLOCKED_PATTERNS) {
     if (pattern.regex.test(text)) {
