@@ -12,8 +12,12 @@ import AnonymousProfile from "../models/anonymousProfile.model.js";
 import { createPendingConfession } from "../services/pendingConfession.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { getIO } from "../socket/socket.js";
-import { notifyNewConfession } from "../socket/socketNotifier.js";
+import {
+  notifyNewConfession,
+  notifyConfessionUpdated,
+} from "../socket/socketNotifier.js";
 import Conversation from "../models/conversation.model.js";
+
 
 /*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
@@ -366,25 +370,37 @@ console.log("ACTION DEBUG:", {
 
     // A conversation is created only when the recipient
     // chooses "curious".
-    if (action === "curious") {
-      await Conversation.findOneAndUpdate(
-        {
+    let conversationId = null;
+
+if (action === "curious") {
+  const conversation =
+    await Conversation.findOneAndUpdate(
+      {
+        confessionId: confession._id,
+      },
+      {
+        $setOnInsert: {
           confessionId: confession._id,
+          senderUser: confession.senderUser,
+          recipientUser: confession.recipientUser,
+          status: "active",
         },
-        {
-          $setOnInsert: {
-            confessionId: confession._id,
-            senderUser: confession.senderUser,
-            recipientUser: confession.recipientUser,
-            status: "active",
-          },
-        },
-        {
-          upsert: true,
-          new: true,
-        }
-      );
-    }
+      },
+      {
+        upsert: true,
+        new: true,
+      }
+    );
+
+  conversationId = conversation._id;
+
+  notifyConfessionUpdated(
+    confession.senderUser,
+    confession._id,
+    confession.recipientAction,
+    conversationId
+  );
+}
 
     return res.status(200).json(
       new ApiResponse(

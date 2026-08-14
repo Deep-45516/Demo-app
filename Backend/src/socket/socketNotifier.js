@@ -18,3 +18,21 @@ export function notifyNewConfession(
     }
   );
 }
+
+export function notifyConfessionUpdated(
+  userId,
+  confessionId,
+  recipientAction,
+  conversationId
+) {
+  const io = getIO();
+
+  io.to(`user:${userId}`).emit(
+    SOCKET_EVENTS.CONFESSION_UPDATED,
+    {
+      confessionId,
+      recipientAction,
+      conversationId,
+    }
+  );
+}

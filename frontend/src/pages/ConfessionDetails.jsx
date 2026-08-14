@@ -3,6 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { getConfession, updateConfessionAction } from "../inbox";
 
+import {
+  getSocket,
+  connectSocket,
+} from "../socket";
+
 export default function ConfessionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -18,9 +23,48 @@ export default function ConfessionDetails() {
 
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-  useEffect(() => {
-    loadConfession();
-  }, [id]);
+useEffect(() => {
+  loadConfession();
+
+  const socket =
+    getSocket() || connectSocket();
+
+  if (!socket) return;
+
+  function handleConfessionUpdated(data) {
+    if (data.confessionId !== id) {
+      return;
+    }
+
+    setConfession((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        recipientAction:
+          data.recipientAction,
+        conversationId:
+          data.conversationId,
+      };
+    });
+
+    setConversationId(
+      data.conversationId || null
+    );
+  }
+
+  socket.on(
+    "confession-updated",
+    handleConfessionUpdated
+  );
+
+  return () => {
+    socket.off(
+      "confession-updated",
+      handleConfessionUpdated
+    );
+  };
+}, [id]);
 
   async function loadConfession() {
     try {
