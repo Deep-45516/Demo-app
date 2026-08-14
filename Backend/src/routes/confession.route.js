@@ -394,12 +394,19 @@ if (action === "curious") {
 
   conversationId = conversation._id;
 
-  notifyConfessionUpdated(
-    confession.senderUser,
-    confession._id,
-    confession.recipientAction,
-    conversationId
-  );
+notifyConfessionUpdated(
+  confession.senderUser,
+  confession._id,
+  confession.recipientAction,
+  conversationId
+);
+
+notifyConfessionUpdated(
+  confession.recipientUser,
+  confession._id,
+  confession.recipientAction,
+  conversationId
+);
 }
 
     return res.status(200).json(
