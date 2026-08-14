@@ -42,11 +42,16 @@ function handleConfessionUpdated(data) {
   setSent((current) =>
     current.map((confession) => {
       if (
-        confession._id !==
-        data.confessionId
+        String(confession._id) !==
+        String(data.confessionId)
       ) {
         return confession;
       }
+
+      console.log(
+        "✅ Updating sent confession:",
+        confession._id
+      );
 
       return {
         ...confession,
