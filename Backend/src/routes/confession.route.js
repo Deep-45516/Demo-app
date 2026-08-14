@@ -401,21 +401,18 @@ notifyConfessionUpdated(
   conversationId
 );
 
-notifyConfessionUpdated(
-  confession.recipientUser,
-  confession._id,
-  confession.recipientAction,
-  conversationId
-);
 }
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        confession,
-        `Confession marked as ${action}.`
-      )
-    );
+return res.status(200).json(
+  new ApiResponse(
+    200,
+    {
+      ...confession.toObject(),
+      conversationId,
+    },
+    `Confession marked as ${action}.`
+  )
+);
 
   } catch (error) {
     console.error(

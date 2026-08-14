@@ -108,6 +108,10 @@ console.log(
       // Update React state immediately.
       // No page reload and no second GET request.
       setConfession(response.data);
+
+setConversationId(
+  response.data.conversationId || null
+);
     } catch (error) {
       console.error(error);
 
