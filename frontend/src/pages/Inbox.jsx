@@ -6,8 +6,6 @@ import { getInbox } from "../inbox";
 import {
   subscribeToNewConfession,
   unsubscribeFromNewConfession,
-  subscribeToConfessionUpdated,
-  unsubscribeFromConfessionUpdated,
 } from "../socket";
 
 export default function Inbox() {
@@ -33,48 +31,12 @@ export default function Inbox() {
 
       console.log("🔥 Inbox Reloaded");
     }
-function handleConfessionUpdated(data) {
-  console.log(
-    "🔥 INBOX CONFESSION UPDATED:",
-    data
-  );
-
-  setSent((current) =>
-    current.map((confession) => {
-      if (
-        String(confession._id) !==
-        String(data.confessionId)
-      ) {
-        return confession;
-      }
-
-      console.log(
-        "✅ Updating sent confession:",
-        confession._id
-      );
-
-      return {
-        ...confession,
-        recipientAction:
-          data.recipientAction,
-        conversationId:
-          data.conversationId,
-      };
-    })
-  );
-}
 
     subscribeToNewConfession(handleNewConfession);
-    subscribeToConfessionUpdated(
-  handleConfessionUpdated
-);
+    
 
     return () => {
       unsubscribeFromNewConfession(handleNewConfession);
-
-       unsubscribeFromConfessionUpdated(
-      handleConfessionUpdated
-    );
     };
   }, []);
 
