@@ -100,104 +100,107 @@ export async function respondReveal(
     // REVEALED
     // =========================
 
-    const [requester, responder] =
-      await User.find({
-        _id: {
-          $in: [
-            result.requestedBy,
-            req.user.id,
-          ],
-        },
-      }).select(
-        "instagramUsername instagramName profilePicture"
-      );
+// =========================
+// REVEALED
+// =========================
 
-const requesterIdentity =
-  requester.find(
+const users = await User.find({
+  _id: {
+    $in: [
+      result.requestedBy,
+      req.user.id,
+    ],
+  },
+}).select(
+  "instagramUsername instagramName profilePicture"
+);
+
+const requester =
+  users.find(
     (user) =>
       String(user._id) ===
       String(result.requestedBy)
   );
 
-const responderIdentity =
-  requester.find(
+const responder =
+  users.find(
     (user) =>
       String(user._id) ===
       String(req.user.id)
   );
 
-    const requesterData =
-      requesterIdentity
-        ? {
-            username:
-              requesterIdentity.instagramUsername,
-            name:
-              requesterIdentity.instagramName,
-            profilePicture:
-              requesterIdentity.profilePicture,
-          }
-        : null;
+if (!requester || !responder) {
+  throw new Error(
+    "Unable to load identity information."
+  );
+}
 
-    const responderData =
-      responderIdentity
-        ? {
-            username:
-              responderIdentity.instagramUsername,
-            name:
-              responderIdentity.instagramName,
-            profilePicture:
-              responderIdentity.profilePicture,
-          }
-        : null;
+const requesterData = {
+  username:
+    requester.instagramUsername,
+  name:
+    requester.instagramName,
+  profilePicture:
+    requester.profilePicture,
+};
 
-
-    // Requester receives responder's identity
-    notifyRevealUpdated(
-      result.requestedBy,
-      {
-        conversationId:
-          req.params.conversationId,
-
-        status: "revealed",
-
-        decision: "reveal",
-
-        identity:
-          responderData,
-      }
-    );
+const responderData = {
+  username:
+    responder.instagramUsername,
+  name:
+    responder.instagramName,
+  profilePicture:
+    responder.profilePicture,
+};
 
 
-    // Responder receives requester's identity
-    notifyRevealUpdated(
-      req.user.id,
-      {
-        conversationId:
-          req.params.conversationId,
+// Requester receives responder's identity
+notifyRevealUpdated(
+  result.requestedBy,
+  {
+    conversationId:
+      req.params.conversationId,
 
-        status: "revealed",
+    status: "revealed",
 
-        decision: "reveal",
+    decision: "reveal",
 
-        identity:
-          requesterData,
-      }
-    );
+    identity:
+      responderData,
+  }
+);
 
 
-    return res.status(200).json({
-      success: true,
+// Responder receives requester's identity
+notifyRevealUpdated(
+  req.user.id,
+  {
+    conversationId:
+      req.params.conversationId,
 
-      data: {
-        ...result,
+    status: "revealed",
 
-        identity:
-          requesterData,
-      },
+    decision: "reveal",
 
-      message:
-        "Identity revealed.",
-    });
+    identity:
+      requesterData,
+  }
+);
+
+
+return res.status(200).json({
+  success: true,
+
+  data: {
+    ...result,
+
+    identity:
+      requesterData,
+  },
+
+  message:
+    "Identity revealed.",
+});
 
   } catch (error) {
     console.error(
