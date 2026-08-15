@@ -5,6 +5,7 @@ import {
 import {
   notifyRevealUpdated,
 } from "../socket/reveal.socket.js";
+import User from "../models/user.model.js";
 
 export async function createRevealRequest(
   req,
@@ -66,25 +67,136 @@ export async function respondReveal(
         decision
       );
 
+    // =========================
+    // NOT YET
+    // =========================
+
+    if (
+      result.decision ===
+      "not_yet"
+    ) {
+      notifyRevealUpdated(
+        result.requestedBy,
+        {
+          conversationId:
+            req.params.conversationId,
+
+          status: "none",
+
+          decision: "not_yet",
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        data: result,
+        message:
+          "Reveal request declined for now.",
+      });
+    }
+
+
+    // =========================
+    // REVEALED
+    // =========================
+
+    const [requester, responder] =
+      await User.find({
+        _id: {
+          $in: [
+            result.requestedBy,
+            req.user.id,
+          ],
+        },
+      }).select(
+        "instagramUsername instagramName profilePicture"
+      );
+
+const requesterIdentity =
+  requester.find(
+    (user) =>
+      String(user._id) ===
+      String(result.requestedBy)
+  );
+
+const responderIdentity =
+  requester.find(
+    (user) =>
+      String(user._id) ===
+      String(req.user.id)
+  );
+
+    const requesterData =
+      requesterIdentity
+        ? {
+            username:
+              requesterIdentity.instagramUsername,
+            name:
+              requesterIdentity.instagramName,
+            profilePicture:
+              requesterIdentity.profilePicture,
+          }
+        : null;
+
+    const responderData =
+      responderIdentity
+        ? {
+            username:
+              responderIdentity.instagramUsername,
+            name:
+              responderIdentity.instagramName,
+            profilePicture:
+              responderIdentity.profilePicture,
+          }
+        : null;
+
+
+    // Requester receives responder's identity
     notifyRevealUpdated(
-      result.otherUserId,
+      result.requestedBy,
       {
         conversationId:
           req.params.conversationId,
-        status:
-          result.status,
-        requestedBy:
-          req.user.id,
+
+        status: "revealed",
+
+        decision: "reveal",
+
+        identity:
+          responderData,
       }
     );
 
+
+    // Responder receives requester's identity
+    notifyRevealUpdated(
+      req.user.id,
+      {
+        conversationId:
+          req.params.conversationId,
+
+        status: "revealed",
+
+        decision: "reveal",
+
+        identity:
+          requesterData,
+      }
+    );
+
+
     return res.status(200).json({
       success: true,
-      data: result,
+
+      data: {
+        ...result,
+
+        identity:
+          requesterData,
+      },
+
       message:
-        decision === "reveal"
-          ? "Identity revealed."
-          : "Reveal request declined for now.",
+        "Identity revealed.",
     });
 
   } catch (error) {

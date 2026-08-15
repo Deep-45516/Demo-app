@@ -285,6 +285,9 @@ return {
 
   revealRequestedBy:
     conversation.identityRevealRequestedBy,
+
+      senderUser:
+    conversation.senderUser,
 };
 }
 //we used MongoDB Aggregation here

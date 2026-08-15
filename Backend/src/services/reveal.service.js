@@ -157,6 +157,11 @@ export async function respondToReveal(
     error.statusCode = 403;
     throw error;
   }
+  const requestedBy =
+  conversation.identityRevealRequestedBy;
+
+const otherUserId =
+  getOtherUser(conversation, userId);
 
   if (
     conversation.identityRevealStatus !==
@@ -222,13 +227,12 @@ export async function respondToReveal(
 
     await conversation.save();
 
-     return {
-    status: "none",
-    otherUserId: getOtherUser(
-      conversation,
-      userId
-    ),
-  };
+return {
+  status: "none",
+  decision: "not_yet",
+  requestedBy,
+  otherUserId,
+};
   }
 
   if (decision === "reveal") {
@@ -249,15 +253,14 @@ export async function respondToReveal(
 
     await conversation.save();
 
-     return {
-    status: "revealed",
-    revealedAt:
-      conversation.identityRevealedAt,
-    otherUserId: getOtherUser(
-      conversation,
-      userId
-    ),
-  };
+return {
+  status: "revealed",
+  decision: "reveal",
+  requestedBy,
+  otherUserId,
+  revealedAt:
+    conversation.identityRevealedAt,
+};
   }
 
   const error = new Error(
