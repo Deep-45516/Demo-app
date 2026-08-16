@@ -15,6 +15,8 @@ import {
 
 import RevealSection from "../chat/RevealSection.jsx";
 
+
+
 export default function Chat() {
   const { conversationId } =
     useParams();
@@ -59,10 +61,16 @@ export default function Chat() {
     setRevealedIdentity,
   ] = useState(null);
 
+  const [autoOpenIdentity, setAutoOpenIdentity] =
+  useState(false);
+
   const [
     revealNotice,
     setRevealNotice,
   ] = useState("");
+
+  const [autoOpenIdentity, setAutoOpenIdentity] =
+  useState(false);
 
   const [
     conversationSenderId,
@@ -160,8 +168,18 @@ export default function Chat() {
         "pending"
       ) {
         setRevealRequestedBy(
-          data.requestedBy
+          data.requestedBy || null
         );
+
+        if (
+    data.status === "revealed"
+  ) {
+    setRevealedIdentity(
+      data.identity || null
+    );
+    setAutoOpenIdentity(true);
+    setRevealNotice("");
+  }
 
         return;
       }
@@ -288,6 +306,12 @@ export default function Chat() {
         );
       }
 
+      setRevealedIdentity(
+  response.data.revealedIdentity || null
+);
+
+setAutoOpenIdentity(false);
+
     } catch (error) {
       console.error(error);
 
@@ -411,16 +435,17 @@ export default function Chat() {
       );
 
       if (
-        decision ===
-        "reveal"
-      ) {
-        setRevealedIdentity(
-          response.data
-            .identity
-        );
+  decision ===
+  "reveal"
+) {
+  setRevealedIdentity(
+    response.data.identity
+  );
 
-        setRevealNotice("");
-      }
+  setAutoOpenIdentity(true);
+
+  setRevealNotice("");
+}
 
     } catch (error) {
       console.error(error);
@@ -565,6 +590,7 @@ export default function Chat() {
         revealNotice={
           revealNotice
         }
+        autoOpenIdentity={autoOpenIdentity}
         onRequestReveal={
           handleRequestReveal
         }

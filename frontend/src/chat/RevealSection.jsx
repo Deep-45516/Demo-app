@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 export default function RevealSection({
   userId,
@@ -9,11 +12,24 @@ export default function RevealSection({
   revealLoading,
   revealedIdentity,
   revealNotice,
+  autoOpenIdentity,
   onRequestReveal,
   onRevealResponse,
 }) {
   const [showIdentity, setShowIdentity] =
     useState(false);
+
+    useEffect(() => {
+  if (
+    autoOpenIdentity &&
+    revealedIdentity
+  ) {
+    setShowIdentity(true);
+  }
+}, [
+  autoOpenIdentity,
+  revealedIdentity,
+]);
 
   const isSender =
     String(userId) ===
@@ -40,20 +56,18 @@ export default function RevealSection({
             }}
           >
             <strong>
-              👀 They're interested.
-            </strong>
+  🎉 They chose to reveal themselves.
+</strong>
 
-            <p
-              style={{
-                margin:
-                  "6px 0 0",
-              }}
-            >
-              They chose to keep
-              talking to you.
-              Keep the conversation
-              going.
-            </p>
+<p
+  style={{
+    margin: "6px 0 0",
+  }}
+>
+  You started this conversation
+  anonymously. They chose to
+  take that next step with you.
+</p>
           </div>
         )}
 
@@ -227,9 +241,9 @@ export default function RevealSection({
                 color: "#666",
               }}
             >
-              You both chose to
-              reveal your
-              identities.
+              You both chose to take
+    this conversation beyond
+    anonymity.
             </p>
 
             <button

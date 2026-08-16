@@ -31,6 +31,18 @@ const conversationSchema = new mongoose.Schema(
       default: "active",
     },
 
+        // Whether both users have revealed their identities.
+    identityRevealed: {
+      type: Boolean,
+      default: false,
+    },
+
+    // When the identity reveal happened.
+    identityRevealedAt: {
+      type: Date,
+      default: null,
+    },
+
     // Useful later for inbox/chat-list preview.
     lastMessageAt: {
       type: Date,

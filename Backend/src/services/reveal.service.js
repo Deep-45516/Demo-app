@@ -236,32 +236,27 @@ return {
   }
 
   if (decision === "reveal") {
-    conversation.identityRevealStatus =
-      "revealed";
+  conversation.identityRevealStatus = "revealed";
 
-    conversation.identityRevealedAt =
-      new Date();
+  conversation.identityRevealed = true;
 
-    conversation.identityRevealRequestedBy =
-      null;
+  conversation.identityRevealedAt = new Date();
 
-    conversation.identityRevealRequestedAt =
-      null;
+  conversation.identityRevealRequestedBy = null;
+  conversation.identityRevealRequestedAt = null;
+  conversation.identityRevealExpiresAt = null;
 
-    conversation.identityRevealExpiresAt =
-      null;
+  await conversation.save();
 
-    await conversation.save();
-
-return {
-  status: "revealed",
-  decision: "reveal",
-  requestedBy,
-  otherUserId,
-  revealedAt:
-    conversation.identityRevealedAt,
-};
-  }
+  return {
+    status: "revealed",
+    decision: "reveal",
+    requestedBy,
+    otherUserId,
+    revealedAt:
+      conversation.identityRevealedAt,
+  };
+}
 
   const error = new Error(
     "Invalid reveal decision."

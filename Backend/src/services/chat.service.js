@@ -3,6 +3,7 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { moderateMessage } from "./moderation.service.js";
 import { CHAT_MAX_MESSAGES } from "../rules/chatBox.rule.js";
+import User from "../models/user.model.js";
 
 
 /*
@@ -107,6 +108,33 @@ export async function getMessages(
 
     throw error;
   }
+  let revealedIdentity = null;
+
+if (conversation.identityRevealed) {
+  const otherUserId =
+    String(conversation.senderUser) === String(userId)
+      ? conversation.recipientUser
+      : conversation.senderUser;
+
+  const otherUser = await User.findById(
+    otherUserId
+  )
+    .select(
+      "instagramUsername instagramName profilePicture"
+    )
+    .lean();
+
+  if (otherUser) {
+    revealedIdentity = {
+      username:
+        otherUser.instagramUsername,
+      name:
+        otherUser.instagramName,
+      profilePicture:
+        otherUser.profilePicture,
+    };
+  }
+}
 
   // ----------------------------------
   // 2. Keep limit under our control
@@ -281,10 +309,20 @@ return {
   remainingMessages,
 
   revealStatus:
-    conversation.identityRevealStatus,
+    conversation.identityRevealed
+      ? "revealed"
+      : "none",
 
   revealRequestedBy:
     conversation.identityRevealRequestedBy,
+
+    identityRevealed:
+    conversation.identityRevealed,
+
+     identityRevealedAt:
+    conversation.identityRevealedAt,
+
+    revealedIdentity,
 
       senderUser:
     conversation.senderUser,
