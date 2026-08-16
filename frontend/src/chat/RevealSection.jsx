@@ -195,6 +195,7 @@ export default function RevealSection({
       marginBottom: 20,
       padding: 22,
       borderRadius: 16,
+      background: "#ba9c9c",
       border: "1px solid #e5e5e5",
       textAlign: "center",
     }}
