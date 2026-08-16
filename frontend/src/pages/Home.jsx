@@ -15,6 +15,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [recipientStatus, setRecipientStatus] = useState(null); //null(we havent check is he registered or not,true(registered recipient),false(not registered))
   const [allowPending, setAllowPending] = useState(false); //If recipient doesn't exist, did the sender explicitly choose "Send Anyway"?initialyy it is false , so no
+  const [publicConsent, setPublicConsent] = useState(false);
   const [checkingRecipient, setCheckingRecipient] = useState(false);
   //Has this browser already logged into ConfessionVault?
   /*If stored exists:
@@ -27,11 +28,11 @@ Return null. */
   });
 
   //this connect the user to socketwhen login,(always connected to socket)
-// useEffect(() => {
-//   if (!user) return;
+  // useEffect(() => {
+  //   if (!user) return;
 
-//   connectSocket();
-// }, [user]);
+  //   connectSocket();
+  // }, [user]);
   //useeffect trigged when to, from, or message changes. It generates the pages for preview.
   useEffect(() => {
     document.fonts.ready.then(() => {
@@ -75,14 +76,14 @@ Return null. */
     } //finally runs whether try succeeded or failed.this setcheckingrecipent bring back "checking..." to normal button
   };
 
- const logoutUser = () => {
-  // disconnectSocket();
+  const logoutUser = () => {
+    // disconnectSocket();
 
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-  window.location.reload();
-};
+    window.location.reload();
+  };
 
   if (!user) {
     return (
@@ -117,13 +118,13 @@ and the user's information.
                   alert(data.message);
                   return;
                 }
-localStorage.setItem("token", data.data.token);
-localStorage.setItem("user", JSON.stringify(data.data.user));
+                localStorage.setItem("token", data.data.token);
+                localStorage.setItem("user", JSON.stringify(data.data.user));
 
-// Create socket connection immediately
-connectSocket();
+                // Create socket connection immediately
+                connectSocket();
 
-window.location.reload();
+                window.location.reload();
               } catch (err) {
                 console.error(err);
                 alert("Login failed");
@@ -142,11 +143,8 @@ window.location.reload();
     <div className="container">
       <div className="form">
         <p>Logged in as {user.email}</p>
-
         <button onClick={logoutUser}>Logout</button>
-
         <label>Recipient Username</label>
-
         <input
           type="text"
           value={to}
@@ -156,6 +154,7 @@ window.location.reload();
             setTo(e.target.value);
             setRecipientStatus(null);
             setAllowPending(false);
+            setPublicConsent(false);
           }}
         />
         <p
@@ -170,13 +169,11 @@ window.location.reload();
         <button onClick={verifyRecipient} disabled={checkingRecipient}>
           {checkingRecipient ? "Checking..." : "Verify Recipient"}
         </button>
-
         {recipientStatus?.exists && (
           <p style={{ color: "green" }}>
             ✅ Recipient verified. You can now send your confession.
           </p>
         )}
-
         {recipientStatus && !recipientStatus.exists && (
           <>
             <p style={{ color: "orange" }}>
@@ -188,20 +185,37 @@ window.location.reload();
             <button onClick={() => setAllowPending(true)}>Send Anyway</button>
           </>
         )}
-
         <label>Message</label>
-
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-
         <label>From</label>
-
         <textarea value={from} onChange={(e) => setFrom(e.target.value)} />
-
         <button onClick={downloadPages}>Download Pages</button>
+        //checkbox for public post consent
+        {recipientStatus?.exists && (
+          <label
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "flex-start",
+              marginTop: 15,
+              marginBottom: 15,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={publicConsent}
+              onChange={(e) => setPublicConsent(e.target.checked)}
+            />
 
+            <span>
+              I'm okay with this confession being shared publicly if they also
+              choose to share it.
+            </span>
+          </label>
+        )}
         <button
           disabled={
             !recipientStatus ||
@@ -209,7 +223,7 @@ window.location.reload();
             (!recipientStatus.exists && !allowPending)
           }
           onClick={() => {
-            submitConfession(to, message, allowPending);
+            submitConfession(to, message, allowPending, publicConsent);
           }}
         >
           Submit Confession

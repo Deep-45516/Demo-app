@@ -244,7 +244,7 @@ export default function RevealSection({
           style={{
             margin:
               "8px 0 16px",
-            color: "#bebebe",
+            color: "#201f1f",
             lineHeight: 1.5,
           }}
         >
@@ -260,7 +260,7 @@ export default function RevealSection({
           style={{
             margin:
               "0 0 14px",
-            color: "#555",
+            color: "#2c2a2a",
           }}
         >
           Keep the conversation
@@ -408,7 +408,7 @@ export default function RevealSection({
                 style={{
                   margin:
                     "0 0 22px",
-                  color: "#f7f1f1",
+                  color: "#242424",
                 }}
               >
                 The person behind the

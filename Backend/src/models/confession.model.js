@@ -76,6 +76,34 @@ const confessionSchema = new mongoose.Schema(
       default: "private",
     },
 
+        // ==========================
+    // Public Posting Consent
+    // ==========================
+    // Sender agrees that the recipient
+    // may choose to publish this confession publicly.
+    publicConsent: {
+      type: Boolean,
+      default: false,
+    },
+
+    // True after the recipient actually
+    // chooses to publish the confession.
+    publicPosted: {
+      type: Boolean,
+      default: false,
+    },
+
+    publicPostedAt: {
+      type: Date,
+      default: null,
+    },
+
+    publicPostedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
     // ==========================
     // Admin Moderation
     // ==========================

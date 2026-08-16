@@ -3,10 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { getConfession, updateConfessionAction } from "../inbox";
 
-import {
-  getSocket,
-  connectSocket,
-} from "../socket";
+import { getSocket, connectSocket } from "../socket";
+
+import { publishConfessionPublicly } from "../publicPost.js";
 
 export default function ConfessionDetails() {
   const { id } = useParams();
@@ -17,54 +16,65 @@ export default function ConfessionDetails() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [conversationId, setConversationId] = useState(null);
+  const [publicPosting, setPublicPosting] = useState(false);
 
   // Current logged-in user
   const storedUser = localStorage.getItem("user");
 
   const user = storedUser ? JSON.parse(storedUser) : null;
 
-useEffect(() => {
-  loadConfession();
+  useEffect(() => {
+    loadConfession();
 
-  const socket =
-    getSocket() || connectSocket();
+    const socket = getSocket() || connectSocket();
 
-  if (!socket) return;
+    if (!socket) return;
 
-  function handleConfessionUpdated(data) {
-    if (data.confessionId !== id) {
-      return;
+    function handleConfessionUpdated(data) {
+      if (data.confessionId !== id) {
+        return;
+      }
+
+      setConfession((current) => {
+        if (!current) return current;
+
+        return {
+          ...current,
+          recipientAction: data.recipientAction,
+          conversationId: data.conversationId,
+        };
+      });
+
+      setConversationId(data.conversationId || null);
     }
 
-    setConfession((current) => {
-      if (!current) return current;
+    function handlePublicPostUpdated(data) {
+      if (String(data.confessionId) !== String(id)) {
+        return;
+      }
 
-      return {
-        ...current,
-        recipientAction:
-          data.recipientAction,
-        conversationId:
-          data.conversationId,
-      };
-    });
+      setConfession((current) => {
+        if (!current) return current;
 
-    setConversationId(
-      data.conversationId || null
-    );
-  }
+        return {
+          ...current,
+          visibility: "public",
+          publicPosted: true,
+          publicPostedAt: data.publicPostedAt,
+          instagramPostId: data.instagramPostId,
+        };
+      });
+    }
 
-  socket.on(
-    "confession-updated",
-    handleConfessionUpdated
-  );
+    socket.on("confession-updated", handleConfessionUpdated);
 
-  return () => {
-    socket.off(
-      "confession-updated",
-      handleConfessionUpdated
-    );
-  };
-}, [id]);
+    socket.on("public-post-updated", handlePublicPostUpdated);
+
+    return () => {
+      socket.off("confession-updated", handleConfessionUpdated);
+      socket.off("public-post-updated", handlePublicPostUpdated);
+    };
+  }, [id]);
 
   async function loadConfession() {
     try {
@@ -72,22 +82,14 @@ useEffect(() => {
       setError("");
       console.log("1. Loading confession:", id);
       const response = await getConfession(id);
-       console.log("2. API response:", response);
+      console.log("2. API response:", response);
 
       setConfession(response.data);
 
-setConversationId(
-  response.data.conversationId || null
-);
-console.log(
-      "3. Confession loaded:",
-      response.data
-    );
+      setConversationId(response.data.conversationId || null);
+      console.log("3. Confession loaded:", response.data);
     } catch (error) {
-       console.error(
-      "CONFESSION LOAD ERROR:",
-      error
-    );
+      console.error("CONFESSION LOAD ERROR:", error);
 
       setError(error.message || "Unable to load confession.");
     } finally {
@@ -104,29 +106,40 @@ console.log(
       setError("");
 
       const response = await updateConfessionAction(confession._id, action);
-      console.log(
-  "ACTION RESPONSE:",
-  response.data
-);
+      console.log("ACTION RESPONSE:", response.data);
 
-console.log(
-  "CONVERSATION ID:",
-  response.data.conversationId
-);
+      console.log("CONVERSATION ID:", response.data.conversationId);
 
       // Update React state immediately.
       // No page reload and no second GET request.
       setConfession(response.data);
 
-setConversationId(
-  response.data.conversationId || null
-);
+      setConversationId(response.data.conversationId || null);
     } catch (error) {
       console.error(error);
 
       setError(error.message || "Unable to respond.");
     } finally {
       setActionLoading(false);
+    }
+  }
+
+  async function handlePublicPost() {
+    if (!confession) return;
+
+    try {
+      setPublicPosting(true);
+      setError("");
+
+      const response = await publishConfessionPublicly(confession._id);
+
+      setConfession(response.data);
+    } catch (error) {
+      console.error(error);
+
+      setError(error.message || "Unable to share confession publicly.");
+    } finally {
+      setPublicPosting(false);
     }
   }
 
@@ -219,21 +232,62 @@ setConversationId(
             </>
           )}
 
-{confession.recipientAction === "curious" && (
-  <>
-    <p>👀 You said you're curious.</p>
+          {confession.recipientAction === "curious" && (
+            <>
+              <p>👀 You said you're curious.</p>
 
-    {conversationId && (
-      <button
-        onClick={() =>
-          navigate(`/chat/${conversationId}`)
-        }
-      >
-        💬 Open Conversation
-      </button>
-    )}
-  </>
-)}
+              {conversationId && (
+                <button onClick={() => navigate(`/chat/${conversationId}`)}>
+                  💬 Open Conversation
+                </button>
+              )}
+
+              {confession.publicConsent && !confession.publicPosted && (
+                <div
+                  style={{
+                    marginTop: 20,
+                    padding: 15,
+                    border: "1px solid #ccc",
+                    borderRadius: 10,
+                  }}
+                >
+                  <p>
+                    📸 You both agreed that this confession can be shared
+                    publicly.
+                  </p>
+
+                  <button disabled={publicPosting} onClick={handlePublicPost}>
+                    {publicPosting
+                      ? "Sharing on Instagram..."
+                      : "📸 Share on Instagram"}
+                  </button>
+                </div>
+              )}
+
+              {confession.publicPosted && (
+                <div
+                  style={{
+                    marginTop: 20,
+                    padding: 15,
+                    border: "1px solid #ccc",
+                    borderRadius: 10,
+                  }}
+                >
+                  <p>✨ This confession is now public.</p>
+
+                  <p>You both chose to share this moment.</p>
+
+                  <a
+                    href={`https://www.instagram.com/p/${confession.instagramPostId}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View on Instagram
+                  </a>
+                </div>
+              )}
+            </>
+          )}
 
           {confession.recipientAction === "not_interested" && (
             <p>You're not interested in this confession.</p>
@@ -259,26 +313,17 @@ setConversationId(
             <p>⏳ Waiting for their response.</p>
           )}
 
-          {confession.recipientAction ===
-  "curious" && (
-  <>
-    <p>
-      👀 They're curious about you.
-    </p>
+          {confession.recipientAction === "curious" && (
+            <>
+              <p>👀 They're curious about you.</p>
 
-    {conversationId && (
-      <button
-        onClick={() =>
-          navigate(
-            `/chat/${conversationId}`
-          )
-        }
-      >
-        💬 Continue Conversation
-      </button>
-    )}
-  </>
-)}
+              {conversationId && (
+                <button onClick={() => navigate(`/chat/${conversationId}`)}>
+                  💬 Continue Conversation
+                </button>
+              )}
+            </>
+          )}
 
           {confession.recipientAction === "not_interested" && (
             <p>They aren't interested.</p>

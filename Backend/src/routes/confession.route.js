@@ -17,6 +17,13 @@ import {
   notifyConfessionUpdated,
 } from "../socket/socketNotifier.js";
 import Conversation from "../models/conversation.model.js";
+import {
+  publishConfessionPublicly,
+} from "../services/publicPost.service.js";
+
+import {
+  notifyPublicPostUpdated,
+} from "../socket/publicPost.socket.js";
 
 /*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
@@ -67,7 +74,12 @@ returns null when nothing is found. in frontend */
 // CREATE CONFESSION
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { recipientUsername, message, allowPending = false } = req.body; //basic take input from browser
+    const {
+  recipientUsername,
+  message,
+  allowPending = false,
+  publicConsent = false,
+} = req.body; //basic take input from browser
     console.log(req.body);
     // 🔥 generate image
 
@@ -198,23 +210,34 @@ Not sending to yourself ✅*/
     //this are currently sequential like 1st then 2nd page
 
     // 3. save in DB
-    const confession = await Confession.create({
-      senderUser: sender._id,
-      senderAnonymousProfile: senderAnonymous._id,
-      senderAnonymousName: senderAnonymous.anonymousName,
-      recipientUser: recipient._id,
-      recipientInstagramUsername: recipient.instagramUsername,
-      message,
-      imageUrls,
-    });
+const confession = await Confession.create({
+  senderUser: sender._id,
+  senderAnonymousProfile: senderAnonymous._id,
+  senderAnonymousName: senderAnonymous.anonymousName,
+
+  recipientUser: recipient._id,
+  recipientInstagramUsername: recipient.instagramUsername,
+
+  message,
+  imageUrls,
+
+  publicConsent:
+    publicConsent === true,
+});
 
     notifyNewConfession(recipient._id, confession);
     notifyNewConfession(confession.senderUser, confession);
     console.log(`Emitted new-confession to room user:${recipient._id}`);
-    await sendAdminNotification({
-      title: "New confession request",
-      body: `${confession.recipientInstagramUsername} received a confession`,
-    });
+// =========================
+// ADMIN NOTIFICATION
+// Disabled for V1.
+// Keep this for future admin moderation.
+// =========================
+
+// await sendAdminNotification({
+//   title: "New confession request",
+//   body: `${confession.recipientInstagramUsername} received a confession`,
+// });
 
     // SUCCESS RESPONSE
     return res
@@ -416,6 +439,63 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
       );
   }
 });
+
+// RECIPIENT CHOOSES TO MAKE CONFESSION PUBLIC
+router.post("/:id/public", verifyToken, async (req, res) => {
+  try {
+    const confession =
+      await publishConfessionPublicly(
+        req.params.id,
+        req.user.id
+      );
+
+    const notification = {
+      confessionId: confession._id,
+      status: "public",
+      instagramPostId:
+        confession.instagramPostId,
+      publicPostedAt:
+        confession.publicPostedAt,
+    };
+
+    // Notify sender.
+    notifyPublicPostUpdated(
+      confession.senderUser,
+      notification
+    );
+
+    // Notify recipient too.
+    notifyPublicPostUpdated(
+      confession.recipientUser,
+      notification
+    );
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confession,
+        "Confession shared publicly."
+      )
+    );
+  } catch (error) {
+    console.error(
+      "PUBLIC CONFESSION ERROR:",
+      error
+    );
+
+    return res.status(
+      error.statusCode || 500
+    ).json(
+      new ApiResponse(
+        error.statusCode || 500,
+        null,
+        error.message ||
+          "Unable to share confession publicly."
+      )
+    );
+  }
+});
+
 // GET ONE CONFESSION
 router.get("/:id", verifyToken, async (req, res) => {
   try {
