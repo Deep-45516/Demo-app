@@ -46,6 +46,8 @@ docs
 
       message: p.message,
       imageUrls: p.imageUrls,
+
+      publicConsent: p.publicConsent,
     }));
 /*docs
 [A, B, C]

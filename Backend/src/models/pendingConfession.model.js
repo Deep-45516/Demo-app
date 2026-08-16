@@ -37,6 +37,11 @@ const pendingConfessionSchema = new mongoose.Schema(
       default: [],
     },
 
+    publicConsent: {
+      type: Boolean,
+      default: false,
+    },
+
     delivered: {
       type: Boolean,
       default: false,
@@ -50,10 +55,7 @@ const pendingConfessionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export default mongoose.model(
-  "PendingConfession",
-  pendingConfessionSchema
-);
+export default mongoose.model("PendingConfession", pendingConfessionSchema);

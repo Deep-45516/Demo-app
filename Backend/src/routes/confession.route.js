@@ -159,8 +159,10 @@ STOP       create pending */
         recipientInstagramUsername: recipientUsername.trim().toLowerCase(),
 
         message,
-
         imageUrls,
+
+        publicConsent:
+    publicConsent === true,
       });
 
       return res
