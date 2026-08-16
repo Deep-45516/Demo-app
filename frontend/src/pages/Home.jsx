@@ -194,28 +194,30 @@ and the user's information.
         <textarea value={from} onChange={(e) => setFrom(e.target.value)} />
         <button onClick={downloadPages}>Download Pages</button>
         //checkbox for public post consent
-        {recipientStatus?.exists && (
-          <label
-            style={{
-              display: "flex",
-              gap: 8,
-              alignItems: "flex-start",
-              marginTop: 15,
-              marginBottom: 15,
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={publicConsent}
-              onChange={(e) => setPublicConsent(e.target.checked)}
-            />
+        {recipientStatus && (
+  <label
+    style={{
+      display: "flex",
+      gap: 8,
+      alignItems: "flex-start",
+      marginTop: 15,
+      marginBottom: 15,
+    }}
+  >
+    <input
+      type="checkbox"
+      checked={publicConsent}
+      onChange={(e) =>
+        setPublicConsent(e.target.checked)
+      }
+    />
 
-            <span>
-              I'm okay with this confession being shared publicly if they also
-              choose to share it.
-            </span>
-          </label>
-        )}
+    <span>
+      I'm okay with this confession being shared
+      publicly if they also choose to share it.
+    </span>
+  </label>
+)}
         <button
           disabled={
             !recipientStatus ||

@@ -233,61 +233,77 @@ export default function ConfessionDetails() {
           )}
 
           {confession.recipientAction === "curious" && (
-            <>
-              <p>👀 You said you're curious.</p>
+  <>
+    <p>👀 You said you're curious.</p>
 
-              {conversationId && (
-                <button onClick={() => navigate(`/chat/${conversationId}`)}>
-                  💬 Open Conversation
-                </button>
-              )}
+    {conversationId && (
+      <button
+        onClick={() =>
+          navigate(`/chat/${conversationId}`)
+        }
+      >
+        💬 Open Conversation
+      </button>
+    )}
+  </>
+)}
 
-              {confession.publicConsent && !confession.publicPosted && (
-                <div
-                  style={{
-                    marginTop: 20,
-                    padding: 15,
-                    border: "1px solid #ccc",
-                    borderRadius: 10,
-                  }}
-                >
-                  <p>
-                    📸 You both agreed that this confession can be shared
-                    publicly.
-                  </p>
+{/* =========================
+    PUBLIC POST
+    ========================= */}
 
-                  <button disabled={publicPosting} onClick={handlePublicPost}>
-                    {publicPosting
-                      ? "Sharing on Instagram..."
-                      : "📸 Share on Instagram"}
-                  </button>
-                </div>
-              )}
+{confession.publicConsent &&
+  !confession.publicPosted && (
+    <div
+      style={{
+        marginTop: 20,
+        padding: 15,
+        border: "1px solid #ccc",
+        borderRadius: 10,
+      }}
+    >
+      <p>
+        📸 You both agreed that this confession
+        can be shared publicly.
+      </p>
 
-              {confession.publicPosted && (
-                <div
-                  style={{
-                    marginTop: 20,
-                    padding: 15,
-                    border: "1px solid #ccc",
-                    borderRadius: 10,
-                  }}
-                >
-                  <p>✨ This confession is now public.</p>
+      <button
+        disabled={publicPosting}
+        onClick={handlePublicPost}
+      >
+        {publicPosting
+          ? "Sharing on Instagram..."
+          : "📸 Share on Instagram"}
+      </button>
+    </div>
+  )}
 
-                  <p>You both chose to share this moment.</p>
+{confession.publicPosted && (
+  <div
+    style={{
+      marginTop: 20,
+      padding: 15,
+      border: "1px solid #ccc",
+      borderRadius: 10,
+    }}
+  >
+    <p>
+      ✨ This confession is now public.
+    </p>
 
-                  <a
-                    href={`https://www.instagram.com/p/${confession.instagramPostId}/`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View on Instagram
-                  </a>
-                </div>
-              )}
-            </>
-          )}
+    <p>
+      You both chose to share this moment.
+    </p>
+
+    <a
+      href={`https://www.instagram.com/p/${confession.instagramPostId}/`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View on Instagram
+    </a>
+  </div>
+)}
 
           {confession.recipientAction === "not_interested" && (
             <p>You're not interested in this confession.</p>
