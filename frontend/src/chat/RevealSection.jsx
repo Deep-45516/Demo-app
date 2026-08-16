@@ -244,7 +244,7 @@ export default function RevealSection({
           style={{
             margin:
               "8px 0 16px",
-            color: "#666",
+            color: "#bebebe",
             lineHeight: 1.5,
           }}
         >
@@ -287,8 +287,7 @@ export default function RevealSection({
           }
           style={{
             marginTop: 10,
-            background:
-              "transparent",
+            background: "#ffffff",
             border: "none",
             cursor: "pointer",
             color: "#666",
