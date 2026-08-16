@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export default function RevealSection({
   userId,
   conversationSenderId,
@@ -10,6 +12,9 @@ export default function RevealSection({
   onRequestReveal,
   onRevealResponse,
 }) {
+  const [showIdentity, setShowIdentity] =
+    useState(false);
+
   const isSender =
     String(userId) ===
     String(conversationSenderId);
@@ -25,14 +30,31 @@ export default function RevealSection({
         remainingMessages <= 5 &&
         remainingMessages > 0 &&
         revealStatus !== "revealed" && (
-          <p
+          <div
             style={{
-              marginBottom: 15,
+              marginBottom: 20,
+              padding: 16,
+              borderRadius: 12,
+              background: "#f8f8f8",
+              border: "1px solid #e5e5e5",
             }}
           >
-            ✨ You're getting close.
-            Keep the conversation going.
-          </p>
+            <strong>
+              👀 They're interested.
+            </strong>
+
+            <p
+              style={{
+                margin:
+                  "6px 0 0",
+              }}
+            >
+              They chose to keep
+              talking to you.
+              Keep the conversation
+              going.
+            </p>
+          </div>
         )}
 
 
@@ -46,7 +68,7 @@ export default function RevealSection({
         revealStatus === "none" && (
           <div
             style={{
-              marginBottom: 15,
+              marginBottom: 20,
             }}
           >
             <button
@@ -72,21 +94,47 @@ export default function RevealSection({
       {revealStatus === "pending" && (
         <div
           style={{
-            marginBottom: 15,
+            marginBottom: 20,
+            padding: 16,
+            borderRadius: 12,
+            background: "#f8f8f8",
+            border: "1px solid #e5e5e5",
           }}
         >
           {String(
             revealRequestedBy
           ) === String(userId) ? (
-            <p>
-              👀 Reveal request sent.
-              Waiting for their response.
-            </p>
+            <>
+              <strong>
+                👀 Reveal request sent
+              </strong>
+
+              <p
+                style={{
+                  margin:
+                    "6px 0 0",
+                }}
+              >
+                Waiting for them
+                to decide.
+              </p>
+            </>
           ) : (
             <>
-              <p>
+              <strong>
                 👀 They want to know
                 who you are.
+              </strong>
+
+              <p
+                style={{
+                  margin:
+                    "6px 0 14px",
+                }}
+              >
+                You can reveal your
+                identity when you're
+                ready.
               </p>
 
               <button
@@ -128,13 +176,18 @@ export default function RevealSection({
           ========================= */}
 
       {revealNotice && (
-        <p
+        <div
           style={{
-            marginBottom: 15,
+            marginBottom: 20,
+            padding: 14,
+            borderRadius: 12,
+            background: "#fafafa",
+            border:
+              "1px solid #e5e5e5",
           }}
         >
           {revealNotice}
-        </p>
+        </div>
       )}
 
 
@@ -143,108 +196,228 @@ export default function RevealSection({
           ========================= */}
 
       {revealStatus ===
-        "revealed" &&
-        revealedIdentity && (
+        "revealed" && (
           <div
             style={{
-              marginTop: 25,
-              marginBottom: 25,
-              padding: 25,
-              borderRadius: 16,
-              border: "1px solid #ddd",
+              marginBottom: 20,
+              padding: 18,
+              borderRadius: 14,
+              border:
+                "1px solid #e5e5e5",
               textAlign: "center",
-              background: "#fafafa",
             }}
           >
             <div
               style={{
-                fontSize: 32,
-                marginBottom: 8,
+                fontSize: 28,
+                marginBottom: 6,
               }}
             >
               🎉
             </div>
 
-            <h3
-              style={{
-                margin: "5px 0",
-              }}
-            >
-              Identity Revealed
-            </h3>
+            <strong>
+              Identity revealed
+            </strong>
 
             <p
               style={{
+                margin:
+                  "6px 0 14px",
                 color: "#666",
-                marginBottom: 20,
               }}
             >
-              You both chose to reveal
-              your identities.
+              You both chose to
+              reveal your
+              identities.
             </p>
 
-            {revealedIdentity.profilePicture ? (
-              <img
-                src={
-                  revealedIdentity.profilePicture
-                }
-                alt="Instagram profile"
-                style={{
-                  width: 90,
-                  height: 90,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  marginBottom: 12,
-                }}
-              />
-            ) : (
+            <button
+              onClick={() =>
+                setShowIdentity(true)
+              }
+            >
+              👀 See Identity
+            </button>
+          </div>
+        )}
+
+
+      {/* =========================
+          IDENTITY POPUP
+          ========================= */}
+
+      {showIdentity &&
+        revealedIdentity && (
+          <div
+            onClick={() =>
+              setShowIdentity(false)
+            }
+            style={{
+              position: "fixed",
+              inset: 0,
+              background:
+                "rgba(0, 0, 0, 0.55)",
+              display: "flex",
+              alignItems:
+                "center",
+              justifyContent:
+                "center",
+              zIndex: 1000,
+              padding: 20,
+            }}
+          >
+            <div
+              onClick={(event) =>
+                event.stopPropagation()
+              }
+              style={{
+                width: "100%",
+                maxWidth: 380,
+                background:
+                  "#ffffff",
+                borderRadius: 22,
+                padding: 28,
+                textAlign: "center",
+                boxShadow:
+                  "0 20px 60px rgba(0,0,0,0.25)",
+              }}
+            >
               <div
                 style={{
-                  width: 90,
-                  height: 90,
-                  borderRadius: "50%",
-                  margin:
-                    "0 auto 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent:
-                    "center",
-                  fontSize: 35,
-                  background: "#eee",
+                  fontSize: 36,
+                  marginBottom: 8,
                 }}
               >
-                👤
+                ✨
               </div>
-            )}
 
-            <h3>
-              {revealedIdentity.name ||
-                revealedIdentity.username}
-            </h3>
+              <h2
+                style={{
+                  margin:
+                    "0 0 6px",
+                }}
+              >
+                Identity Revealed
+              </h2>
 
-            <p>
-              @{revealedIdentity.username}
-            </p>
+              <p
+                style={{
+                  margin:
+                    "0 0 22px",
+                  color: "#666",
+                }}
+              >
+                The person behind the
+                anonymous conversation.
+              </p>
 
-            <a
-              href={`https://www.instagram.com/${revealedIdentity.username}/`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display:
-                  "inline-block",
-                marginTop: 10,
-                padding:
-                  "10px 18px",
-                borderRadius: 10,
-                textDecoration:
-                  "none",
-                border:
-                  "1px solid #ccc",
-              }}
-            >
-              View Instagram
-            </a>
+
+              {/* Profile picture */}
+
+              {revealedIdentity.profilePicture ? (
+                <img
+                  src={
+                    revealedIdentity.profilePicture
+                  }
+                  alt="Instagram profile"
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius:
+                      "50%",
+                    objectFit:
+                      "cover",
+                    marginBottom: 14,
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius:
+                      "50%",
+                    margin:
+                      "0 auto 14px",
+                    display: "flex",
+                    alignItems:
+                      "center",
+                    justifyContent:
+                      "center",
+                    fontSize: 42,
+                    background:
+                      "#f1f1f1",
+                  }}
+                >
+                  👤
+                </div>
+              )}
+
+
+              <h3
+                style={{
+                  margin:
+                    "4px 0",
+                }}
+              >
+                {revealedIdentity.name ||
+                  revealedIdentity.username}
+              </h3>
+
+              <p
+                style={{
+                  margin:
+                    "4px 0 20px",
+                  color: "#666",
+                }}
+              >
+                @
+                {
+                  revealedIdentity.username
+                }
+              </p>
+
+
+              <a
+                href={`https://www.instagram.com/${revealedIdentity.username}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display:
+                    "block",
+                  padding:
+                    "12px 18px",
+                  borderRadius: 12,
+                  textDecoration:
+                    "none",
+                  border:
+                    "1px solid #ddd",
+                  marginBottom: 10,
+                }}
+              >
+                View Instagram
+              </a>
+
+              <button
+                onClick={() =>
+                  setShowIdentity(
+                    false
+                  )
+                }
+                style={{
+                  width: "100%",
+                  padding:
+                    "10px",
+                  border: "none",
+                  background:
+                    "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         )}
     </>
