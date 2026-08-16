@@ -185,76 +185,165 @@ export default function RevealSection({
       )}
 
 
-      {/* =========================
-          NOT YET NOTICE
-          ========================= */}
+{/* =========================
+    IDENTITY REVEALED
+    ========================= */}
 
-      {revealNotice && (
+{revealStatus === "revealed" && (
+  <div
+    style={{
+      marginBottom: 20,
+      padding: 22,
+      borderRadius: 16,
+      border: "1px solid #e5e5e5",
+      textAlign: "center",
+    }}
+  >
+
+    {/* =========================
+        SENDER VIEW
+        ========================= */}
+
+    {isSender ? (
+      <>
         <div
           style={{
-            marginBottom: 20,
-            padding: 14,
-            borderRadius: 12,
-            background: "#fafafa",
-            border:
-              "1px solid #e5e5e5",
+            fontSize: 32,
+            marginBottom: 8,
           }}
         >
-          {revealNotice}
+          ✨
         </div>
-      )}
 
+        <strong
+          style={{
+            fontSize: 20,
+          }}
+        >
+          They know it's you now.
+        </strong>
 
-      {/* =========================
-          IDENTITY REVEALED
-          ========================= */}
+        <p
+          style={{
+            margin:
+              "12px 0 6px",
+            fontSize: 16,
+          }}
+        >
+          <strong>
+            @
+            {revealedIdentity?.username ||
+              "them"}
+          </strong>{" "}
+          knows who was behind
+          the message.
+        </p>
 
-      {revealStatus ===
-        "revealed" && (
-          <div
-            style={{
-              marginBottom: 20,
-              padding: 18,
-              borderRadius: 14,
-              border:
-                "1px solid #e5e5e5",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 28,
-                marginBottom: 6,
-              }}
-            >
-              🎉
-            </div>
+        <p
+          style={{
+            margin:
+              "8px 0 16px",
+            color: "#666",
+            lineHeight: 1.5,
+          }}
+        >
+          You wondered what
+          they'd think after they get to know its you
+          <br />
+          {/* <strong>
+            Now they know.
+          </strong> */}
+        </p>
 
-            <strong>
-              Identity revealed
-            </strong>
+        <p
+          style={{
+            margin:
+              "0 0 14px",
+            color: "#555",
+          }}
+        >
+          💬 Keep the conversation
+          going and see where it
+          goes.
+        </p>
 
-            <p
-              style={{
-                margin:
-                  "6px 0 14px",
-                color: "#666",
-              }}
-            >
-              You both chose to take
-    this conversation beyond
-    anonymity.
-            </p>
+        <button
+          onClick={() => {
+            window.open(
+              `https://www.instagram.com/direct/t/${revealedIdentity?.username}/`,
+              "_blank"
+            );
+          }}
+        >
+          💬 Continue on Instagram
+        </button>
 
-            <button
-              onClick={() =>
-                setShowIdentity(true)
-              }
-            >
-              👀 See Identity
-            </button>
-          </div>
-        )}
+        <br />
+
+        <button
+          onClick={() =>
+            setShowIdentity(true)
+          }
+          style={{
+            marginTop: 10,
+            background:
+              "transparent",
+            border: "none",
+            cursor: "pointer",
+            color: "#666",
+          }}
+        >
+          👀 See their identity
+        </button>
+      </>
+    ) : (
+
+      /* =========================
+          RECIPIENT VIEW
+          ========================= */
+
+      <>
+        <div
+          style={{
+            fontSize: 32,
+            marginBottom: 8,
+          }}
+        >
+          🎉
+        </div>
+
+        <strong
+          style={{
+            fontSize: 20,
+          }}
+        >
+          Identity revealed
+        </strong>
+
+        <p
+          style={{
+            margin:
+              "8px 0 16px",
+            color: "#666",
+          }}
+        >
+          You both chose to take
+          this conversation beyond
+          anonymity.
+        </p>
+
+        <button
+          onClick={() =>
+            setShowIdentity(true)
+          }
+        >
+          👀 See Identity
+        </button>
+      </>
+    )}
+
+  </div>
+)}
 
 
       {/* =========================
