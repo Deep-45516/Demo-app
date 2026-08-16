@@ -45,7 +45,7 @@ export default function RevealSection({
         remainingMessages !== null &&
         remainingMessages <= 5 &&
         remainingMessages > 0 &&
-        revealStatus !== "revealed" && (
+        revealStatus === "revealed" && (
           <div
             style={{
               marginBottom: 20,

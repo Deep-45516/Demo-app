@@ -69,8 +69,6 @@ export default function Chat() {
     setRevealNotice,
   ] = useState("");
 
-  const [autoOpenIdentity, setAutoOpenIdentity] =
-  useState(false);
 
   const [
     conversationSenderId,
@@ -144,93 +142,87 @@ export default function Chat() {
 
 
     // Reveal request / response
-    function handleRevealUpdated(
-      data
-    ) {
-      if (
-        data.conversationId !==
-        conversationId
-      ) {
-        return;
-      }
-
-      console.log(
-        "🔥 REVEAL UPDATED:",
-        data
-      );
-
-      setRevealStatus(
-        data.status
-      );
-
-      if (
-        data.status ===
-        "pending"
-      ) {
-        setRevealRequestedBy(
-          data.requestedBy || null
-        );
-
-        if (
-    data.status === "revealed"
+  function handleRevealUpdated(data) {
+  if (
+    data.conversationId !==
+    conversationId
   ) {
-    setRevealedIdentity(
-      data.identity || null
-    );
-    setAutoOpenIdentity(true);
-    setRevealNotice("");
+    return;
   }
 
-        return;
-      }
+  console.log(
+    "🔥 REVEAL UPDATED:",
+    data
+  );
 
+  setRevealStatus(
+    data.status
+  );
 
-      // =========================
-      // NOT YET
-      // =========================
+  // =========================
+  // PENDING
+  // =========================
 
-      if (
-        data.decision ===
-        "not_yet"
-      ) {
-        setRevealStatus(
-          "none"
-        );
+  if (
+    data.status ===
+    "pending"
+  ) {
+    setRevealRequestedBy(
+      data.requestedBy || null
+    );
 
-        setRevealRequestedBy(
-          null
-        );
+    return;
+  }
 
-        setRevealNotice(
-          "🌱 They're not ready to reveal yet. You can keep talking anonymously."
-        );
+  // =========================
+  // NOT YET
+  // =========================
 
-        return;
-      }
+  if (
+    data.decision ===
+    "not_yet"
+  ) {
+    setRevealStatus(
+      "none"
+    );
 
+    setRevealRequestedBy(
+      null
+    );
 
-      // =========================
-      // REVEALED
-      // =========================
+    setRevealNotice(
+      "🌱 They're not ready to reveal yet. You can keep talking anonymously."
+    );
 
-      if (
-        data.status ===
-        "revealed"
-      ) {
-        setRevealRequestedBy(
-          null
-        );
+    return;
+  }
 
-        setRevealedIdentity(
-          data.identity ||
-            null
-        );
+  // =========================
+  // REVEALED
+  // =========================
 
-        setRevealNotice(
-          ""
-        );
-      }
-    }
+  if (
+    data.status ===
+    "revealed"
+  ) {
+    setRevealRequestedBy(
+      null
+    );
+
+    setRevealedIdentity(
+      data.identity ||
+        null
+    );
+
+    setAutoOpenIdentity(
+      true
+    );
+
+    setRevealNotice(
+      ""
+    );
+  }
+}
 
 
     socket.on(
