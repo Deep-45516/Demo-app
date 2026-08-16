@@ -262,7 +262,7 @@ export default function RevealSection({
             color: "#555",
           }}
         >
-          💬 Keep the conversation
+          Keep the conversation
           going and see where it
           goes.
         </p>
@@ -324,7 +324,7 @@ export default function RevealSection({
           style={{
             margin:
               "8px 0 16px",
-            color: "#666",
+            color: "#faf8f8",
           }}
         >
           You both chose to take
@@ -408,7 +408,7 @@ export default function RevealSection({
                 style={{
                   margin:
                     "0 0 22px",
-                  color: "#666",
+                  color: "#f7f1f1",
                 }}
               >
                 The person behind the
@@ -472,7 +472,7 @@ export default function RevealSection({
                 style={{
                   margin:
                     "4px 0 20px",
-                  color: "#666",
+                  color: "#f7f7f7",
                 }}
               >
                 @
