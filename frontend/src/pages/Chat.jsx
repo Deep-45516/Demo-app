@@ -235,6 +235,30 @@ setInstagramPostId(
     }
   }
 
+  async function handlePublishPublicly() {
+  try {
+    setError("");
+
+    const response =
+      await publishConfessionPublicly(
+        conversationId
+      );
+
+    setPublicPosted(true);
+
+    setInstagramPostId(
+      response.data?.instagramPostId || null
+    );
+  } catch (error) {
+    console.error(error);
+
+    setError(
+      error.message ||
+      "Unable to post confession."
+    );
+  }
+}
+
   // =========================
   // ASK FOR REVEAL
   // =========================
@@ -374,6 +398,57 @@ setInstagramPostId(
         onRequestReveal={handleRequestReveal}
         onRevealResponse={handleRevealResponse}
       />
+
+      {/* =========================
+    PUBLIC CONFESSION
+    ========================= */}
+
+{publicConsent &&
+ !publicPosted &&
+ String(userId) !==
+ String(conversationSenderId) && (
+  <div
+    style={{
+      marginBottom: 20,
+      padding: 15,
+      border: "1px solid #ddd",
+      borderRadius: 10,
+    }}
+  >
+    <p>
+      ✨ You both agreed to make this
+      confession public.
+    </p>
+
+    <button
+      onClick={handlePublishPublicly}
+    >
+      📸 Post on Instagram
+    </button>
+  </div>
+)}
+
+{publicPosted && (
+  <div
+    style={{
+      marginBottom: 20,
+      padding: 15,
+      border: "1px solid #ddd",
+      borderRadius: 10,
+    }}
+  >
+    <p>
+      ✨ This confession is now public
+      on Instagram.
+    </p>
+
+    {instagramPostId && (
+      <small>
+        Instagram post created successfully.
+      </small>
+    )}
+  </div>
+)}
 
       {/* =========================
           MESSAGE INPUT
