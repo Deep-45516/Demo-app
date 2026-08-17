@@ -31,6 +31,56 @@ export default function InstagramVerification() {
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
 
+
+  useEffect(() => {
+  const checkExistingLogin = async () => {
+    const token = localStorage.getItem("token");
+
+    // No token in this browser.
+    // Continue with normal Instagram verification.
+    if (!token) {
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${API}/api/v1/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Token is invalid or expired.
+      if (!res.ok) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return;
+      }
+
+      const data = await res.json();
+
+      // This token belongs to the user already
+      // authenticated in THIS browser.
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.data.user)
+      );
+
+      // Already logged in.
+      window.location.replace("/");
+    } catch (error) {
+      console.error(
+        "Existing login check failed:",
+        error
+      );
+    }
+  };
+
+  checkExistingLogin();
+}, []);
+
   useEffect(() => {
     return () => {
       clearInterval(intervalRef.current);
@@ -85,23 +135,23 @@ export default function InstagramVerification() {
           setStep("error");
           return;
         }
-    if (data.data?.alreadyVerified) {
-  localStorage.setItem("token", data.data.token);
+//     if (data.data?.alreadyVerified) {
+//   localStorage.setItem("token", data.data.token);
 
-  const meRes = await fetch(`${API}/api/v1/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${data.data.token}`,
-    },
-  });
+//   const meRes = await fetch(`${API}/api/v1/auth/me`, {
+//     headers: {
+//       Authorization: `Bearer ${data.data.token}`,
+//     },
+//   });
 
-  const meData = await meRes.json();
+//   const meData = await meRes.json();
 
-  localStorage.setItem("user", JSON.stringify(meData.data.user));
+//   localStorage.setItem("user", JSON.stringify(meData.data.user));
 
-  // Go straight to the confession page/home
-  window.location.replace("/");
-  return;
-}
+//   // Go straight to the confession page/home
+//   window.location.replace("/");
+//   return;
+// }
 
 if (data.data.status === "verified") {
   clearInterval(intervalRef.current);
@@ -194,25 +244,25 @@ if (data.data.status === "verified") {
         alert(data.message || "Verification failed.");
         return;
       }
-      // ⭐ EXISTING USER
-if (data.data?.alreadyVerified) {
-  localStorage.setItem("token", data.data.token);
+//       // ⭐ EXISTING USER
+// if (data.data?.alreadyVerified) {
+//   localStorage.setItem("token", data.data.token);
 
-  const meRes = await fetch(`${API}/api/v1/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${data.data.token}`,
-    },
-  });
-  console.log("START RESPONSE:", data);
-console.log("alreadyVerified:", data.data?.alreadyVerified);
+//   const meRes = await fetch(`${API}/api/v1/auth/me`, {
+//     headers: {
+//       Authorization: `Bearer ${data.data.token}`,
+//     },
+//   });
+//   console.log("START RESPONSE:", data);
+// console.log("alreadyVerified:", data.data?.alreadyVerified);
 
-  const meData = await meRes.json();
+//   const meData = await meRes.json();
 
-  localStorage.setItem("user", JSON.stringify(meData.data.user));
+//   localStorage.setItem("user", JSON.stringify(meData.data.user));
 
-  window.location.replace("/");
-  return;   // <-- THIS IS CRITICAL
-}
+//   window.location.replace("/");
+//   return;   // <-- THIS IS CRITICAL
+// }
 
       //this is js destructuring,instead of const sessionId = data.data.sessionId; const code = data.data.code;
       const { sessionId, code } = data.data;
