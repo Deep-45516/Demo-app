@@ -103,29 +103,97 @@ export const receiveWebhook = async (req, res) => {
 }
 
     // Find existing user
-    let user = await User.findOne({
-      $or: [
-        { instagramScopedId: profile.id },
-        { instagramUsername: profile.username.toLowerCase() },
-      ],
+// =====================================================
+// FIND USER BY INSTAGRAM SCOPED ID
+// =====================================================
+//
+// The scoped ID comes from Instagram itself.
+// It is the identity we trust for an already verified
+// Instagram account.
+//
+// DO NOT use instagramUsername as the primary lookup here.
+// A username alone does not prove ownership.
+// =====================================================
+
+const instagramUsername =
+  profile.username.toLowerCase();
+
+let user =
+  await User.findOne({
+    instagramScopedId: profile.id,
+  });
+
+// =====================================================
+// EXISTING INSTAGRAM ID
+// =====================================================
+
+if (user) {
+  // The Instagram account has already been verified before.
+
+  user.instagramUsername =
+    instagramUsername;
+
+  user.instagramName =
+    profile.name;
+
+  user.instagramVerified =
+    true;
+
+  await user.save();
+}
+
+// =====================================================
+// NEW INSTAGRAM ID
+// =====================================================
+
+else {
+  // Before creating a new user, make sure another
+  // account is not already using this username.
+  //
+  // This protects against a username collision where
+  // the username exists but belongs to another
+  // Instagram scoped ID.
+
+  const usernameOwner =
+    await User.findOne({
+      instagramUsername,
     });
 
-    // Create user if it doesn't exist
-    if (!user) {
-      user = await User.create({
-        instagramScopedId: profile.id,
-        instagramUsername: profile.username.toLowerCase(),
-        instagramName: profile.name,
-        instagramVerified: true,
-      });
-    } else {
-      // Update existing user
-      user.instagramUsername = profile.username.toLowerCase();
-      user.instagramName = profile.name;
-      user.instagramVerified = true;
+  if (usernameOwner) {
+    console.log(
+      `Instagram username already belongs to another verified account: @${instagramUsername}`,
+    );
 
-      await user.save();
-    }
+    session.status =
+      "username_mismatch";
+
+    session.lastError =
+      `This Instagram username is already connected to another account.`;
+
+    await session.save();
+
+    return res.sendStatus(200);
+  }
+
+  // No existing Instagram identity and no
+  // username collision.
+  //
+  // Create a completely new application user.
+
+  user =
+    await User.create({
+      instagramScopedId:
+        profile.id,
+
+      instagramUsername,
+
+      instagramName:
+        profile.name,
+
+      instagramVerified:
+        true,
+    });
+}
     //give anonomous identity attch to that user_.id, anonomous identity also has its own id
     let anonymousProfile = await AnonymousProfile.findOne({
   userId: user._id,

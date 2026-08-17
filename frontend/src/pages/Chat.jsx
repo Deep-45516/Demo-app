@@ -39,9 +39,6 @@ export default function Chat() {
 
   const [conversationSenderId, setConversationSenderId] = useState(null);
 
-  const [confessionId, setConfessionId] =
-  useState(null);
-
   const [publicConsent, setPublicConsent] = useState(false);
 
   const [publicPosted, setPublicPosted] = useState(false);
@@ -168,10 +165,6 @@ export default function Chat() {
 
       setConversationSenderId(response.data.senderUser);
 
-      setConfessionId(
-  response.data.confessionId
-);
-
       setPublicConsent(
   response.data.publicConsent || false
 );
@@ -242,26 +235,27 @@ setInstagramPostId(
     }
   }
 
-  async function handlePublishPublicly() {
+async function handlePublishPublicly() {
   try {
     setError("");
 
-const response =
-  await publishConfessionPublicly(
-    confessionId
-  );
+    const response =
+      await publishConfessionPublicly(
+        conversationId
+      );
 
     setPublicPosted(true);
 
     setInstagramPostId(
-      response.data?.instagramPostId || null
+      response.data?.instagramPostId ||
+        null
     );
   } catch (error) {
     console.error(error);
 
     setError(
       error.message ||
-      "Unable to post confession."
+        "Unable to share confession publicly."
     );
   }
 }

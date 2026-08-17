@@ -296,7 +296,7 @@ export default function ConfessionDetails() {
     </p>
 
     <a
-      href={`https://www.instagram.com/p/${confession.instagramPostId}/`}
+      href={`https://www.instagram.com/wit_confessions.26/`}
       target="_blank"
       rel="noopener noreferrer"
     >

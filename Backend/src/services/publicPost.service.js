@@ -1,15 +1,45 @@
 import Confession from "../models/confession.model.js";
+import Conversation from "../models/conversation.model.js";
 import { postConfessionToInstagram } from "../utils/postConfessionToInstagram.js";
 
 export async function publishConfessionPublicly(
-  confessionId,
+  id,
   userId
 ) {
-  const confession =
+  // ----------------------------------
+  // 1. Try direct confession ID
+  // ----------------------------------
+
+  let confession =
     await Confession.findOne({
-      _id: confessionId,
+      _id: id,
       recipientUser: userId,
     });
+
+  // ----------------------------------
+  // 2. If not found, treat id as
+  //    conversationId
+  // ----------------------------------
+
+  if (!confession) {
+    const conversation =
+      await Conversation.findOne({
+        _id: id,
+        recipientUser: userId,
+      }).lean();
+
+    if (conversation) {
+      confession =
+        await Confession.findOne({
+          _id: conversation.confessionId,
+          recipientUser: userId,
+        });
+    }
+  }
+
+  // ----------------------------------
+  // 3. Verify access
+  // ----------------------------------
 
   if (!confession) {
     const error = new Error(
@@ -21,7 +51,10 @@ export async function publishConfessionPublicly(
     throw error;
   }
 
-  // Sender must have agreed first.
+  // ----------------------------------
+  // 4. Sender must have agreed
+  // ----------------------------------
+
   if (!confession.publicConsent) {
     const error = new Error(
       "The sender has not agreed to public sharing."
@@ -32,7 +65,10 @@ export async function publishConfessionPublicly(
     throw error;
   }
 
-  // Prevent duplicate Instagram posts.
+  // ----------------------------------
+  // 5. Prevent duplicate posting
+  // ----------------------------------
+
   if (confession.publicPosted) {
     const error = new Error(
       "This confession has already been shared publicly."
@@ -43,7 +79,10 @@ export async function publishConfessionPublicly(
     throw error;
   }
 
-  // Reuse the existing Instagram posting system.
+  // ----------------------------------
+  // 6. Post to Instagram
+  // ----------------------------------
+
   const posted =
     await postConfessionToInstagram(
       confession
