@@ -39,6 +39,9 @@ export default function Chat() {
 
   const [conversationSenderId, setConversationSenderId] = useState(null);
 
+  const [confessionId, setConfessionId] =
+  useState(null);
+
   const [publicConsent, setPublicConsent] = useState(false);
 
   const [publicPosted, setPublicPosted] = useState(false);
@@ -165,6 +168,10 @@ export default function Chat() {
 
       setConversationSenderId(response.data.senderUser);
 
+      setConfessionId(
+  response.data.confessionId
+);
+
       setPublicConsent(
   response.data.publicConsent || false
 );
@@ -239,10 +246,10 @@ setInstagramPostId(
   try {
     setError("");
 
-    const response =
-      await publishConfessionPublicly(
-        conversationId
-      );
+const response =
+  await publishConfessionPublicly(
+    confessionId
+  );
 
     setPublicPosted(true);
 

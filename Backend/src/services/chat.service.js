@@ -293,30 +293,44 @@ export async function getMessages(
 
   const remainingMessages = Math.max(CHAT_MAX_MESSAGES - totalMessages, 0);
 
-  return {
-    messages,
-    nextCursor,
-    hasMore,
-    remainingMessages,
+return {
+  messages,
+  nextCursor,
+  hasMore,
+  remainingMessages,
 
-    publicConsent: conversation.confessionId?.publicConsent || false,
+  confessionId:
+    conversation.confessionId?._id ||
+    conversation.confessionId,
 
-    publicPosted: conversation.confessionId?.publicPosted || false,
+  publicConsent:
+    conversation.confessionId?.publicConsent || false,
 
-    instagramPostId: conversation.confessionId?.instagramPostId || null,
+  publicPosted:
+    conversation.confessionId?.publicPosted || false,
 
-    revealStatus: conversation.identityRevealed ? "revealed" : "none",
+  instagramPostId:
+    conversation.confessionId?.instagramPostId || null,
 
-    revealRequestedBy: conversation.identityRevealRequestedBy,
+  revealStatus:
+    conversation.identityRevealed
+      ? "revealed"
+      : "none",
 
-    identityRevealed: conversation.identityRevealed,
+  revealRequestedBy:
+    conversation.identityRevealRequestedBy,
 
-    identityRevealedAt: conversation.identityRevealedAt,
+  identityRevealed:
+    conversation.identityRevealed,
 
-    revealedIdentity,
+  identityRevealedAt:
+    conversation.identityRevealedAt,
 
-    senderUser: conversation.senderUser,
-  };
+  revealedIdentity,
+
+  senderUser:
+    conversation.senderUser,
+};
 }
 //we used MongoDB Aggregation here
 export async function getConversations(userId) {
