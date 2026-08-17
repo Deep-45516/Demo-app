@@ -39,6 +39,12 @@ export default function Chat() {
 
   const [conversationSenderId, setConversationSenderId] = useState(null);
 
+  const [publicConsent, setPublicConsent] = useState(false);
+
+  const [publicPosted, setPublicPosted] = useState(false);
+
+  const [instagramPostId, setInstagramPostId] = useState(null);
+
   // Current logged-in user
   const storedUser = localStorage.getItem("user");
 
@@ -159,6 +165,17 @@ export default function Chat() {
 
       setConversationSenderId(response.data.senderUser);
 
+      setPublicConsent(
+  response.data.publicConsent || false
+);
+
+setPublicPosted(
+  response.data.publicPosted || false
+);
+
+setInstagramPostId(
+  response.data.instagramPostId || null
+);
       // If backend already provides
       // reveal information, use it.
       if (response.data.revealStatus) {
@@ -201,6 +218,12 @@ export default function Chat() {
       setMessages((current) => [...current, response.data.message]);
 
       setRemainingMessages(response.data.remainingMessages);
+
+      // setPublicConsent(response.data.publicConsent || false);
+
+      // setPublicPosted(response.data.publicPosted || false);
+
+      // setInstagramPostId(response.data.instagramPostId || null);
 
       setText("");
     } catch (error) {

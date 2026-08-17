@@ -99,7 +99,9 @@ export async function getMessages(
   const conversation = await Conversation.findOne({
     _id: conversationId,
     $or: [{ senderUser: userId }, { recipientUser: userId }],
-  }).lean();
+  })
+    .populate("confessionId", "publicConsent publicPosted instagramPostId")
+    .lean();
   //lean means Give me a plain JavaScript object instead of a full Mongoose document , we only need ConversationId
   if (!conversation) {
     const error = new Error("Conversation not found or access denied.");
@@ -110,31 +112,24 @@ export async function getMessages(
   }
   let revealedIdentity = null;
 
-if (conversation.identityRevealed) {
-  const otherUserId =
-    String(conversation.senderUser) === String(userId)
-      ? conversation.recipientUser
-      : conversation.senderUser;
+  if (conversation.identityRevealed) {
+    const otherUserId =
+      String(conversation.senderUser) === String(userId)
+        ? conversation.recipientUser
+        : conversation.senderUser;
 
-  const otherUser = await User.findById(
-    otherUserId
-  )
-    .select(
-      "instagramUsername instagramName profilePicture"
-    )
-    .lean();
+    const otherUser = await User.findById(otherUserId)
+      .select("instagramUsername instagramName profilePicture")
+      .lean();
 
-  if (otherUser) {
-    revealedIdentity = {
-      username:
-        otherUser.instagramUsername,
-      name:
-        otherUser.instagramName,
-      profilePicture:
-        otherUser.profilePicture,
-    };
+    if (otherUser) {
+      revealedIdentity = {
+        username: otherUser.instagramUsername,
+        name: otherUser.instagramName,
+        profilePicture: otherUser.profilePicture,
+      };
+    }
   }
-}
 
   // ----------------------------------
   // 2. Keep limit under our control
@@ -292,41 +287,36 @@ if (conversation.identityRevealed) {
     ).toString("base64url");
   }
 
-  const totalMessages =
-  await Message.countDocuments({
+  const totalMessages = await Message.countDocuments({
     conversationId: conversation._id,
   });
 
-const remainingMessages = Math.max(
-  CHAT_MAX_MESSAGES - totalMessages,
-  0
-);
+  const remainingMessages = Math.max(CHAT_MAX_MESSAGES - totalMessages, 0);
 
-return {
-  messages,
-  nextCursor,
-  hasMore,
-  remainingMessages,
+  return {
+    messages,
+    nextCursor,
+    hasMore,
+    remainingMessages,
 
-  revealStatus:
-    conversation.identityRevealed
-      ? "revealed"
-      : "none",
+    publicConsent: conversation.confessionId?.publicConsent || false,
 
-  revealRequestedBy:
-    conversation.identityRevealRequestedBy,
+    publicPosted: conversation.confessionId?.publicPosted || false,
 
-    identityRevealed:
-    conversation.identityRevealed,
+    instagramPostId: conversation.confessionId?.instagramPostId || null,
 
-     identityRevealedAt:
-    conversation.identityRevealedAt,
+    revealStatus: conversation.identityRevealed ? "revealed" : "none",
+
+    revealRequestedBy: conversation.identityRevealRequestedBy,
+
+    identityRevealed: conversation.identityRevealed,
+
+    identityRevealedAt: conversation.identityRevealedAt,
 
     revealedIdentity,
 
-      senderUser:
-    conversation.senderUser,
-};
+    senderUser: conversation.senderUser,
+  };
 }
 //we used MongoDB Aggregation here
 export async function getConversations(userId) {
