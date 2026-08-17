@@ -89,16 +89,17 @@ export default function InstagramVerification() {
     };
   }, []);
 
-  const openInstagram = () => {
-  // Try opening Instagram
-  window.location.href = `instagram://user?username=${BUSINESS_USERNAME}`;
+const openInstagram = () => {
+  // Try opening the Instagram app.
+  window.location.href =
+    `instagram://user?username=${BUSINESS_USERNAME}`;
 
-  // Fallback to Instagram web in a new tab.q
+  // Fallback to Instagram web.
   setTimeout(() => {
     window.open(
       `https://ig.me/m/${BUSINESS_USERNAME}`,
       "_blank",
-      "noopener,noreferrer"
+      "noopener,noreferrer",
     );
   }, 1200);
 };
@@ -112,108 +113,197 @@ export default function InstagramVerification() {
   };
 
   const startPolling = (sessionId) => {
-    setStep("waiting");
+  setStep("waiting");
 
-    intervalRef.current = setInterval(async () => {
-      try {
-        const res = await fetch(
-          `${API}/api/v1/auth/instagram/status/${sessionId}`,
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          clearInterval(intervalRef.current);
-          clearTimeout(timeoutRef.current);
-
-          setError(data.message || "Verification failed.");
-          setStep("error");
-          return;
-        }
-
-        if (data.data.status === "username_mismatch") {
-          clearInterval(intervalRef.current);
-          clearTimeout(timeoutRef.current);
-
-          setError(data.data.error);
-          setStep("error");
-          return;
-        }
-//     if (data.data?.alreadyVerified) {
-//   localStorage.setItem("token", data.data.token);
-
-//   const meRes = await fetch(`${API}/api/v1/auth/me`, {
-//     headers: {
-//       Authorization: `Bearer ${data.data.token}`,
-//     },
-//   });
-
-//   const meData = await meRes.json();
-
-//   localStorage.setItem("user", JSON.stringify(meData.data.user));
-
-//   // Go straight to the confession page/home
-//   window.location.replace("/");
-//   return;
-// }
-
-if (data.data.status === "verified") {
+  // Prevent duplicate polling intervals.
   clearInterval(intervalRef.current);
   clearTimeout(timeoutRef.current);
 
-  localStorage.setItem("token", data.data.token);
+  let checking = false;
 
-  const meRes = await fetch(`${API}/api/v1/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${data.data.token}`,
-    },
-  });
+  intervalRef.current = setInterval(async () => {
+    // Prevent another request from starting
+    // if the previous request has not finished yet.
+    if (checking) {
+      return;
+    }
 
-  const meData = await meRes.json();
+    checking = true;
 
-  if (!meRes.ok) {
-    setError("Unable to load user.");
-    setStep("error");
-    return;
-  }
+    try {
+      const res = await fetch(
+        `${API}/api/v1/auth/instagram/status/${sessionId}`,
+      );
 
-  // ⭐ Save BOTH user and token
-  localStorage.setItem("user", JSON.stringify(meData.data.user));
+      const data = await res.json();
 
-  if (!meData.data.anonymousProfile) {
-    setError("Unable to load anonymous profile.");
-    setStep("error");
-    return;
-  }
+      console.log(
+        "Instagram verification status:",
+        data.data?.status,
+      );
 
-  setAnonymousName(meData.data.anonymousProfile.anonymousName);
-  setStep("verified");
-}
-      } catch (err) {
-        console.error(err);
-
+      if (!res.ok) {
         clearInterval(intervalRef.current);
         clearTimeout(timeoutRef.current);
 
-        setError("Unable to contact the server. Please try again.");
-
-        setStep("error");
-      }
-    }, 2000);
-
-    timeoutRef.current = setTimeout(
-      () => {
-        clearInterval(intervalRef.current);
-
         setError(
-          "Verification expired. Please generate a new verification code.",
+          data.message ||
+            "Verification failed.",
         );
 
         setStep("error");
-      },
-      5 * 60 * 1000,
-    );
-  };
+        return;
+      }
+
+      // =========================
+      // USERNAME MISMATCH
+      // =========================
+
+      if (
+        data.data?.status ===
+        "username_mismatch"
+      ) {
+        clearInterval(intervalRef.current);
+        clearTimeout(timeoutRef.current);
+
+        setError(
+          data.data.error ||
+            "The verification code was sent from a different Instagram account.",
+        );
+
+        setStep("error");
+        return;
+      }
+
+      // =========================
+      // VERIFIED
+      // =========================
+
+      if (
+        data.data?.status ===
+        "verified"
+      ) {
+        clearInterval(intervalRef.current);
+        clearTimeout(timeoutRef.current);
+
+        const token =
+          data.data.token;
+
+        if (!token) {
+          setError(
+            "Verification succeeded, but login token was not received.",
+          );
+
+          setStep("error");
+          return;
+        }
+
+        // Save JWT immediately.
+        localStorage.setItem(
+          "token",
+          token,
+        );
+
+        // Get the complete current user
+        // from the backend.
+        const meRes =
+          await fetch(
+            `${API}/api/v1/auth/me`,
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            },
+          );
+
+        const meData =
+          await meRes.json();
+
+        if (!meRes.ok) {
+          localStorage.removeItem(
+            "token",
+          );
+
+          setError(
+            "Unable to load user.",
+          );
+
+          setStep("error");
+          return;
+        }
+
+        // Save user information.
+        localStorage.setItem(
+          "user",
+          JSON.stringify(
+            meData.data.user,
+          ),
+        );
+
+        // Keep anonymous profile available
+        // for the current UI.
+        if (
+          meData.data.anonymousProfile
+        ) {
+          setAnonymousName(
+            meData.data
+              .anonymousProfile
+              .anonymousName,
+          );
+        }
+
+        // Verification is complete.
+        // Automatically go to the main page.
+        window.location.replace("/");
+        return;
+      }
+
+      // =========================
+      // STILL WAITING
+      // =========================
+
+      // No action required.
+      // The next interval will check again.
+
+    } catch (err) {
+      console.error(
+        "Instagram polling error:",
+        err,
+      );
+
+      clearInterval(
+        intervalRef.current,
+      );
+
+      clearTimeout(
+        timeoutRef.current,
+      );
+
+      setError(
+        "Unable to contact the server. Please try again.",
+      );
+
+      setStep("error");
+    } finally {
+      checking = false;
+    }
+  }, 2000);
+
+  // Stop checking after 5 minutes.
+  timeoutRef.current =
+    setTimeout(() => {
+      clearInterval(
+        intervalRef.current,
+      );
+
+      setError(
+        "Verification expired. Please generate a new verification code.",
+      );
+
+      setStep("error");
+    }, 5 * 60 * 1000);
+};
 
   const verify = async () => {
     if (!username.trim()) {
@@ -282,23 +372,37 @@ if (data.data.status === "verified") {
       //open DM
       // openInstagram();
 
-      setStep("instructions");
-      setCountdown(5);
+setStep("instructions");
+setCountdown(5);
 
-      countdownRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdownRef.current);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      // Give React time to render the instructions
-      setTimeout(() => {
-        openInstagram();
-        startPolling(sessionId);
-      }, 5000);
+// Start polling immediately.
+// We do NOT wait for Instagram to open.
+//
+// This is important because the Instagram app /
+// instagram:// link may move the browser into the
+// background.
+startPolling(sessionId);
+
+countdownRef.current =
+  setInterval(() => {
+    setCountdown((prev) => {
+      if (prev <= 1) {
+        clearInterval(
+          countdownRef.current,
+        );
+
+        return 0;
+      }
+
+      return prev - 1;
+    });
+  }, 1000);
+
+// Give React time to render the
+// instructions before opening Instagram.
+setTimeout(() => {
+  openInstagram();
+}, 5000);
     } catch (err) {
       console.error(err);
 
