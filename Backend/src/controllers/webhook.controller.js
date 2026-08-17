@@ -106,6 +106,7 @@ export const receiveWebhook = async (req, res) => {
 // =====================================================
 // FIND USER BY INSTAGRAM SCOPED ID
 // =====================================================
+// The scoped ID comes from Instagram itself.
 //
 // The scoped ID comes from Instagram itself.
 // It is the identity we trust for an already verified
