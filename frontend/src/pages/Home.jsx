@@ -77,12 +77,12 @@ Return null. */
   };
 
   const logoutUser = () => {
-    // disconnectSocket();
+    // Remove the current login session.
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.reload();
+    window.location.replace("/instagram");
   };
 
   if (!user) {

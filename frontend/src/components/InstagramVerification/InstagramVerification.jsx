@@ -90,18 +90,22 @@ export default function InstagramVerification() {
   }, []);
 
 const openInstagram = () => {
-  // Try opening the Instagram app.
-  window.location.href =
-    `instagram://user?username=${BUSINESS_USERNAME}`;
+  const instagramDMUrl =
+    `https://ig.me/m/${BUSINESS_USERNAME}`;
 
-  // Fallback to Instagram web.
-  setTimeout(() => {
-    window.open(
-      `https://ig.me/m/${BUSINESS_USERNAME}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
-  }, 1200);
+  // Open Instagram DM link in a new tab/window.
+  //
+  // On mobile:
+  // If Instagram is installed, the Instagram app
+  // should handle this universal link.
+  //
+  // If Instagram is not installed:
+  // the Instagram web page opens in the new tab.
+  window.open(
+    instagramDMUrl,
+    "_blank",
+    "noopener,noreferrer",
+  );
 };
 
   const copyCode = async () => {
@@ -378,31 +382,28 @@ setStep("instructions");
 setCountdown(5);
 
 // Start polling immediately.
-// We do NOT wait for Instagram to open.
-//
-// This is important because the Instagram app /
-// instagram:// link may move the browser into the
-// background.
+// Verification does not depend on Instagram being opened.
 startPolling(sessionId);
 
-countdownRef.current =
-  setInterval(() => {
-    setCountdown((prev) => {
-      if (prev <= 1) {
-        clearInterval(
-          countdownRef.current,
-        );
+// Countdown shown on the instructions screen.
+clearInterval(countdownRef.current);
 
-        return 0;
-      }
+countdownRef.current = setInterval(() => {
+  setCountdown((prev) => {
+    if (prev <= 1) {
+      clearInterval(countdownRef.current);
+      return 0;
+    }
 
-      return prev - 1;
-    });
-  }, 1000);
+    return prev - 1;
+  });
+}, 1000);
 
-// Give React time to render the
-// instructions before opening Instagram.
-setTimeout(() => {
+// Give React time to render the instructions page
+// before opening Instagram.
+clearTimeout(timeoutRef.current);
+
+timeoutRef.current = setTimeout(() => {
   openInstagram();
 }, 5000);
     } catch (err) {
