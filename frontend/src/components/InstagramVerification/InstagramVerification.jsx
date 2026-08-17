@@ -246,17 +246,19 @@ const openInstagram = () => {
         if (
           meData.data.anonymousProfile
         ) {
-          setAnonymousName(
-            meData.data
-              .anonymousProfile
-              .anonymousName,
-          );
-        }
+setAnonymousName(
+  meData.data
+    .anonymousProfile
+    .anonymousName,
+);
+}
 
-        // Verification is complete.
-        // Automatically go to the main page.
-        window.location.replace("/");
-        return;
+// Verification is complete.
+// Show the anonymous identity first.
+// The user will continue to the main page
+// from the success screen.
+setStep("verified");
+return;
       }
 
       // =========================
