@@ -93,7 +93,7 @@ export default function InstagramVerification() {
   // Try opening Instagram
   window.location.href = `instagram://user?username=${BUSINESS_USERNAME}`;
 
-  // Fallback to Instagram web in a new tab.
+  // Fallback to Instagram web in a new tab.q
   setTimeout(() => {
     window.open(
       `https://ig.me/m/${BUSINESS_USERNAME}`,
