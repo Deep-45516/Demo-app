@@ -90,12 +90,16 @@ export default function InstagramVerification() {
   }, []);
 
   const openInstagram = () => {
-  // Try opening the Instagram app
+  // Try opening Instagram
   window.location.href = `instagram://user?username=${BUSINESS_USERNAME}`;
 
-  // Fallback to web after a short delay
+  // Fallback to Instagram web in a new tab
   setTimeout(() => {
-    window.location.href = `https://ig.me/m/${BUSINESS_USERNAME}`;
+    window.open(
+      `https://ig.me/m/${BUSINESS_USERNAME}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }, 1200);
 };
 
