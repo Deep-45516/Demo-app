@@ -161,10 +161,15 @@ const handleSubmit = async () => {
   try {
     setSubmitting(true);
 
+    await new Promise((resolve) => {
+  setTimeout(resolve, 0);
+});
+
     const data = await submitConfession(
       recipientUsername,
       to,
       message,
+      from,
       !recipientStatus.exists,
       publicConsent
     );
@@ -271,7 +276,7 @@ const handleSubmit = async () => {
         />
         <label>From</label>
         <textarea value={from} onChange={(e) => setFrom(e.target.value)}
-        placeholder="Hint of yourself" />
+        placeholder="B3 Division" />
         <button onClick={downloadPages}>Download Pages</button>
         //checkbox for public post consent
         {recipientStatus && (

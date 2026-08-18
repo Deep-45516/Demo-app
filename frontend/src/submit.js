@@ -4,6 +4,7 @@ export async function submitConfession(
   recipientUsername,
   to,
   message,
+  from,
   allowPending = false,
   publicConsent = false
 ) {
@@ -27,8 +28,8 @@ export async function submitConfession(
         recipientUsername: recipientUsername.trim(),
 
         to: to.trim(),
-
         message: message.trim(),
+        from: from.trim(),
 
         allowPending,
 

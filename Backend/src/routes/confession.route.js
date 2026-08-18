@@ -78,6 +78,7 @@ router.post("/", verifyToken, async (req, res) => {
   recipientUsername,
   to,
   message,
+  from,
   allowPending = false,
   publicConsent = false,
 } = req.body; //basic take input from browser
@@ -101,6 +102,15 @@ router.post("/", verifyToken, async (req, res) => {
   throw new ApiError(
     400,
     "To name is required."
+  );
+}
+if (
+  typeof from !== "string" ||
+  from.trim() === ""
+) {
+  throw new ApiError(
+    400,
+    "From hint is required."
   );
 }
     }
@@ -142,7 +152,7 @@ STOP       create pending */
       // Generate images for the pending confession
       const imagePaths = await generateImages({
         to,
-        from: senderAnonymous.anonymousName,
+        from,
         message,
       }); /*[
   "/temp/page1.jpg",
@@ -200,7 +210,7 @@ Not sending to yourself ✅*/
     //create confession with sender anonomous and for recipent real insta id
     const imagePaths = await generateImages({
       to,
-      from: senderAnonymous.anonymousName,
+      from,
       message,
     }); /*[
   "/temp/page1.jpg",
