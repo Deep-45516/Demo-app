@@ -76,15 +76,6 @@ Return null. */
     } //finally runs whether try succeeded or failed.this setcheckingrecipent bring back "checking..." to normal button
   };
 
-  const logoutUser = () => {
-    // Remove the current login session.
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    window.location.replace("/instagram");
-  };
-
   if (!user) {
     return (
       <div className="container">
@@ -143,7 +134,6 @@ and the user's information.
     <div className="container">
       <div className="form">
         <p>Logged in as {user.email}</p>
-        <button onClick={logoutUser}>Logout</button>
         <label>Recipient Username</label>
         <input
           type="text"

@@ -1,9 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
+
 import {
   connectSocket,
   disconnectSocket,
 } from "./socket";
+
 import Home from "./pages/Home.jsx";
 import Admin from "./pages/Admin.jsx";
 import InstagramVerification from "./components/InstagramVerification/InstagramVerification.jsx";
@@ -11,23 +13,30 @@ import Inbox from "./pages/Inbox.jsx";
 import ConfessionDetails from "./pages/ConfessionDetails.jsx";
 import Chat from "./pages/Chat.jsx";
 
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import AppLayout from "./layouts/AppLayout.jsx";
+
 function App() {
   useEffect(() => {
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  if (!token) return;
+    if (!token) {
+      return;
+    }
 
-  connectSocket();
+    connectSocket();
 
-  return () => {
-    disconnectSocket();
-  };
-}, []);
+    return () => {
+      disconnectSocket();
+    };
+  }, []);
+
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
 
-      <Route path="/admin" element={<Admin />} />
+      {/* =========================
+          PUBLIC ROUTES
+          ========================= */}
 
       <Route
         path="/instagram"
@@ -35,22 +44,48 @@ function App() {
       />
 
       <Route
-        path="/inbox"
-        element={<Inbox />}
+        path="/admin"
+        element={<Admin />}
       />
 
-      <Route
-        path="/confessions/:id"
-        element={<ConfessionDetails />}
-      />
 
-      <Route
-  path="/chat/:conversationId"
-  element={<Chat />}
-/>
+      {/* =========================
+          PROTECTED APP
+          ========================= */}
+
+      <Route element={<ProtectedRoute />}>
+
+        <Route element={<AppLayout />}>
+
+          {/* Home / Confess */}
+          <Route
+            path="/"
+            element={<Home />}
+          />
+
+          {/* Inbox */}
+          <Route
+            path="/inbox"
+            element={<Inbox />}
+          />
+
+          {/* Individual confession */}
+          <Route
+            path="/confessions/:id"
+            element={<ConfessionDetails />}
+          />
+
+          {/* Anonymous conversation */}
+          <Route
+            path="/chat/:conversationId"
+            element={<Chat />}
+          />
+
+        </Route>
+
+      </Route>
+
     </Routes>
-
-    
   );
 }
 
