@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\layouts\AppLayout.jsx
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { disconnectSocket } from "../socket";

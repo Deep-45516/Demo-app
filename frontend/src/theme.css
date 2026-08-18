@@ -1,0 +1,154 @@
+/* =========================================================
+   ConfessionVault — shared design tokens & primitives
+   Import this once (e.g. in index.css or App.jsx) and every
+   component below can use these classes/variables.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  /* -- surfaces -- */
+  --cv-void:#0D0D10;
+  --cv-steel:#1C1B22;
+  --cv-steel-2:#242229;
+  --cv-line:rgba(255,255,255,0.08);
+
+  /* -- accent: brushed brass, the app's "unlocked" color -- */
+  --cv-brass:#CEA854;
+  --cv-brass-bright:#E4C57E;
+  --cv-brass-dim:#8C7440;
+  --cv-brass-soft:rgba(206,168,84,0.14);
+
+  /* -- secondary accents -- */
+  --cv-mint:#54C6B8;      /* curious / positive */
+  --cv-coral:#D8695C;     /* not interested / danger */
+  --cv-seal:#6C1E22;      /* wax-seal red, used sparingly */
+
+  /* -- the one warm surface: confession text lives on paper -- */
+  --cv-paper:#F3EDE1;
+  --cv-ink:#241F2B;
+
+  /* -- text -- */
+  --cv-text:#F1EFEA;
+  --cv-text-dim:#9C98A8;
+  --cv-text-faint:#5F5C6E;
+
+  --cv-r-lg:22px;
+  --cv-r-md:14px;
+  --cv-r-pill:999px;
+  --cv-shadow:0 20px 50px -20px rgba(0,0,0,0.6);
+}
+
+/* =========================================================
+   Type
+   Fraunces = the human voice (confession text, names)
+   Space Grotesk = the system voice (buttons, labels, chrome)
+   IBM Plex Mono = the mechanism (codes, counters, combinations)
+   ========================================================= */
+.cv-display{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; color:var(--cv-text); }
+.cv-mono{ font-family:'IBM Plex Mono', monospace; letter-spacing:.05em; }
+.cv-eyebrow{
+  font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--cv-brass); display:flex; align-items:center; gap:8px;
+}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+.cv-btn{
+  font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px;
+  padding:13px 22px; border-radius:var(--cv-r-pill); border:none; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  transition:transform .15s ease, box-shadow .2s ease, opacity .15s ease;
+}
+.cv-btn:active{ transform:scale(.97); }
+.cv-btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+.cv-btn-primary{
+  background:linear-gradient(135deg, var(--cv-brass-bright), var(--cv-brass));
+  color:#231D10; box-shadow:0 14px 28px -14px rgba(206,168,84,.6);
+}
+.cv-btn-primary:hover:not(:disabled){ box-shadow:0 18px 32px -12px rgba(206,168,84,.75); }
+.cv-btn-outline{ background:rgba(255,255,255,.04); color:var(--cv-text); border:1px solid var(--cv-line); }
+.cv-btn-outline:hover:not(:disabled){ border-color:rgba(255,255,255,.25); }
+.cv-btn-ghost{ background:none; color:var(--cv-text-dim); }
+.cv-btn-ghost:hover:not(:disabled){ color:var(--cv-text); }
+.cv-btn-danger{ background:rgba(216,105,92,.08); color:var(--cv-coral); border:1px solid rgba(216,105,92,.35); }
+.cv-btn-block{ width:100%; }
+
+/* =========================================================
+   Surfaces
+   ========================================================= */
+.cv-card{
+  background:var(--cv-steel); border:1px solid var(--cv-line);
+  border-radius:var(--cv-r-lg); padding:20px; box-shadow:var(--cv-shadow);
+}
+.cv-paper-card{
+  background:linear-gradient(180deg, var(--cv-paper), #EAE3D3);
+  border-radius:var(--cv-r-lg); padding:22px; color:var(--cv-ink);
+  box-shadow:0 20px 40px -18px rgba(0,0,0,.5);
+}
+.cv-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.04em;
+  padding:6px 13px; border-radius:var(--cv-r-pill);
+  background:rgba(255,255,255,.05); color:var(--cv-text-dim); border:1px solid var(--cv-line);
+}
+.cv-pulse-dot{ width:6px; height:6px; border-radius:50%; background:var(--cv-mint); animation:cvPulse 1.4s ease-in-out infinite; }
+
+/* =========================================================
+   The Vault — the app's one signature motion.
+   A circular frame with two brass-seamed steel doors over
+   a photo. Add `.cv-unlock` to `.cv-vault` to play the
+   unlock-and-open sequence once (dial spins → doors part).
+   Use everywhere an identity resolves from anonymous → known.
+   ========================================================= */
+.cv-vault{
+  position:relative; width:104px; height:104px; border-radius:50%;
+  overflow:hidden; flex-shrink:0; background:var(--cv-steel-2);
+  box-shadow:0 0 0 3px rgba(255,255,255,.05), var(--cv-shadow);
+}
+.cv-vault-photo{ position:absolute; inset:0; }
+.cv-vault-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+.cv-vault-placeholder{
+  width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(160deg,#332F3D,#1D1A24);
+}
+.cv-vault-door{ position:absolute; top:0; bottom:0; width:52%; background:linear-gradient(120deg,#3C3945,#242129 65%); z-index:3; }
+.cv-vault-door::after{ content:""; position:absolute; top:0; bottom:0; width:2px; background:linear-gradient(var(--cv-brass), var(--cv-brass-dim)); opacity:.85; }
+.cv-vault-door-l{ left:0; border-radius:999px 0 0 999px; }
+.cv-vault-door-l::after{ right:0; }
+.cv-vault-door-r{ right:0; border-radius:0 999px 999px 0; }
+.cv-vault-door-r::after{ left:0; }
+.cv-vault-dial{
+  position:absolute; top:50%; left:50%; width:24px; height:24px; margin:-12px 0 0 -12px;
+  border:2px solid var(--cv-brass); border-radius:50%; z-index:4;
+}
+.cv-vault-dial::before{ content:""; position:absolute; top:-2px; left:50%; width:2px; height:7px; background:var(--cv-brass); transform:translateX(-50%); }
+
+.cv-unlock .cv-vault-dial{ animation:cvDialSpin .5s ease-out forwards; }
+.cv-unlock .cv-vault-door-l{ animation:cvDoorL .6s cubic-bezier(.6,0,.2,1) .45s forwards; }
+.cv-unlock .cv-vault-door-r{ animation:cvDoorR .6s cubic-bezier(.6,0,.2,1) .45s forwards; }
+
+@keyframes cvDialSpin{ from{ transform:rotate(0deg); opacity:1; } to{ transform:rotate(300deg); opacity:0; } }
+@keyframes cvDoorL{ from{ transform:translateX(0); } to{ transform:translateX(-100%); } }
+@keyframes cvDoorR{ from{ transform:translateX(0); } to{ transform:translateX(100%); } }
+
+/* =========================================================
+   Entrance motion — restrained, used for cards/rows appearing
+   ========================================================= */
+.cv-fade-up{ animation:cvFadeUp .45s ease both; }
+@keyframes cvFadeUp{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+@keyframes cvPulse{ 0%,100%{ opacity:.3; } 50%{ opacity:1; } }
+
+.cv-stagger > *{ animation:cvFadeUp .4s ease both; }
+.cv-stagger > *:nth-child(1){ animation-delay:.02s; }
+.cv-stagger > *:nth-child(2){ animation-delay:.07s; }
+.cv-stagger > *:nth-child(3){ animation-delay:.12s; }
+.cv-stagger > *:nth-child(4){ animation-delay:.17s; }
+.cv-stagger > *:nth-child(5){ animation-delay:.22s; }
+.cv-stagger > *:nth-child(n+6){ animation-delay:.26s; }
+
+@media (prefers-reduced-motion: reduce){
+  .cv-unlock .cv-vault-dial, .cv-unlock .cv-vault-door-l, .cv-unlock .cv-vault-door-r,
+  .cv-fade-up, .cv-stagger > *, .cv-pulse-dot{ animation:none !important; }
+}

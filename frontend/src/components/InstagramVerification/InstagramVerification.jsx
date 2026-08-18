@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\components\InstagramVerification\InstagramVerification.jsx
 import { useEffect, useRef, useState } from "react";
 import "./InstagramVerification.css";
 

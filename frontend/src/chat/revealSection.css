@@ -1,0 +1,50 @@
+.rs-banner{
+  margin-bottom:20px; padding:16px 18px; border-radius:var(--cv-r-md);
+  background:var(--cv-brass-soft); border:1px solid rgba(206,168,84,.3);
+}
+.rs-banner strong{ color:var(--cv-brass-bright); font-size:14px; }
+.rs-banner p{ margin:6px 0 0; font-size:13px; color:var(--cv-text-dim); line-height:1.5; }
+
+.rs-notice{
+  margin-bottom:16px; padding:12px 16px; border-radius:var(--cv-r-md);
+  background:rgba(84,198,184,.08); border:1px solid rgba(84,198,184,.25);
+  font-size:12.5px; color:var(--cv-mint); line-height:1.5;
+}
+
+.rs-ask-row{ margin-bottom:20px; }
+
+.rs-pending{
+  margin-bottom:20px; padding:18px; border-radius:var(--cv-r-md);
+  background:var(--cv-steel-2); border:1px solid var(--cv-line);
+}
+.rs-pending strong{ font-size:14px; color:var(--cv-text); display:flex; align-items:center; gap:8px; }
+.rs-pending p{ margin:6px 0 14px; font-size:13px; color:var(--cv-text-dim); line-height:1.5; }
+.rs-pending .cv-btn{ margin-right:8px; }
+
+.rs-revealed{
+  margin-bottom:20px; padding:26px 22px; border-radius:var(--cv-r-lg);
+  background:linear-gradient(180deg, var(--cv-steel), var(--cv-steel-2));
+  border:1px solid rgba(206,168,84,.25); text-align:center;
+}
+.rs-revealed .rs-icon{ font-size:26px; margin-bottom:6px; }
+.rs-revealed strong{ font-size:18px; color:var(--cv-text); display:block; margin-bottom:8px; }
+.rs-revealed p{ font-size:13.5px; color:var(--cv-text-dim); line-height:1.55; margin:0 0 6px; }
+.rs-revealed .cv-btn{ margin-top:14px; }
+.rs-revealed .rs-secondary-btn{ display:block; margin:10px auto 0; }
+
+.rs-modal-overlay{
+  position:fixed; inset:0; background:rgba(8,7,10,.72); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px;
+}
+.rs-modal{
+  width:100%; max-width:380px; background:var(--cv-steel);
+  border:1px solid var(--cv-line); border-radius:26px; padding:32px 26px;
+  text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.rs-modal .rs-icon{ font-size:28px; margin-bottom:6px; }
+.rs-modal h2{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:22px; color:var(--cv-text); margin:0 0 6px; }
+.rs-modal .rs-sub{ font-size:13px; color:var(--cv-text-dim); margin:0 0 24px; }
+.rs-modal .cv-vault{ width:112px; height:112px; margin:0 auto 18px; }
+.rs-modal h3{ font-family:'Fraunces', serif; font-style:italic; font-size:19px; color:var(--cv-text); margin:4px 0 2px; }
+.rs-modal .rs-handle{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--cv-text-dim); margin:0 0 22px; }
+.rs-modal .cv-btn{ width:100%; margin-bottom:10px; }

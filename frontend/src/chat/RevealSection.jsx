@@ -1,8 +1,6 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import { useEffect, useState } from "react";
+import "./RevealSection.css";
+import "../theme.css"
 export default function RevealSection({
   userId,
   conversationSenderId,
@@ -16,513 +14,189 @@ export default function RevealSection({
   onRequestReveal,
   onRevealResponse,
 }) {
-  const [showIdentity, setShowIdentity] =
-    useState(false);
+  const [showIdentity, setShowIdentity] = useState(false);
 
-    useEffect(() => {
-  if (
-    autoOpenIdentity &&
-    revealedIdentity
-  ) {
-    setShowIdentity(true);
-  }
-}, [
-  autoOpenIdentity,
-  revealedIdentity,
-]);
+  useEffect(() => {
+    if (autoOpenIdentity && revealedIdentity) {
+      setShowIdentity(true);
+    }
+  }, [autoOpenIdentity, revealedIdentity]);
 
-  const isSender =
-    String(userId) ===
-    String(conversationSenderId);
+  const isSender = String(userId) === String(conversationSenderId);
 
   return (
     <>
       {/* =========================
+          A "not yet" notice from the other side
+          (kept from the original prop, previously unused in the UI)
+          ========================= */}
+      {revealNotice && <div className="rs-notice">{revealNotice}</div>}
+
+      {/* =========================
           SENDER ATTENTION
           ========================= */}
-
       {isSender &&
         remainingMessages !== null &&
         remainingMessages <= 5 &&
         remainingMessages > 0 &&
         revealStatus === "revealed" && (
-          <div
-            style={{
-              marginBottom: 20,
-              padding: 16,
-              borderRadius: 12,
-              background: "#f8f8f8",
-              border: "1px solid #e5e5e5",
-            }}
-          >
-            <strong>
-  🎉 They chose to reveal themselves.
-</strong>
-
-<p
-  style={{
-    margin: "6px 0 0",
-  }}
->
-  You started this conversation
-  anonymously. They chose to
-  take that next step with you.
-</p>
+          <div className="rs-banner cv-fade-up">
+            <strong>They chose to reveal themselves.</strong>
+            <p>
+              You started this conversation anonymously. They chose to take
+              that next step with you.
+            </p>
           </div>
         )}
-
 
       {/* =========================
           RECIPIENT REVEAL REQUEST
           ========================= */}
-
       {!isSender &&
         remainingMessages !== null &&
         remainingMessages <= 5 &&
         revealStatus === "none" && (
-          <div
-            style={{
-              marginBottom: 20,
-            }}
-          >
+          <div className="rs-ask-row">
             <button
-              onClick={
-                onRequestReveal
-              }
-              disabled={
-                revealLoading
-              }
+              className="cv-btn cv-btn-outline"
+              onClick={onRequestReveal}
+              disabled={revealLoading}
             >
-              {revealLoading
-                ? "Sending..."
-                : "✨ Ask to Reveal Identity"}
+              {revealLoading ? "Sending..." : "Ask to reveal identity"}
             </button>
           </div>
         )}
 
-
       {/* =========================
           PENDING REVEAL
           ========================= */}
-
       {revealStatus === "pending" && (
-        <div
-          style={{
-            marginBottom: 20,
-            padding: 16,
-            borderRadius: 12,
-            background: "#f8f8f8",
-            border: "1px solid #e5e5e5",
-          }}
-        >
-          {String(
-            revealRequestedBy
-          ) === String(userId) ? (
+        <div className="rs-pending cv-fade-up">
+          {String(revealRequestedBy) === String(userId) ? (
             <>
               <strong>
-                👀 Reveal request sent
+                <span className="cv-pulse-dot" /> Reveal request sent
               </strong>
-
-              <p
-                style={{
-                  margin:
-                    "6px 0 0",
-                }}
-              >
-                Waiting for them
-                to decide.
-              </p>
+              <p>Waiting for them to decide.</p>
             </>
           ) : (
             <>
-              <strong>
-                👀 They want to know
-                who you are.
-              </strong>
-
-              <p
-                style={{
-                  margin:
-                    "6px 0 14px",
-                }}
-              >
-                You can reveal your
-                identity when you're
-                ready.
-              </p>
-
+              <strong>They want to know who you are.</strong>
+              <p>You can reveal your identity when you're ready.</p>
               <button
-                onClick={() =>
-                  onRevealResponse(
-                    "reveal"
-                  )
-                }
-                disabled={
-                  revealLoading
-                }
+                className="cv-btn cv-btn-primary"
+                onClick={() => onRevealResponse("reveal")}
+                disabled={revealLoading}
               >
-                ✨ Reveal Identity
+                Reveal identity
               </button>
-
               <button
-                onClick={() =>
-                  onRevealResponse(
-                    "not_yet"
-                  )
-                }
-                disabled={
-                  revealLoading
-                }
-                style={{
-                  marginLeft: 10,
-                }}
+                className="cv-btn cv-btn-ghost"
+                onClick={() => onRevealResponse("not_yet")}
+                disabled={revealLoading}
               >
-                Not Yet
+                Not yet
               </button>
             </>
           )}
         </div>
       )}
 
-
-{/* =========================
-    IDENTITY REVEALED
-    ========================= */}
-
-{revealStatus === "revealed" && (
-  <div
-    style={{
-      marginBottom: 20,
-      padding: 22,
-      borderRadius: 16,
-      background: "#ba9c9c",
-      border: "1px solid #e5e5e5",
-      textAlign: "center",
-    }}
-  >
-
-    {/* =========================
-        SENDER VIEW
-        ========================= */}
-
-    {isSender ? (
-      <>
-        <div
-          style={{
-            fontSize: 32,
-            marginBottom: 8,
-          }}
-        >
-          ✨
-        </div>
-
-        <strong
-          style={{
-            fontSize: 20,
-          }}
-        >
-          They know it's you now.
-        </strong>
-
-        <p
-          style={{
-            margin:
-              "12px 0 6px",
-            fontSize: 16,
-          }}
-        >
-          <strong>
-            @
-            {revealedIdentity?.username ||
-              "them"}
-          </strong>{" "}
-          knows who was behind
-          the message.
-        </p>
-
-        <p
-          style={{
-            margin:
-              "8px 0 16px",
-            color: "#201f1f",
-            lineHeight: 1.5,
-          }}
-        >
-          You wondered what
-          they'd think after they get to know its you
-          <br />
-          {/* <strong>
-            Now they know.
-          </strong> */}
-        </p>
-
-        <p
-          style={{
-            margin:
-              "0 0 14px",
-            color: "#2c2a2a",
-          }}
-        >
-          Keep the conversation
-          going and see where it
-          goes.
-        </p>
-
-        <button
-          onClick={() => {
-            window.open(
-              `https://www.instagram.com/direct/t/${revealedIdentity?.username}/`,
-              "_blank"
-            );
-          }}
-        >
-          💬 Continue on Instagram
-        </button>
-
-        <br />
-
-        <button
-          onClick={() =>
-            setShowIdentity(true)
-          }
-          style={{
-            marginTop: 10,
-            background: "#ffffff",
-            border: "none",
-            cursor: "pointer",
-            color: "#666",
-          }}
-        >
-          👀 See their identity
-        </button>
-      </>
-    ) : (
-
-      /* =========================
-          RECIPIENT VIEW
-          ========================= */
-
-      <>
-        <div
-          style={{
-            fontSize: 32,
-            marginBottom: 8,
-          }}
-        >
-          🎉
-        </div>
-
-        <strong
-          style={{
-            fontSize: 20,
-          }}
-        >
-          Identity revealed
-        </strong>
-
-        <p
-          style={{
-            margin:
-              "8px 0 16px",
-            color: "#faf8f8",
-          }}
-        >
-          You both chose to take
-          this conversation beyond
-          anonymity.
-        </p>
-
-        <button
-          onClick={() =>
-            setShowIdentity(true)
-          }
-        >
-          👀 See Identity
-        </button>
-      </>
-    )}
-
-  </div>
-)}
-
-
       {/* =========================
-          IDENTITY POPUP
+          IDENTITY REVEALED
           ========================= */}
-
-      {showIdentity &&
-        revealedIdentity && (
-          <div
-            onClick={() =>
-              setShowIdentity(false)
-            }
-            style={{
-              position: "fixed",
-              inset: 0,
-              background:
-                "rgba(0, 0, 0, 0.55)",
-              display: "flex",
-              alignItems:
-                "center",
-              justifyContent:
-                "center",
-              zIndex: 1000,
-              padding: 20,
-            }}
-          >
-            <div
-              onClick={(event) =>
-                event.stopPropagation()
-              }
-              style={{
-                width: "100%",
-                maxWidth: 380,
-                background:
-                  "#ffffff",
-                borderRadius: 22,
-                padding: 28,
-                textAlign: "center",
-                boxShadow:
-                  "0 20px 60px rgba(0,0,0,0.25)",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 36,
-                  marginBottom: 8,
-                }}
-              >
-                ✨
-              </div>
-
-              <h2
-                style={{
-                  margin:
-                    "0 0 6px",
-                }}
-              >
-                Identity Revealed
-              </h2>
-
-              <p
-                style={{
-                  margin:
-                    "0 0 22px",
-                  color: "#242424",
-                }}
-              >
-                The person behind the
-                anonymous conversation.
+      {revealStatus === "revealed" && (
+        <div className="rs-revealed cv-fade-up">
+          {isSender ? (
+            <>
+              <div className="rs-icon">🔓</div>
+              <strong>They know it's you now.</strong>
+              <p>
+                <strong>@{revealedIdentity?.username || "them"}</strong> knows
+                who was behind the message.
               </p>
-
-
-              {/* Profile picture */}
-
-              {revealedIdentity.profilePicture ? (
-                <img
-                  src={
-                    revealedIdentity.profilePicture
-                  }
-                  alt="Instagram profile"
-                  style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius:
-                      "50%",
-                    objectFit:
-                      "cover",
-                    marginBottom: 14,
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius:
-                      "50%",
-                    margin:
-                      "0 auto 14px",
-                    display: "flex",
-                    alignItems:
-                      "center",
-                    justifyContent:
-                      "center",
-                    fontSize: 42,
-                    background:
-                      "#f1f1f1",
-                  }}
-                >
-                  👤
-                </div>
-              )}
-
-
-              <h3
-                style={{
-                  margin:
-                    "4px 0",
-                }}
-              >
-                {revealedIdentity.name ||
-                  revealedIdentity.username}
-              </h3>
-
-              <p
-                style={{
-                  margin:
-                    "4px 0 20px",
-                  color: "#f7f7f7",
-                }}
-              >
-                @
-                {
-                  revealedIdentity.username
-                }
-              </p>
-
-
-              <a
-                href={`https://www.instagram.com/${revealedIdentity.username}/`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display:
-                    "block",
-                  padding:
-                    "12px 18px",
-                  borderRadius: 12,
-                  textDecoration:
-                    "none",
-                  border:
-                    "1px solid #ddd",
-                  marginBottom: 10,
-                }}
-              >
-                View Instagram
-              </a>
-
+              <p>You wondered what they'd think once they knew. Now they do.</p>
+              <p>Keep the conversation going and see where it goes.</p>
               <button
+                className="cv-btn cv-btn-primary"
                 onClick={() =>
-                  setShowIdentity(
-                    false
+                  window.open(
+                    `https://www.instagram.com/direct/t/${revealedIdentity?.username}/`,
+                    "_blank"
                   )
                 }
-                style={{
-                  width: "100%",
-                  padding:
-                    "10px",
-                  border: "none",
-                  background:
-                    "transparent",
-                  cursor: "pointer",
-                }}
               >
-                Close
+                Continue on Instagram
               </button>
+              <button
+                className="cv-btn cv-btn-ghost rs-secondary-btn"
+                onClick={() => setShowIdentity(true)}
+              >
+                See their identity
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="rs-icon">🔓</div>
+              <strong>Identity revealed</strong>
+              <p>You both chose to take this conversation beyond anonymity.</p>
+              <button
+                className="cv-btn cv-btn-primary"
+                onClick={() => setShowIdentity(true)}
+              >
+                See identity
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* =========================
+          IDENTITY POPUP — the vault opens here
+          ========================= */}
+      {showIdentity && revealedIdentity && (
+        <div className="rs-modal-overlay" onClick={() => setShowIdentity(false)}>
+          <div className="rs-modal cv-fade-up" onClick={(event) => event.stopPropagation()}>
+            <div className="rs-icon">🔓</div>
+            <h2>Identity revealed</h2>
+            <p className="rs-sub">The person behind the anonymous conversation.</p>
+
+            <div className="cv-vault cv-unlock">
+              <div className="cv-vault-photo">
+                {revealedIdentity.profilePicture ? (
+                  <img src={revealedIdentity.profilePicture} alt="Instagram profile" />
+                ) : (
+                  <div className="cv-vault-placeholder">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#F1EFEA" strokeWidth="1.6">
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="cv-vault-door cv-vault-door-l" />
+              <div className="cv-vault-door cv-vault-door-r" />
+              <div className="cv-vault-dial" />
             </div>
+
+            <h3>{revealedIdentity.name || revealedIdentity.username}</h3>
+            <p className="rs-handle">@{revealedIdentity.username}</p>
+
+            <a
+              href={`https://www.instagram.com/${revealedIdentity.username}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cv-btn cv-btn-outline"
+              style={{ textDecoration: "none" }}
+            >
+              View on Instagram
+            </a>
+            <button className="cv-btn cv-btn-ghost" onClick={() => setShowIdentity(false)}>
+              Close
+            </button>
           </div>
-        )}
+        </div>
+      )}
     </>
   );
 }

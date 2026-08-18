@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\Inbox.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { getConversations } from "../chat/chat.js";
