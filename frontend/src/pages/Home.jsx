@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";;
+// import { GoogleLogin } from "@react-oauth/google";
 
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
@@ -10,6 +11,7 @@ import { connectSocket, disconnectSocket } from "../socket";
 const API = import.meta.env.VITE_BACKEND_URL;
 
 export default function Home() {
+  const navigate = useNavigate();
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
@@ -80,6 +82,9 @@ Return null. */
     return (
       <div className="container">
         <div className="form">
+          <button onClick={() => navigate("/inbox")}>
+        Go to Inbox
+      </button>
           <h2>Login to submit confession</h2>
           {/*
 Google doesn't directly give us the user's name/email.

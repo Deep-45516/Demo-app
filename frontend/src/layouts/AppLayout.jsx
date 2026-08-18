@@ -1,11 +1,15 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
+import { disconnectSocket } from "../socket";
+
 export default function AppLayout() {
   const navigate = useNavigate();
 
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
+     disconnectSocket();
 
     navigate("/instagram", { replace: true });
   }
