@@ -1,43 +1,198 @@
 import { useEffect, useRef, useState } from "react";
+import "./InstagramVerification.css";
 
-import VerificationForm from "./VerificationForm";
-import VerificationInstructions from "./VerificationInstructions";
-import VerificationWaiting from "./VerificationWaiting";
-import VerificationError from "./VerificationError";
-import VerificationSuccess from "./VerificationSuccess";
-//useRef is used to store mutable values that do not cause a re-render when updated, it save values that we want to use later.
-// setInterval() runs the same code again and again after a fixed time.
-// Here, it checks the verification status every 2 seconds.
-// setTimeout() runs the code only once after a fixed time.
-// Here, it stops the verification process after 5 minutes.
-// We store their IDs in useRef so we can stop them later using clearInterval() and clearTimeout().
 const API = import.meta.env.VITE_BACKEND_URL;
+
 const BUSINESS_USERNAME = "wit_confessions.26";
 
+const VERIFICATION_STATES = {
+  IDLE: "idle",
+  GENERATING: "generating",
+  WAITING: "waiting",
+  VERIFYING: "verifying",
+  VERIFIED: "verified",
+  ERROR: "error",
+  EXPIRED: "expired",
+};
+
+function LockIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect
+        x="4"
+        y="10"
+        width="16"
+        height="11"
+        rx="2"
+      />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 3l7 3v5c0 4.5-2.8 8.3-7 10-4.2-1.7-7-5.5-7-10V6l7-3z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="5"
+      />
+
+      <circle
+        cx="12"
+        cy="12"
+        r="4"
+      />
+
+      <circle
+        cx="17.5"
+        cy="6.5"
+        r="0.8"
+        fill="currentColor"
+        stroke="none"
+      />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12l4 4L19 6" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14" />
+      <path d="M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
 export default function InstagramVerification() {
-  const [step, setStep] = useState("form");
+  const [state, setState] = useState(
+    VERIFICATION_STATES.IDLE
+  );
 
-  const [username, setUsername] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [username, setUsername] =
+    useState("");
 
-  const [sessionId, setSessionId] = useState("");
-  const [code, setCode] = useState("");
+  const [sessionId, setSessionId] =
+    useState(null);
 
-  const [error, setError] = useState("");
-  const [anonymousName, setAnonymousName] = useState("");
-  const [countdown, setCountdown] = useState(5);
-  const countdownRef = useRef(null);
+  const [code, setCode] =
+    useState("");
 
-  const intervalRef = useRef(null);
-  const timeoutRef = useRef(null);
+  const [anonymousName, setAnonymousName] =
+    useState("");
 
+  const [error, setError] =
+    useState("");
+
+  const [copied, setCopied] =
+    useState(false);
+
+  const [openingInstagram, setOpeningInstagram] =
+    useState(false);
+
+  const pollingRef =
+    useRef(null);
+
+  const timeoutRef =
+    useRef(null);
+
+  const mountedRef =
+    useRef(true);
 
   useEffect(() => {
-  const checkExistingLogin = async () => {
-    const token = localStorage.getItem("token");
+    mountedRef.current = true;
 
-    // No token in this browser.
-    // Continue with normal Instagram verification.
+    return () => {
+      mountedRef.current = false;
+
+      clearInterval(
+        pollingRef.current
+      );
+
+      clearTimeout(
+        timeoutRef.current
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    checkExistingLogin();
+  }, []);
+
+  async function checkExistingLogin() {
+    const token =
+      localStorage.getItem("token");
+
     if (!token) {
       return;
     }
@@ -47,28 +202,34 @@ export default function InstagramVerification() {
         `${API}/api/v1/auth/me`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization:
+              `Bearer ${token}`,
           },
         }
       );
 
-      // Token is invalid or expired.
       if (!res.ok) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        localStorage.removeItem(
+          "token"
+        );
+
+        localStorage.removeItem(
+          "user"
+        );
+
         return;
       }
 
-      const data = await res.json();
+      const data =
+        await res.json();
 
-      // This token belongs to the user already
-      // authenticated in THIS browser.
       localStorage.setItem(
         "user",
-        JSON.stringify(data.data.user)
+        JSON.stringify(
+          data.data.user
+        )
       );
 
-      // Already logged in.
       window.location.replace("/");
     } catch (error) {
       console.error(
@@ -76,382 +237,741 @@ export default function InstagramVerification() {
         error
       );
     }
-  };
+  }
 
-  checkExistingLogin();
-}, []);
+  async function handleGenerateCode() {
+    const cleanUsername =
+      username
+        .trim()
+        .replace(/^@/, "")
+        .toLowerCase();
 
-  useEffect(() => {
-    return () => {
-      clearInterval(intervalRef.current);
-      clearInterval(countdownRef.current);
-      clearTimeout(timeoutRef.current);
-    };
-  }, []);
+    if (!cleanUsername) {
+      setError(
+        "Please enter your Instagram username."
+      );
 
-const openInstagram = () => {
-  const instagramDMUrl =
-    `https://ig.me/m/${BUSINESS_USERNAME}`;
-
-  // Open Instagram DM link in a new tab/window.
-  //
-  // On mobile:
-  // If Instagram is installed, the Instagram app
-  // should handle this universal link.
-  //
-  // If Instagram is not installed:
-  // the Instagram web page opens in the new tab.
-  window.open(
-    instagramDMUrl,
-    "_blank",
-    "noopener,noreferrer",
-  );
-};
-
-  const copyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const startPolling = (sessionId) => {
-  setStep("waiting");
-
-  // Prevent duplicate polling intervals.
-  clearInterval(intervalRef.current);
-  clearTimeout(timeoutRef.current);
-
-  let checking = false;
-
-  intervalRef.current = setInterval(async () => {
-    // Prevent another request from starting
-    // if the previous request has not finished yet.
-    if (checking) {
       return;
     }
 
-    checking = true;
+    clearPolling();
+
+    setError("");
+    setCopied(false);
+
+    setState(
+      VERIFICATION_STATES.GENERATING
+    );
 
     try {
       const res = await fetch(
-        `${API}/api/v1/auth/instagram/status/${sessionId}`,
+        `${API}/api/v1/auth/instagram/start`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            username:
+              cleanUsername,
+          }),
+        }
       );
 
-      const data = await res.json();
-
-      console.log(
-        "Instagram verification status:",
-        data.data?.status,
-      );
+      const data =
+        await res.json();
 
       if (!res.ok) {
-        clearInterval(intervalRef.current);
-        clearTimeout(timeoutRef.current);
-
-        setError(
+        throw new Error(
           data.message ||
-            "Verification failed.",
+            "Unable to create verification code."
         );
-
-        setStep("error");
-        return;
       }
 
-      // =========================
-      // USERNAME MISMATCH
-      // =========================
+      const newSessionId =
+        data.data?.sessionId;
+
+      const newCode =
+        data.data?.code;
 
       if (
-        data.data?.status ===
-        "username_mismatch"
+        !newSessionId ||
+        !newCode
       ) {
-        clearInterval(intervalRef.current);
-        clearTimeout(timeoutRef.current);
-
-        setError(
-          data.data.error ||
-            "The verification code was sent from a different Instagram account.",
+        throw new Error(
+          "Verification code could not be created."
         );
-
-        setStep("error");
-        return;
       }
 
-      // =========================
-      // VERIFIED
-      // =========================
+      setUsername(
+        cleanUsername
+      );
 
-      if (
-        data.data?.status ===
-        "verified"
-      ) {
-        clearInterval(intervalRef.current);
-        clearTimeout(timeoutRef.current);
+      setSessionId(
+        newSessionId
+      );
 
-        const token =
-          data.data.token;
+      setCode(
+        newCode
+      );
 
-        if (!token) {
-          setError(
-            "Verification succeeded, but login token was not received.",
-          );
-
-          setStep("error");
-          return;
-        }
-
-        // Save JWT immediately.
-        localStorage.setItem(
-          "token",
-          token,
+      try {
+        await navigator.clipboard.writeText(
+          newCode
         );
 
-        // Get the complete current user
-        // from the backend.
-        const meRes =
-          await fetch(
-            `${API}/api/v1/auth/me`,
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`,
-              },
-            },
-          );
-
-        const meData =
-          await meRes.json();
-
-        if (!meRes.ok) {
-          localStorage.removeItem(
-            "token",
-          );
-
-          setError(
-            "Unable to load user.",
-          );
-
-          setStep("error");
-          return;
-        }
-
-        // Save user information.
-        localStorage.setItem(
-          "user",
-          JSON.stringify(
-            meData.data.user,
-          ),
-        );
-
-        // Keep anonymous profile available
-        // for the current UI.
         if (
-          meData.data.anonymousProfile
+          mountedRef.current
         ) {
-setAnonymousName(
-  meData.data
-    .anonymousProfile
-    .anonymousName,
-);
-}
+          setCopied(true);
 
-// Verification is complete.
-// Show the anonymous identity first.
-// The user will continue to the main page
-// from the success screen.
-setStep("verified");
-return;
+          setTimeout(() => {
+            if (
+              mountedRef.current
+            ) {
+              setCopied(false);
+            }
+          }, 1500);
+        }
+      } catch (clipboardError) {
+        console.warn(
+          "Automatic clipboard copy failed:",
+          clipboardError
+        );
       }
 
-      // =========================
-      // STILL WAITING
-      // =========================
+      setState(
+        VERIFICATION_STATES.WAITING
+      );
 
-      // No action required.
-      // The next interval will check again.
-
-    } catch (err) {
+      startPolling(
+        newSessionId
+      );
+    } catch (error) {
       console.error(
-        "Instagram polling error:",
-        err,
+        "Generate verification error:",
+        error
       );
 
-      clearInterval(
-        intervalRef.current,
-      );
-
-      clearTimeout(
-        timeoutRef.current,
-      );
+      if (
+        !mountedRef.current
+      ) {
+        return;
+      }
 
       setError(
-        "Unable to contact the server. Please try again.",
+        error.message ||
+          "Unable to start verification."
       );
 
-      setStep("error");
-    } finally {
-      checking = false;
+      setState(
+        VERIFICATION_STATES.ERROR
+      );
     }
-  }, 2000);
+  }
 
-  // Stop checking after 5 minutes.
-  timeoutRef.current =
-    setTimeout(() => {
-      clearInterval(
-        intervalRef.current,
+  function startPolling(
+    verificationSessionId
+  ) {
+    clearPolling();
+
+    let checking = false;
+
+    pollingRef.current =
+      setInterval(async () => {
+        if (checking) {
+          return;
+        }
+
+        checking = true;
+
+        try {
+          const res =
+            await fetch(
+              `${API}/api/v1/auth/instagram/status/${verificationSessionId}`
+            );
+
+          const data =
+            await res.json();
+
+          if (!res.ok) {
+            throw new Error(
+              data.message ||
+                "Verification failed."
+            );
+          }
+
+          const status =
+            data.data?.status;
+
+          if (
+            status ===
+            "username_mismatch"
+          ) {
+            clearPolling();
+
+            if (
+              !mountedRef.current
+            ) {
+              return;
+            }
+
+            setError(
+              data.data?.error ||
+                "The code was sent from a different Instagram account."
+            );
+
+            setState(
+              VERIFICATION_STATES.ERROR
+            );
+
+            return;
+          }
+
+          if (
+            status ===
+            "verified"
+          ) {
+            clearPolling();
+
+            if (
+              !mountedRef.current
+            ) {
+              return;
+            }
+
+            setState(
+              VERIFICATION_STATES.VERIFYING
+            );
+
+            const token =
+              data.data?.token;
+
+            if (!token) {
+              throw new Error(
+                "Verification succeeded but login token was not received."
+              );
+            }
+
+            await completeLogin(
+              token
+            );
+
+            return;
+          }
+
+          if (
+            status ===
+            "pending"
+          ) {
+            if (
+              mountedRef.current
+            ) {
+              setState(
+                VERIFICATION_STATES.WAITING
+              );
+            }
+
+            return;
+          }
+        } catch (error) {
+          console.error(
+            "Verification polling error:",
+            error
+          );
+
+          clearPolling();
+
+          if (
+            mountedRef.current
+          ) {
+            setError(
+              "We couldn't check your verification. Please try again."
+            );
+
+            setState(
+              VERIFICATION_STATES.ERROR
+            );
+          }
+        } finally {
+          checking = false;
+        }
+      }, 2000);
+
+    timeoutRef.current =
+      setTimeout(() => {
+        clearPolling();
+
+        if (
+          mountedRef.current
+        ) {
+          setError(
+            "This verification code has expired."
+          );
+
+          setState(
+            VERIFICATION_STATES.EXPIRED
+          );
+        }
+      }, 5 * 60 * 1000);
+  }
+
+  async function completeLogin(
+    token
+  ) {
+    localStorage.setItem(
+      "token",
+      token
+    );
+
+    const res =
+      await fetch(
+        `${API}/api/v1/auth/me`,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
+        }
       );
 
-      setError(
-        "Verification expired. Please generate a new verification code.",
+    const data =
+      await res.json();
+
+    if (!res.ok) {
+      localStorage.removeItem(
+        "token"
       );
 
-      setStep("error");
-    }, 5 * 60 * 1000);
-};
+      throw new Error(
+        "Unable to load your account."
+      );
+    }
 
-  const verify = async () => {
-    if (!username.trim()) {
-      alert("Please enter your Instagram username.");
+    localStorage.setItem(
+      "user",
+      JSON.stringify(
+        data.data.user
+      )
+    );
+
+    const profile =
+      data.data.anonymousProfile;
+
+    if (
+      !profile?.anonymousName
+    ) {
+      throw new Error(
+        "Anonymous identity could not be loaded."
+      );
+    }
+
+    if (
+      !mountedRef.current
+    ) {
       return;
     }
 
-    setLoading(true);
+    setAnonymousName(
+      profile.anonymousName
+    );
+
+    setState(
+      VERIFICATION_STATES.VERIFIED
+    );
+
+    timeoutRef.current =
+      setTimeout(() => {
+        window.location.replace("/");
+      }, 1100);
+  }
+
+  async function handleCopy() {
+    if (!code) {
+      return;
+    }
 
     try {
-      const res = await fetch(`${API}/api/v1/auth/instagram/start`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-        }),
-      });
-      //convert json to js object
-      /*{
-  statusCode: 201,
-  data: {
-    sessionId: "...",
-    code: "CV-8D4DE2B2"
-  },
-  message: "Verification session created"
-} */
-      const data = await res.json();
-      //check status code is 201 or not
-      if (!res.ok) {
-        alert(data.message || "Verification failed.");
-        return;
-      }
-//       // ⭐ EXISTING USER
-// if (data.data?.alreadyVerified) {
-//   localStorage.setItem("token", data.data.token);
+      await navigator.clipboard.writeText(
+        code
+      );
 
-//   const meRes = await fetch(`${API}/api/v1/auth/me`, {
-//     headers: {
-//       Authorization: `Bearer ${data.data.token}`,
-//     },
-//   });
-//   console.log("START RESPONSE:", data);
-// console.log("alreadyVerified:", data.data?.alreadyVerified);
+      setCopied(true);
 
-//   const meData = await meRes.json();
-
-//   localStorage.setItem("user", JSON.stringify(meData.data.user));
-
-//   window.location.replace("/");
-//   return;   // <-- THIS IS CRITICAL
-// }
-
-      //this is js destructuring,instead of const sessionId = data.data.sessionId; const code = data.data.code;
-      const { sessionId, code } = data.data;
-
-      setSessionId(sessionId);
-      setCode(code);
-      // Copy verification code
-      try {
-        await navigator.clipboard.writeText(code);
-      } catch (err) {
-        console.error(err);
-      }
-      //open DM
-      // openInstagram();
-
-setStep("instructions");
-setCountdown(5);
-
-// Start polling immediately.
-// Verification does not depend on Instagram being opened.
-startPolling(sessionId);
-
-// Countdown shown on the instructions screen.
-clearInterval(countdownRef.current);
-
-countdownRef.current = setInterval(() => {
-  setCountdown((prev) => {
-    if (prev <= 1) {
-      clearInterval(countdownRef.current);
-      return 0;
+      setTimeout(() => {
+        if (
+          mountedRef.current
+        ) {
+          setCopied(false);
+        }
+      }, 1500);
+    } catch (error) {
+      console.error(
+        "Copy failed:",
+        error
+      );
     }
+  }
 
-    return prev - 1;
-  });
-}, 1000);
+  function handleOpenInstagram() {
+    setOpeningInstagram(true);
 
-// Give React time to render the instructions page
-// before opening Instagram.
-clearTimeout(timeoutRef.current);
+    const instagramUrl =
+      `https://ig.me/m/${BUSINESS_USERNAME}`;
 
-timeoutRef.current = setTimeout(() => {
-  openInstagram();
-}, 5000);
-    } catch (err) {
-      console.error(err);
+    window.open(
+      instagramUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
 
-      alert("Something went wrong.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setTimeout(() => {
+      if (
+        mountedRef.current
+      ) {
+        setOpeningInstagram(false);
+      }
+    }, 500);
+  }
+
+  function clearPolling() {
+    clearInterval(
+      pollingRef.current
+    );
+
+    clearTimeout(
+      timeoutRef.current
+    );
+
+    pollingRef.current =
+      null;
+
+    timeoutRef.current =
+      null;
+  }
+
+  function handleRetry() {
+    clearPolling();
+
+    setError("");
+    setCode("");
+    setSessionId(null);
+    setCopied(false);
+    setOpeningInstagram(false);
+
+    setState(
+      VERIFICATION_STATES.IDLE
+    );
+  }
+
+  // =====================================================
+  // SUCCESS
+  // =====================================================
+
+  if (
+    state ===
+    VERIFICATION_STATES.VERIFIED
+  ) {
+    return (
+      <main className="cv-instagram-auth">
+        <section className="cv-instagram-auth__success">
+          <div className="cv-instagram-auth__success-icon">
+            <CheckIcon />
+          </div>
+
+          <h1>
+            You're verified.
+          </h1>
+
+          <p className="cv-instagram-auth__success-label">
+            You're now known as
+          </p>
+
+          <h2 className="cv-instagram-auth__anonymous-name">
+            {anonymousName}
+          </h2>
+
+          <p className="cv-instagram-auth__success-message">
+            Welcome to ConfessionVault.
+          </p>
+
+          <p className="cv-instagram-auth__success-loading">
+            Taking you home...
+          </p>
+        </section>
+      </main>
+    );
+  }
+
+  const verificationActive =
+    Boolean(code);
+
+  const canEditUsername =
+    state ===
+      VERIFICATION_STATES.IDLE ||
+    state ===
+      VERIFICATION_STATES.ERROR ||
+    state ===
+      VERIFICATION_STATES.EXPIRED;
 
   return (
-    <div style={{ padding: 40 }}>
-      {step === "form" && (
-        <VerificationForm
-          username={username}
-          setUsername={setUsername}
-          loading={loading}
-          onVerify={verify}
-        />
-      )}
+    <main className="cv-instagram-auth">
+      <div className="cv-instagram-auth__container">
 
-      {step === "instructions" && (
-        <VerificationInstructions
-          username={username}
-          code={code}
-          onCopy={copyCode}
-          onOpenInstagram={openInstagram}
-          countdown={countdown}
-          // onSent={startPolling}
-        />
-      )}
+        {/* =========================================
+            BRAND
+            ========================================= */}
 
-      {step === "waiting" && <VerificationWaiting />}
+        <header className="cv-instagram-auth__brand">
+          <div className="cv-instagram-auth__brand-mark">
+            <ShieldIcon />
+          </div>
 
-      {step === "error" && (
-        <VerificationError
-          message={error}
-          onRetry={() => window.location.reload()}
-        />
-      )}
+          <p className="cv-instagram-auth__brand-name">
+            ConfessionVault
+          </p>
 
-      {step === "verified" && (
-        <VerificationSuccess
-          anonymousName={anonymousName}
-          onContinue={() => window.location.replace("/")}
-        />
-      )}
-    </div>
+          <p className="cv-instagram-auth__brand-subtitle">
+            Private by design
+          </p>
+        </header>
+
+        {/* =========================================
+            HEADING
+            ========================================= */}
+
+        <h1 className="cv-instagram-auth__heading">
+          Verify your Instagram
+        </h1>
+
+        <p className="cv-instagram-auth__description">
+          Verify your account to enter
+          ConfessionVault anonymously.
+        </p>
+
+        {/* =========================================
+            MAIN CARD
+            ========================================= */}
+
+        <section className="cv-instagram-auth__card">
+
+          {/* =======================================
+              USERNAME
+              ======================================= */}
+
+          <label
+            htmlFor="instagram-username"
+            className="cv-instagram-auth__field-label"
+          >
+            Instagram username
+          </label>
+
+          <div className="cv-instagram-auth__input-wrap">
+
+            <span className="cv-instagram-auth__input-prefix">
+              @
+            </span>
+
+            <input
+              id="instagram-username"
+              className={`cv-instagram-auth__input ${
+                !canEditUsername
+                  ? "cv-instagram-auth__input--locked"
+                  : ""
+              }`}
+              type="text"
+              value={username}
+              disabled={!canEditUsername}
+              onChange={(event) => {
+                setUsername(
+                  event.target.value
+                );
+
+                setError("");
+              }}
+              placeholder="your Instagram username"
+              autoComplete="username"
+            />
+
+            {!canEditUsername && (
+              <span className="cv-instagram-auth__lock">
+                <LockIcon />
+              </span>
+            )}
+          </div>
+
+          {/* =======================================
+              CONTINUE
+              ======================================= */}
+
+          {!verificationActive && (
+            <button
+              type="button"
+              className="cv-instagram-auth__primary"
+              disabled={
+                state ===
+                VERIFICATION_STATES.GENERATING
+              }
+              onClick={
+                handleGenerateCode
+              }
+            >
+              {state ===
+              VERIFICATION_STATES.GENERATING
+                ? "Creating your code..."
+                : "Continue →"}
+            </button>
+          )}
+
+          {/* =======================================
+              PRIVACY
+              ======================================= */}
+
+          {!verificationActive && (
+            <div className="cv-instagram-auth__privacy">
+              <span className="cv-instagram-auth__privacy-icon">
+                <ShieldIcon />
+              </span>
+
+              <span>
+                Your Instagram is only used
+                to verify your account.
+                Your identity stays anonymous
+                on ConfessionVault.
+              </span>
+            </div>
+          )}
+
+          {/* =======================================
+              VERIFICATION CARD
+              ======================================= */}
+
+          {verificationActive && (
+            <section
+              className="cv-instagram-auth__verification"
+              aria-live="polite"
+            >
+              <h2 className="cv-instagram-auth__verification-title">
+                Almost there 👋
+              </h2>
+
+              <p className="cv-instagram-auth__verification-text">
+                Send this code from{" "}
+                <strong>
+                  @{username}
+                </strong>{" "}
+                to{" "}
+                <span className="cv-instagram-auth__destination">
+                  @{BUSINESS_USERNAME}
+                </span>{" "}
+                on Instagram.
+              </p>
+
+              {/* CODE */}
+
+              <div
+                className="cv-instagram-auth__code"
+                aria-label={`Verification code ${code}`}
+              >
+                {code}
+              </div>
+
+              {/* ACTIONS */}
+
+              <div className="cv-instagram-auth__actions">
+
+                <button
+                  type="button"
+                  className="cv-instagram-auth__secondary"
+                  onClick={
+                    handleCopy
+                  }
+                >
+                  {copied
+                    ? "✓ Copied"
+                    : "Copy code"}
+                </button>
+
+                <button
+                  type="button"
+                  className="cv-instagram-auth__instagram"
+                  disabled={
+                    openingInstagram
+                  }
+                  onClick={
+                    handleOpenInstagram
+                  }
+                >
+                  <InstagramIcon />
+
+                  {openingInstagram
+                    ? "Opening Instagram..."
+                    : "Open Instagram →"}
+                </button>
+
+              </div>
+
+              {/* STATUS */}
+
+              {state ===
+                VERIFICATION_STATES.WAITING && (
+                <div className="cv-instagram-auth__status">
+                  <span className="cv-instagram-auth__status-dot" />
+
+                  <span>
+                    Waiting for your message...
+                  </span>
+                </div>
+              )}
+
+              {state ===
+                VERIFICATION_STATES.VERIFYING && (
+                <div className="cv-instagram-auth__status">
+                  <span className="cv-instagram-auth__status-dot" />
+
+                  <span>
+                    Verifying your Instagram...
+                  </span>
+                </div>
+              )}
+
+              {state ===
+                VERIFICATION_STATES.ERROR && (
+                <div className="cv-instagram-auth__error">
+                  {error}
+                </div>
+              )}
+
+              {state ===
+                VERIFICATION_STATES.EXPIRED && (
+                <div className="cv-instagram-auth__error">
+                  {error}
+                </div>
+              )}
+
+              {(state ===
+                VERIFICATION_STATES.ERROR ||
+                state ===
+                  VERIFICATION_STATES.EXPIRED) && (
+                <button
+                  type="button"
+                  className="cv-instagram-auth__retry"
+                  onClick={
+                    handleRetry
+                  }
+                >
+                  Generate new code
+                </button>
+              )}
+
+            </section>
+          )}
+
+        </section>
+      </div>
+    </main>
   );
 }
