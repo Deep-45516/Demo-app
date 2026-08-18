@@ -19,6 +19,7 @@ export default function Home() {
   const [allowPending, setAllowPending] = useState(false); //If recipient doesn't exist, did the sender explicitly choose "Send Anyway"?initialyy it is false , so no
   const [publicConsent, setPublicConsent] = useState(false);
   const [checkingRecipient, setCheckingRecipient] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   //Has this browser already logged into ConfessionVault?
   /*If stored exists:
 Convert the JSON string back into an object.
@@ -135,6 +136,71 @@ and the user's information.
     );
   }
 
+const handleSubmit = async () => {
+  if (!recipientStatus) {
+    alert("Please verify the recipient first.");
+    return;
+  }
+
+  if (!message.trim()) {
+    alert("Message is required.");
+    return;
+  }
+
+  if (
+    !recipientStatus.exists &&
+    !allowPending
+  ) {
+    alert(
+      "This recipient hasn't joined yet. Click Send Anyway first."
+    );
+    return;
+  }
+
+  try {
+    setSubmitting(true);
+
+    const data = await submitConfession(
+      to,
+      message,
+      !recipientStatus.exists,
+      publicConsent
+    );
+
+    console.log(
+      "CONFESSION CREATED:",
+      data
+    );
+
+    alert(
+      recipientStatus.exists
+        ? "Confession submitted!"
+        : "Confession saved! It will be delivered if they join within 7 days."
+    );
+
+    // Reset form
+    setTo("");
+    setMessage("");
+    setFrom("");
+    setRecipientStatus(null);
+    setAllowPending(false);
+    setPublicConsent(false);
+
+  } catch (error) {
+    console.error(
+      "SUBMIT CONFESSION ERROR:",
+      error
+    );
+
+    alert(
+      error.message ||
+        "Unable to submit confession."
+    );
+  } finally {
+    setSubmitting(false);
+  }
+};
+
   return (
     <div className="container">
       <div className="form">
@@ -214,17 +280,22 @@ and the user's information.
   </label>
 )}
         <button
-          disabled={
-            !recipientStatus ||
-            checkingRecipient ||
-            (!recipientStatus.exists && !allowPending)
-          }
-          onClick={() => {
-            submitConfession(to, message, allowPending, publicConsent);
-          }}
-        >
-          Submit Confession
-        </button>
+  disabled={
+    !recipientStatus ||
+    checkingRecipient ||
+    submitting ||
+    !message.trim() ||
+    (
+      !recipientStatus.exists &&
+      !allowPending
+    )
+  }
+  onClick={handleSubmit}
+>
+  {submitting
+    ? "Submitting..."
+    : "Submit Confession"}
+</button>
       </div>
 
       <div className="preview-wrapper" id="previewWrapper" />
