@@ -2,6 +2,7 @@ const API = import.meta.env.VITE_BACKEND_URL;
 
 export async function submitConfession(
   recipientUsername,
+  to,
   message,
   allowPending = false,
   publicConsent = false
@@ -23,11 +24,11 @@ export async function submitConfession(
       },
 
       body: JSON.stringify({
-        recipientUsername:
-          recipientUsername.trim(),
+        recipientUsername: recipientUsername.trim(),
 
-        message:
-          message.trim(),
+        to: to.trim(),
+
+        message: message.trim(),
 
         allowPending,
 
@@ -45,8 +46,7 @@ export async function submitConfession(
 
   if (!res.ok) {
     throw new Error(
-      data.message ||
-        "Submission failed."
+      data.message || "Submission failed."
     );
   }
 

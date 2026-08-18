@@ -76,6 +76,7 @@ router.post("/", verifyToken, async (req, res) => {
   try {
     const {
   recipientUsername,
+  to,
   message,
   allowPending = false,
   publicConsent = false,
@@ -92,6 +93,16 @@ router.post("/", verifyToken, async (req, res) => {
       recipientUsername.trim() === ""
     ) {
       throw new ApiError(400, "Recipient username is required.");
+
+      if (
+  typeof to !== "string" ||
+  to.trim() === ""
+) {
+  throw new ApiError(
+    400,
+    "To name is required."
+  );
+}
     }
     //find sender
     const sender = await User.findById(req.user.id);
@@ -130,7 +141,7 @@ STOP       create pending */
 
       // Generate images for the pending confession
       const imagePaths = await generateImages({
-        to: recipientUsername,
+        to,
         from: senderAnonymous.anonymousName,
         message,
       }); /*[
@@ -188,7 +199,7 @@ Not sending to yourself ✅*/
     //Hey backend, create image using this data
     //create confession with sender anonomous and for recipent real insta id
     const imagePaths = await generateImages({
-      to: recipient.instagramUsername,
+      to,
       from: senderAnonymous.anonymousName,
       message,
     }); /*[

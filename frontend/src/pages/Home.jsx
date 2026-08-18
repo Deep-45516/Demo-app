@@ -13,6 +13,7 @@ const API = import.meta.env.VITE_BACKEND_URL;
 export default function Home() {
   const navigate = useNavigate();
   const [to, setTo] = useState("");
+  const [recipientUsername, setRecipientUsername] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
   const [recipientStatus, setRecipientStatus] = useState(null); //null(we havent check is he registered or not,true(registered recipient),false(not registered))
@@ -47,15 +48,15 @@ Return null. */
   }, [to, from, message]);
 
   const verifyRecipient = async () => {
-    if (!to.trim()) {
-      alert("Enter recipient username.");
+    if (!recipientUsername.trim()) {
+      alert("Enter recipient Instagram username.");
       return;
     }
 
     try {
       setCheckingRecipient(true);
 
-      const result = await searchRecipient(to);
+      const result = await searchRecipient(recipientUsername);
       /*result = {
   success: true,
   data: {
@@ -161,6 +162,7 @@ const handleSubmit = async () => {
     setSubmitting(true);
 
     const data = await submitConfession(
+      recipientUsername,
       to,
       message,
       !recipientStatus.exists,
@@ -180,6 +182,7 @@ const handleSubmit = async () => {
 
     // Reset form
     setTo("");
+    setRecipientUsername("");
     setMessage("");
     setFrom("");
     setRecipientStatus(null);
@@ -205,7 +208,7 @@ const handleSubmit = async () => {
     <div className="container">
       <div className="form">
         <p>Logged in as {user.email}</p>
-        <label>Recipient Username</label>
+        <label>Name / Hint of person</label>
         <input
           type="text"
           value={to}
@@ -213,11 +216,26 @@ const handleSubmit = async () => {
             // Recipient changed, so previous verification is no longer valid.
             // Reset verification status and require the user to verify again.
             setTo(e.target.value);
-            setRecipientStatus(null);
-            setAllowPending(false);
-            setPublicConsent(false);
+            // setRecipientStatus(null);
+            // setAllowPending(false);
+            // setPublicConsent(false);
+            placeholder="e.g. Someone special"
           }}
         />
+
+        <label>Recipient Instagram Username</label>
+
+<input
+  type="text"
+  value={recipientUsername}
+  onChange={(e) => {
+    setRecipientUsername(e.target.value);
+    setRecipientStatus(null);
+    setAllowPending(false);
+    setPublicConsent(false);
+  }}
+  placeholder="@instagram_username"
+/>
         <p
           style={{
             color: "#666",
@@ -252,7 +270,8 @@ const handleSubmit = async () => {
           onChange={(e) => setMessage(e.target.value)}
         />
         <label>From</label>
-        <textarea value={from} onChange={(e) => setFrom(e.target.value)} />
+        <textarea value={from} onChange={(e) => setFrom(e.target.value)}
+        placeholder="Hint of yourself" />
         <button onClick={downloadPages}>Download Pages</button>
         //checkbox for public post consent
         {recipientStatus && (
