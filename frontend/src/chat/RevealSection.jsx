@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./RevealSection.css";
+import "./revealSection.css";
 import "../theme.css"
 export default function RevealSection({
   userId,

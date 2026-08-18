@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { getConversations } from "../chat/chat.js";
-
+import "../theme.css"
 import { getInbox } from "../inbox";
 import {
   subscribeToNewConfession,

@@ -1,6 +1,6 @@
 //C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\layouts\AppLayout.jsx
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-
+import "../theme.css"
 import { disconnectSocket } from "../socket";
 
 export default function AppLayout() {
