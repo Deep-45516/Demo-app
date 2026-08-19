@@ -1,857 +1,159 @@
 /* =========================================================
-   ConfessionVault — Instagram Verification
-   Scoped to .cv-instagram-auth
+   Wavelength — Instagram Verification
+   Scoped to .wl-instagram-auth. Requires wavelength-theme.css
+   to be imported first (fonts, tokens, .wl-btn/.wl-card, etc).
    ========================================================= */
 
-.cv-instagram-auth {
-  --cv-bg: #08080d;
-  --cv-surface: rgba(255, 255, 255, 0.055);
-  --cv-surface-strong: rgba(255, 255, 255, 0.075);
-  --cv-border: rgba(255, 255, 255, 0.1);
-  --cv-border-soft: rgba(255, 255, 255, 0.07);
-
-  --cv-text: #f7f7fb;
-  --cv-text-soft: #a8a8b7;
-  --cv-text-muted: #777786;
-
-  --cv-purple: #8b5cf6;
-  --cv-purple-light: #a78bfa;
-  --cv-purple-dark: #6d28d9;
-
-  --cv-green: #4ade80;
-
-  min-height: 100vh;
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-  overflow: hidden;
-
-  box-sizing: border-box;
-
-  padding: 32px 20px;
+.wl-instagram-auth{
+  min-height:100vh;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  box-sizing:border-box;
+  padding:32px 20px;
 
   background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(124, 58, 237, 0.14),
-      transparent 38%
-    ),
-    radial-gradient(
-      circle at 90% 85%,
-      rgba(139, 92, 246, 0.07),
-      transparent 28%
-    ),
-    var(--cv-bg);
+    radial-gradient(circle at 16% 8%, rgba(124,92,252,0.16), transparent 45%),
+    radial-gradient(circle at 88% 88%, rgba(255,77,141,0.13), transparent 45%),
+    var(--wl-void);
 
-  color: var(--cv-text);
-
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  color:var(--wl-text);
+  font-family:'Space Grotesk', sans-serif;
 }
 
-/* =========================================================
-   Ambient background
-   ========================================================= */
-
-.cv-instagram-auth::before,
-.cv-instagram-auth::after {
-  content: "";
-  position: absolute;
-
-  width: 280px;
-  height: 280px;
-
-  border-radius: 50%;
-
-  pointer-events: none;
-
-  filter: blur(90px);
-
-  opacity: 0.18;
+.wl-instagram-auth__container{
+  width:100%;
+  max-width:420px;
+  position:relative;
+  z-index:1;
 }
 
-.cv-instagram-auth::before {
-  top: -150px;
-  left: -120px;
-
-  background: rgba(124, 58, 237, 0.7);
+/* -- brand -- */
+.wl-instagram-auth__brand{ text-align:center; margin-bottom:22px; }
+.wl-instagram-auth__brand-mark{
+  width:44px; height:44px; margin:0 auto 12px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(124,92,252,0.22), rgba(255,77,141,0.12));
+  border:1px solid rgba(124,92,252,0.22);
+  color:var(--wl-signal-bright);
+  box-shadow:0 10px 32px rgba(124,92,252,0.16);
+}
+.wl-instagram-auth__brand-name{
+  margin:0; font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+  font-size:17px; color:var(--wl-text);
+}
+.wl-instagram-auth__brand-subtitle{
+  margin:6px 0 0; font-size:12px; color:var(--wl-text-faint);
 }
 
-.cv-instagram-auth::after {
-  right: -150px;
-  bottom: -150px;
-
-  background: rgba(139, 92, 246, 0.45);
+/* -- heading -- */
+.wl-instagram-auth__heading{
+  margin:0; text-align:center; font-size:clamp(26px, 6vw, 32px); line-height:1.18;
+}
+.wl-instagram-auth__description{
+  max-width:340px; margin:10px auto 0; text-align:center;
+  color:var(--wl-text-dim); font-size:13.5px; line-height:1.6;
 }
 
-/* =========================================================
-   Main container
-   ========================================================= */
+/* -- card -- */
+.wl-instagram-auth__card{ margin-top:26px; padding:24px; backdrop-filter:blur(14px); }
 
-.cv-instagram-auth__container {
-  width: 100%;
-  max-width: 480px;
-
-  position: relative;
-  z-index: 1;
+.wl-instagram-auth__field-label{
+  display:block; margin-bottom:9px; font-family:'IBM Plex Mono', monospace;
+  font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--wl-text-dim);
 }
 
-/* =========================================================
-   Brand
-   ========================================================= */
+.wl-instagram-auth__input-wrap{ position:relative; }
+.wl-instagram-auth__input-prefix{
+  position:absolute; left:15px; top:50%; transform:translateY(-50%);
+  color:var(--wl-text-faint); font-size:15px; pointer-events:none;
+}
+.wl-instagram-auth__input{
+  width:100%; height:52px; box-sizing:border-box; padding:0 15px 0 32px;
+  border-radius:14px; border:1px solid var(--wl-line); outline:none;
+  background:rgba(0,0,0,0.22); color:var(--wl-text); font-family:'Space Grotesk';
+  font-size:15px; transition:border-color .18s ease, box-shadow .18s ease;
+}
+.wl-instagram-auth__input::placeholder{ color:var(--wl-text-faint); }
+.wl-instagram-auth__input:focus{
+  border-color:rgba(124,92,252,.7); box-shadow:0 0 0 3px rgba(124,92,252,0.14);
+}
+.wl-instagram-auth__input--locked{ padding-right:46px; color:var(--wl-text-dim); background:rgba(255,255,255,0.03); cursor:not-allowed; }
+.wl-instagram-auth__lock{ position:absolute; right:15px; top:50%; transform:translateY(-50%); color:var(--wl-text-faint); display:flex; }
 
-.cv-instagram-auth__brand {
-  text-align: center;
+.wl-instagram-auth__primary{ margin-top:14px; }
 
-  margin-bottom: 34px;
+.wl-instagram-auth__privacy{
+  display:flex; align-items:flex-start; gap:10px; margin-top:18px; padding:13px 14px;
+  border-radius:13px; background:rgba(255,255,255,0.025); border:1px solid var(--wl-line);
+  color:var(--wl-text-faint); font-size:11.5px; line-height:1.55;
+}
+.wl-instagram-auth__privacy-icon{ flex:0 0 auto; color:var(--wl-signal-bright); margin-top:1px; }
+
+/* -- verification card -- */
+.wl-instagram-auth__verification{
+  margin-top:18px; padding:20px; border-radius:18px;
+  background:linear-gradient(145deg, rgba(124,92,252,0.09), rgba(255,255,255,0.03));
+  border:1px solid rgba(124,92,252,0.2);
+}
+.wl-instagram-auth__verification-title{ margin:0; font-size:17px; color:var(--wl-text); font-weight:600; }
+.wl-instagram-auth__verification-text{ margin:7px 0 0; color:var(--wl-text-dim); font-size:13px; line-height:1.55; }
+.wl-instagram-auth__destination{ color:var(--wl-cyan); font-weight:600; }
+
+.wl-instagram-auth__code{
+  margin-top:18px; min-height:76px; display:flex; align-items:center; justify-content:center;
+  border-radius:15px; border:1px solid rgba(124,92,252,0.22);
+  background:linear-gradient(135deg, rgba(124,92,252,0.1), rgba(0,0,0,0.18));
+  color:var(--wl-text); font-size:clamp(26px, 7vw, 32px); font-weight:500; letter-spacing:.16em;
 }
 
-.cv-instagram-auth__brand-mark {
-  width: 42px;
-  height: 42px;
+.wl-instagram-auth__actions{ display:grid; grid-template-columns:1fr 1.3fr; gap:9px; margin-top:11px; }
+.wl-instagram-auth__secondary{ height:46px; font-size:12.5px; }
+.wl-instagram-auth__instagram{
+  height:46px; font-size:12.5px;
+  background:linear-gradient(135deg, rgba(124,92,252,0.22), rgba(255,77,141,0.16));
+  border:1px solid rgba(124,92,252,0.3); color:var(--wl-text);
+}
+.wl-instagram-auth__instagram:disabled{ opacity:.65; cursor:wait; }
 
-  margin: 0 auto 14px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 13px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(167, 139, 250, 0.22),
-      rgba(109, 40, 217, 0.1)
-    );
-
-  border: 1px solid rgba(167, 139, 250, 0.18);
-
-  color: var(--cv-purple-light);
-
-  box-shadow:
-    0 10px 35px rgba(109, 40, 217, 0.14);
+.wl-instagram-auth__status{
+  display:flex; align-items:center; gap:10px; margin-top:18px; color:var(--wl-text-dim); font-size:11.5px;
 }
 
-.cv-instagram-auth__brand-name {
-  margin: 0;
-
-  font-size: 15px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-
-  color: #ededf5;
+.wl-instagram-auth__error{
+  margin-top:12px; padding:12px 13px; border-radius:12px;
+  background:rgba(216,105,92,0.08); border:1px solid rgba(216,105,92,0.25);
+  color:#E8A79E; font-size:12px; line-height:1.5;
 }
+.wl-instagram-auth__retry{ margin-top:9px; }
 
-.cv-instagram-auth__brand-subtitle {
-  margin: 6px 0 0;
-
-  font-size: 12px;
-  color: var(--cv-text-muted);
+/* -- success takeover -- */
+.wl-instagram-auth__success{ width:100%; max-width:400px; text-align:center; }
+.wl-instagram-auth__success-icon{
+  width:60px; height:60px; margin:0 auto 22px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%; color:var(--wl-cyan);
+  background:radial-gradient(circle, rgba(77,238,234,0.16), rgba(124,92,252,0.1));
+  border:1px solid rgba(77,238,234,0.25); box-shadow:0 0 50px rgba(77,238,234,0.1);
 }
-
-/* =========================================================
-   Main heading
-   ========================================================= */
-
-.cv-instagram-auth__heading {
-  margin: 0;
-
-  text-align: center;
-
-  font-size: clamp(30px, 6vw, 38px);
-  line-height: 1.1;
-
-  letter-spacing: -0.045em;
-
-  font-weight: 720;
+.wl-instagram-auth__success h1{ margin:0; font-size:clamp(28px, 7vw, 34px); }
+.wl-instagram-auth__success-label{ margin:24px 0 6px; color:var(--wl-text-faint); font-size:11px; letter-spacing:.1em; }
+.wl-instagram-auth__anonymous-name{
+  margin:0; font-size:clamp(24px, 6vw, 29px);
+  background:linear-gradient(90deg, var(--wl-signal-bright), var(--wl-pink));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-
-.cv-instagram-auth__description {
-  max-width: 370px;
-
-  margin: 12px auto 0;
-
-  text-align: center;
-
-  color: var(--cv-text-soft);
-
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* =========================================================
-   Main card
-   ========================================================= */
-
-.cv-instagram-auth__card {
-  margin-top: 28px;
-
-  padding: 24px;
-
-  border-radius: 24px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.065),
-      rgba(255, 255, 255, 0.035)
-    );
-
-  border: 1px solid var(--cv-border);
-
-  box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
-
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-/* =========================================================
-   Field
-   ========================================================= */
-
-.cv-instagram-auth__field-label {
-  display: block;
-
-  margin-bottom: 9px;
-
-  font-size: 12px;
-  font-weight: 600;
-
-  color: #c9c9d5;
-}
-
-.cv-instagram-auth__input-wrap {
-  position: relative;
-}
-
-.cv-instagram-auth__input-prefix {
-  position: absolute;
-
-  left: 15px;
-  top: 50%;
-
-  transform: translateY(-50%);
-
-  color: var(--cv-text-muted);
-
-  font-size: 15px;
-
-  pointer-events: none;
-}
-
-.cv-instagram-auth__input {
-  width: 100%;
-  height: 52px;
-
-  box-sizing: border-box;
-
-  padding: 0 15px 0 34px;
-
-  border-radius: 14px;
-
-  border: 1px solid var(--cv-border);
-
-  outline: none;
-
-  background: rgba(0, 0, 0, 0.18);
-
-  color: var(--cv-text);
-
-  font-size: 15px;
-
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background 180ms ease;
-}
-
-.cv-instagram-auth__input::placeholder {
-  color: #626270;
-}
-
-.cv-instagram-auth__input:focus {
-  border-color: rgba(139, 92, 246, 0.7);
-
-  background: rgba(0, 0, 0, 0.24);
-
-  box-shadow:
-    0 0 0 3px rgba(139, 92, 246, 0.1);
-}
-
-.cv-instagram-auth__input--locked {
-  padding-right: 48px;
-
-  color: #bdbdca;
-
-  background: rgba(255, 255, 255, 0.035);
-
-  cursor: not-allowed;
-}
-
-.cv-instagram-auth__lock {
-  position: absolute;
-
-  right: 15px;
-  top: 50%;
-
-  transform: translateY(-50%);
-
-  color: var(--cv-text-muted);
-
-  display: flex;
-}
-
-/* =========================================================
-   Primary button
-   ========================================================= */
-
-.cv-instagram-auth__primary {
-  width: 100%;
-  height: 52px;
-
-  margin-top: 14px;
-
-  border: 0;
-  border-radius: 14px;
-
-  cursor: pointer;
-
-  color: white;
-
-  font-size: 14px;
-  font-weight: 650;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--cv-purple-light),
-      var(--cv-purple-dark)
-    );
-
-  box-shadow:
-    0 12px 28px rgba(109, 40, 217, 0.2);
-
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease,
-    opacity 150ms ease;
-}
-
-.cv-instagram-auth__primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 15px 34px rgba(109, 40, 217, 0.28);
-}
-
-.cv-instagram-auth__primary:active:not(:disabled) {
-  transform: scale(0.985);
-}
-
-.cv-instagram-auth__primary:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-/* =========================================================
-   Privacy
-   ========================================================= */
-
-.cv-instagram-auth__privacy {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-
-  margin-top: 18px;
-  padding: 13px 14px;
-
-  border-radius: 13px;
-
-  background: rgba(255, 255, 255, 0.025);
-
-  border: 1px solid var(--cv-border-soft);
-
-  color: var(--cv-text-muted);
-
-  font-size: 11.5px;
-  line-height: 1.55;
-}
-
-.cv-instagram-auth__privacy-icon {
-  flex: 0 0 auto;
-
-  color: #9a7cf7;
-
-  margin-top: 1px;
-}
-
-/* =========================================================
-   Verification card
-   ========================================================= */
-
-.cv-instagram-auth__verification {
-  margin-top: 18px;
-
-  padding: 20px;
-
-  border-radius: 18px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(139, 92, 246, 0.09),
-      rgba(255, 255, 255, 0.035)
-    );
-
-  border: 1px solid rgba(139, 92, 246, 0.18);
-
-  animation:
-    cv-verification-enter 420ms cubic-bezier(0.2, 0.8, 0.2, 1)
-    both;
-}
-
-@keyframes cv-verification-enter {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.cv-instagram-auth__verification-title {
-  margin: 0;
-
-  font-size: 18px;
-  line-height: 1.3;
-
-  letter-spacing: -0.025em;
-}
-
-.cv-instagram-auth__verification-text {
-  margin: 7px 0 0;
-
-  color: var(--cv-text-soft);
-
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.cv-instagram-auth__destination {
-  color: #d4c7ff;
-  font-weight: 650;
-}
-
-/* =========================================================
-   Code
-   ========================================================= */
-
-.cv-instagram-auth__code {
-  margin-top: 18px;
-
-  min-height: 78px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  box-sizing: border-box;
-
-  border-radius: 15px;
-
-  border: 1px solid rgba(167, 139, 250, 0.16);
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(139, 92, 246, 0.09),
-      rgba(0, 0, 0, 0.16)
-    );
-
-  color: #f4f0ff;
-
-  font-family:
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace;
-
-  font-size: clamp(28px, 8vw, 36px);
-
-  font-weight: 700;
-
-  letter-spacing: 0.13em;
-
-  text-indent: 0.13em;
-
-  user-select: all;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
-}
-
-/* =========================================================
-   Verification actions
-   ========================================================= */
-
-.cv-instagram-auth__actions {
-  display: grid;
-
-  grid-template-columns: 1fr 1.35fr;
-
-  gap: 9px;
-
-  margin-top: 11px;
-}
-
-.cv-instagram-auth__secondary,
-.cv-instagram-auth__instagram {
-  height: 46px;
-
-  border-radius: 12px;
-
-  cursor: pointer;
-
-  font-size: 12.5px;
-  font-weight: 600;
-
-  transition:
-    transform 150ms ease,
-    background 150ms ease,
-    border-color 150ms ease,
-    opacity 150ms ease;
-}
-
-.cv-instagram-auth__secondary {
-  border: 1px solid var(--cv-border);
-
-  color: #d4d4df;
-
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.cv-instagram-auth__secondary:hover {
-  background: rgba(255, 255, 255, 0.065);
-}
-
-.cv-instagram-auth__instagram {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  border: 1px solid rgba(139, 92, 246, 0.28);
-
-  color: #f5f0ff;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(139, 92, 246, 0.2),
-      rgba(109, 40, 217, 0.13)
-    );
-}
-
-.cv-instagram-auth__instagram:hover:not(:disabled) {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(139, 92, 246, 0.27),
-      rgba(109, 40, 217, 0.18)
-    );
-}
-
-.cv-instagram-auth__secondary:active,
-.cv-instagram-auth__instagram:active:not(:disabled) {
-  transform: scale(0.985);
-}
-
-.cv-instagram-auth__instagram:disabled {
-  opacity: 0.65;
-  cursor: wait;
-}
-
-/* =========================================================
-   Status
-   ========================================================= */
-
-.cv-instagram-auth__status {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-
-  margin-top: 17px;
-
-  color: #aeadbc;
-
-  font-size: 12px;
-}
-
-.cv-instagram-auth__status-dot {
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-
-  background: var(--cv-purple-light);
-
-  box-shadow:
-    0 0 0 5px rgba(167, 139, 250, 0.08);
-
-  animation: cv-status-pulse 1.8s ease-in-out infinite;
-}
-
-@keyframes cv-status-pulse {
-  0%,
-  100% {
-    opacity: 0.45;
-    transform: scale(0.9);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.cv-instagram-auth__status--success {
-  color: #a7eab9;
-}
-
-.cv-instagram-auth__status--success
-  .cv-instagram-auth__status-dot {
-  background: var(--cv-green);
-
-  box-shadow:
-    0 0 0 5px rgba(74, 222, 128, 0.08);
-
-  animation: none;
-}
-
-/* =========================================================
-   Error
-   ========================================================= */
-
-.cv-instagram-auth__error {
-  margin-top: 12px;
-
-  padding: 12px 13px;
-
-  border-radius: 12px;
-
-  background: rgba(248, 113, 113, 0.055);
-
-  border: 1px solid rgba(248, 113, 113, 0.12);
-
-  color: #e8b5b5;
-
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.cv-instagram-auth__retry {
-  width: 100%;
-
-  height: 44px;
-
-  margin-top: 9px;
-
-  border-radius: 11px;
-
-  border: 1px solid var(--cv-border);
-
-  background: rgba(255, 255, 255, 0.035);
-
-  color: #dddde7;
-
-  cursor: pointer;
-
-  font-weight: 600;
-}
-
-/* =========================================================
-   Success takeover
-   ========================================================= */
-
-.cv-instagram-auth__success {
-  width: 100%;
-  max-width: 430px;
-
-  text-align: center;
-
-  animation:
-    cv-success-enter 500ms cubic-bezier(0.2, 0.8, 0.2, 1)
-    both;
-}
-
-@keyframes cv-success-enter {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.985);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.cv-instagram-auth__success-icon {
-  width: 64px;
-  height: 64px;
-
-  margin: 0 auto 24px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  color: #baf5ca;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(74, 222, 128, 0.15),
-      rgba(139, 92, 246, 0.1)
-    );
-
-  border: 1px solid rgba(74, 222, 128, 0.2);
-
-  box-shadow:
-    0 0 50px rgba(74, 222, 128, 0.08);
-}
-
-.cv-instagram-auth__success h1 {
-  margin: 0;
-
-  font-size: clamp(31px, 7vw, 40px);
-
-  letter-spacing: -0.045em;
-}
-
-.cv-instagram-auth__success-label {
-  margin: 25px 0 5px;
-
-  color: var(--cv-text-muted);
-
-  font-size: 12px;
-}
-
-.cv-instagram-auth__anonymous-name {
-  margin: 0;
-
-  font-size: clamp(25px, 6vw, 32px);
-
-  letter-spacing: -0.035em;
-
-  background:
-    linear-gradient(
-      90deg,
-      #ddd6fe,
-      #a78bfa,
-      #c4b5fd
-    );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-
-  color: transparent;
-}
-
-.cv-instagram-auth__success-message {
-  margin: 13px auto 0;
-
-  max-width: 300px;
-
-  color: var(--cv-text-soft);
-
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.cv-instagram-auth__success-loading {
-  margin-top: 28px;
-
-  color: var(--cv-text-muted);
-
-  font-size: 11px;
-}
-
-/* =========================================================
-   Mobile
-   ========================================================= */
-
-@media (max-width: 520px) {
-  .cv-instagram-auth {
-    align-items: flex-start;
-
-    padding:
-      42px 16px
-      28px;
-  }
-
-  .cv-instagram-auth__container {
-    margin-top: 4vh;
-  }
-
-  .cv-instagram-auth__brand {
-    margin-bottom: 28px;
-  }
-
-  .cv-instagram-auth__card {
-    padding: 18px;
-
-    border-radius: 20px;
-  }
-
-  .cv-instagram-auth__verification {
-    padding: 17px;
-
-    border-radius: 16px;
-  }
-
-  .cv-instagram-auth__actions {
-    grid-template-columns: 1fr;
-  }
-
-  .cv-instagram-auth__instagram {
-    order: -1;
-  }
-
-  .cv-instagram-auth__privacy {
-    font-size: 11px;
-  }
-}
-
-/* =========================================================
-   Reduced motion
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .cv-instagram-auth *,
-  .cv-instagram-auth *::before,
-  .cv-instagram-auth *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-
-    transition-duration: 0.01ms !important;
-  }
+.wl-instagram-auth__success-message{ margin:14px auto 0; max-width:280px; color:var(--wl-text-dim); font-size:13px; line-height:1.6; }
+.wl-instagram-auth__success-loading{ margin-top:26px; color:var(--wl-text-faint); font-size:10.5px; }
+
+/* -- mobile -- */
+@media (max-width:520px){
+  .wl-instagram-auth{ align-items:flex-start; padding:42px 16px 28px; }
+  .wl-instagram-auth__container{ margin-top:4vh; }
+  .wl-instagram-auth__card{ padding:18px; border-radius:20px; }
+  .wl-instagram-auth__actions{ grid-template-columns:1fr; }
+  .wl-instagram-auth__instagram{ order:-1; }
 }

@@ -1,7 +1,7 @@
 //C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\ConfessionDetails.jsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "../theme.css"
+import "../wavelength.css"
 import { getConfession, updateConfessionAction } from "../inbox";
 
 import { getSocket, connectSocket } from "../socket";

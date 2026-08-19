@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";;
 // import { GoogleLogin } from "@react-oauth/google";
-import "../theme.css"
+import "../wavelength.css"
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";

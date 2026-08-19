@@ -1,7 +1,7 @@
 //C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\Chat.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "../theme.css"
+import "../wavelength.css"
 import { getMessages, sendMessage } from "../chat/chat.js";
 
 import { requestReveal, respondToReveal } from "../reveal/reveal.js";
