@@ -150,10 +150,329 @@
 .wl-instagram-auth__success-loading{ margin-top:26px; color:var(--wl-text-faint); font-size:10.5px; }
 
 /* -- mobile -- */
-@media (max-width:520px){
-  .wl-instagram-auth{ align-items:flex-start; padding:42px 16px 28px; }
-  .wl-instagram-auth__container{ margin-top:4vh; }
-  .wl-instagram-auth__card{ padding:18px; border-radius:20px; }
-  .wl-instagram-auth__actions{ grid-template-columns:1fr; }
-  .wl-instagram-auth__instagram{ order:-1; }
+/* =========================================================
+   MOBILE RESPONSIVE
+   Instagram Verification
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+  .wl-instagram-auth {
+    min-height: 100dvh;
+    align-items: flex-start;
+    padding: 28px 14px 32px;
+    overflow-x: hidden;
+  }
+
+  .wl-instagram-auth__container {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 2vh;
+  }
+
+  /* -------------------------
+     BRAND
+     ------------------------- */
+
+  .wl-instagram-auth__brand {
+    margin-bottom: 18px;
+  }
+
+  .wl-instagram-auth__brand-mark {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+
+  .wl-instagram-auth__brand-name {
+    font-size: 16px;
+  }
+
+  .wl-instagram-auth__brand-subtitle {
+    font-size: 11px;
+  }
+
+  /* -------------------------
+     STEP INDICATOR
+     ------------------------- */
+
+  .wl-instagram-auth .wl-eyebrow {
+    font-size: 9.5px;
+    letter-spacing: .12em;
+  }
+
+  /* -------------------------
+     HEADING
+     ------------------------- */
+
+  .wl-instagram-auth__heading {
+    font-size: clamp(25px, 8vw, 30px);
+    line-height: 1.15;
+    padding: 0 4px;
+  }
+
+  .wl-instagram-auth__description {
+    width: 100%;
+    max-width: 320px;
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 0 4px;
+  }
+
+  /* -------------------------
+     MAIN CARD
+     ------------------------- */
+
+  .wl-instagram-auth__card {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 20px;
+    padding: 18px 16px;
+    border-radius: 18px;
+  }
+
+  /* -------------------------
+     USERNAME INPUT
+     ------------------------- */
+
+  .wl-instagram-auth__field-label {
+    font-size: 9.5px;
+    margin-bottom: 8px;
+  }
+
+  .wl-instagram-auth__input {
+    height: 50px;
+    font-size: 15px;
+    border-radius: 13px;
+  }
+
+  .wl-instagram-auth__input-prefix {
+    left: 14px;
+    font-size: 14px;
+  }
+
+  /* -------------------------
+     CONTINUE BUTTON
+     ------------------------- */
+
+  .wl-instagram-auth__primary {
+    min-height: 50px;
+    margin-top: 12px;
+  }
+
+  /* -------------------------
+     PRIVACY MESSAGE
+     ------------------------- */
+
+  .wl-instagram-auth__privacy {
+    margin-top: 14px;
+    padding: 11px 12px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  /* -------------------------
+     VERIFICATION SECTION
+     ------------------------- */
+
+  .wl-instagram-auth__verification {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .wl-instagram-auth__verification-title {
+    font-size: 16px;
+  }
+
+  .wl-instagram-auth__verification-text {
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  /* -------------------------
+     VERIFICATION CODE
+     ------------------------- */
+
+  .wl-instagram-auth__code {
+    width: 100%;
+    min-height: 66px;
+    box-sizing: border-box;
+
+    margin-top: 15px;
+    padding: 10px;
+
+    font-size: clamp(23px, 7vw, 29px);
+    letter-spacing: .12em;
+
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* -------------------------
+     ACTION BUTTONS
+     ------------------------- */
+
+  .wl-instagram-auth__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .wl-instagram-auth__secondary,
+  .wl-instagram-auth__instagram {
+    width: 100%;
+    min-height: 48px;
+    height: auto;
+    font-size: 12.5px;
+  }
+
+  /* Instagram button first */
+  .wl-instagram-auth__instagram {
+    order: -1;
+  }
+
+  /* -------------------------
+     WAITING / VERIFYING STATUS
+     ------------------------- */
+
+  .wl-instagram-auth__status {
+    margin-top: 15px;
+    gap: 9px;
+    font-size: 10.5px;
+  }
+
+  /* -------------------------
+     ERROR
+     ------------------------- */
+
+  .wl-instagram-auth__error {
+    margin-top: 10px;
+    padding: 11px 12px;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+
+  .wl-instagram-auth__retry {
+    min-height: 48px;
+    margin-top: 8px;
+  }
+
+  /* -------------------------
+     SUCCESS SCREEN
+     ------------------------- */
+
+  .wl-instagram-auth__success {
+    width: 100%;
+    max-width: 330px;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .wl-instagram-auth__success-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+  }
+
+  .wl-instagram-auth__success h1 {
+    font-size: clamp(27px, 8vw, 32px);
+    line-height: 1.15;
+  }
+
+  .wl-instagram-auth__success-label {
+    margin-top: 20px;
+    font-size: 9.5px;
+  }
+
+  .wl-instagram-auth__anonymous-name {
+    font-size: clamp(23px, 7vw, 28px);
+    overflow-wrap: anywhere;
+  }
+
+  .wl-instagram-auth__success-message {
+    max-width: 280px;
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .wl-instagram-auth__success-loading {
+    margin-top: 22px;
+    font-size: 9.5px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   320px – 360px
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+  .wl-instagram-auth {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .wl-instagram-auth__card {
+    padding: 15px 13px;
+  }
+
+  .wl-instagram-auth__heading {
+    font-size: 24px;
+  }
+
+  .wl-instagram-auth__description {
+    font-size: 12px;
+  }
+
+  .wl-instagram-auth__verification {
+    padding: 14px;
+  }
+
+  .wl-instagram-auth__code {
+    font-size: 21px;
+    letter-spacing: .08em;
+  }
+
+  .wl-instagram-auth__verification-text {
+    font-size: 12px;
+  }
+
+  .wl-btn {
+    min-height: 46px;
+    padding: 12px 16px;
+  }
+}
+
+
+/* =========================================================
+   LANDSCAPE PHONES
+   ========================================================= */
+
+@media (max-width: 850px) and (orientation: landscape) {
+
+  .wl-instagram-auth {
+    align-items: flex-start;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .wl-instagram-auth__container {
+    margin-top: 0;
+  }
+
+  .wl-instagram-auth__brand {
+    margin-bottom: 10px;
+  }
+
+  .wl-instagram-auth__brand-mark {
+    display: none;
+  }
+
+  .wl-instagram-auth__card {
+    margin-top: 14px;
+  }
 }
