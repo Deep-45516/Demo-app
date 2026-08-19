@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\Backend\src\utils\generateImages.js
 import puppeteer from "puppeteer";
 import fs from "fs";
 import path from "path";
@@ -5,7 +6,8 @@ import path from "path";
 export const generateImages = async ({
   to,
   from,
-  message
+  message,
+  theme = "signal",
 }) => {
 
   const templatePath = path.resolve(
@@ -14,9 +16,19 @@ export const generateImages = async ({
   "template.html"
 );
 
+const themeFiles = {
+  signal: "wavelength-template-signal.png",
+  love: "wavelength-template-love.png",
+  funny: "wavelength-template-funny.png",
+};
+
+const themeFile =
+  themeFiles[theme] ||
+  themeFiles.signal;
+
 const imagePath = path.resolve(
   "public",
-  "template.png"
+  themeFile
 );
 
 let html = fs.readFileSync(

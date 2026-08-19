@@ -48,6 +48,7 @@ docs
       imageUrls: p.imageUrls,
 
       publicConsent: p.publicConsent,
+      theme: p.theme,
     }));
 /*docs
 [A, B, C]

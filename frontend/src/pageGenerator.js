@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pageGenerator.js
 export function generatePages(to, from, message) {
   const container = document.getElementById("previewWrapper");
   if (!container) return;

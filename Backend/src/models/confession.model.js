@@ -135,6 +135,11 @@ const confessionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    theme: {
+  type: String,
+  enum: ["signal", "love", "funny"],
+  default: "signal",
+},
 
     postError: {
       type: String,

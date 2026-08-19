@@ -6,7 +6,8 @@ export async function submitConfession(
   message,
   from,
   allowPending = false,
-  publicConsent = false
+  publicConsent = false,
+  theme = "signal"
 ) {
   const token = localStorage.getItem("token");
 
@@ -34,6 +35,8 @@ export async function submitConfession(
         allowPending,
 
         publicConsent,
+
+        theme,
       }),
     }
   );

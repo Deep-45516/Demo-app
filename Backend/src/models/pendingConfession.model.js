@@ -42,6 +42,12 @@ const pendingConfessionSchema = new mongoose.Schema(
       default: false,
     },
 
+    theme: {
+  type: String,
+  enum: ["signal", "love", "funny"],
+  default: "signal",
+},
+
     delivered: {
       type: Boolean,
       default: false,
@@ -52,6 +58,8 @@ const pendingConfessionSchema = new mongoose.Schema(
       required: true,
       expires: 0,
     },
+
+
   },
   {
     timestamps: true,

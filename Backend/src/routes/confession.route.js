@@ -81,8 +81,22 @@ router.post("/", verifyToken, async (req, res) => {
   from,
   allowPending = false,
   publicConsent = false,
+  theme = "signal",
 } = req.body; //basic take input from browser
     console.log(req.body);
+
+    const allowedThemes = [
+  "signal",
+  "love",
+  "funny",
+];
+
+if (!allowedThemes.includes(theme)) {
+  throw new ApiError(
+    400,
+    "Invalid confession theme."
+  );
+}
     // 🔥 generate image
 
     // 🔴 BASIC VALIDATION
@@ -154,6 +168,7 @@ STOP       create pending */
         to,
         from,
         message,
+        theme,
       }); /*[
   "/temp/page1.jpg",
   "/temp/page2.jpg"
@@ -184,6 +199,7 @@ STOP       create pending */
 
         publicConsent:
     publicConsent === true,
+    theme,
       });
 
       return res
@@ -212,6 +228,7 @@ Not sending to yourself ✅*/
       to,
       from,
       message,
+      theme,
     }); /*[
   "/temp/page1.jpg",
   "/temp/page2.jpg"
@@ -246,6 +263,8 @@ const confession = await Confession.create({
 
   publicConsent:
     publicConsent === true,
+
+    theme,
 });
 
     notifyNewConfession(recipient._id, confession);
