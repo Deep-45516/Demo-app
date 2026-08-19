@@ -1,8 +1,9 @@
-//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\Home.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";;
-// import { GoogleLogin } from "@react-oauth/google";
-import "../wavelength.css"
+import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import "../wavelength.css";
+import "./Home.css";
+
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";
@@ -11,42 +12,58 @@ import { connectSocket, disconnectSocket } from "../socket";
 
 const API = import.meta.env.VITE_BACKEND_URL;
 
+function SignalMarkIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+      <circle cx="12" cy="18" r="1.6" fill="currentColor" stroke="none" />
+      <path d="M8.5 14.5a5 5 0 0 1 7 0" />
+      <path d="M5.5 11.5a9 9 0 0 1 13 0" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3l7 3v5c0 4.5-2.8 8.3-7 10-4.2-1.7-7-5.5-7-10V6l7-3z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  );
+}
+
+// Mood picker — changes which background the generated postcard/story
+// image uses. Add the matching PNGs to /public before wiring goes live.
+const MOODS = [
+  { id: "signal", label: "Mystery", file: "/wavelength-template-signal.png" },
+  { id: "love", label: "Love", file: "/wavelength-template-love.png" },
+  { id: "funny", label: "Funny", file: "/wavelength-template-funny.png" },
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [to, setTo] = useState("");
   const [recipientUsername, setRecipientUsername] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
-  const [recipientStatus, setRecipientStatus] = useState(null); //null(we havent check is he registered or not,true(registered recipient),false(not registered))
-  const [allowPending, setAllowPending] = useState(false); //If recipient doesn't exist, did the sender explicitly choose "Send Anyway"?initialyy it is false , so no
+  const [recipientStatus, setRecipientStatus] = useState(null);
+  const [allowPending, setAllowPending] = useState(false);
   const [publicConsent, setPublicConsent] = useState(false);
   const [checkingRecipient, setCheckingRecipient] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  //Has this browser already logged into ConfessionVault?
-  /*If stored exists:
-Convert the JSON string back into an object.
-Otherwise:
-Return null. */
+  const [mood, setMood] = useState("signal");
+
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
 
-  //this connect the user to socketwhen login,(always connected to socket)
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   connectSocket();
-  // }, [user]);
-  //useeffect trigged when to, from, or message changes. It generates the pages for preview.
   useEffect(() => {
     document.fonts.ready.then(() => {
-      //this is promis(something that may finish letter then only "then" part will run)this load the font then go to requestAnimationFrame(() => {means roughly:Browser, run this right before your nextvisual repaint.and then generatePage
       requestAnimationFrame(() => {
-        generatePages(to, from, message);
+        generatePages(to, from, message, mood);
       });
     });
-  }, [to, from, message]);
+  }, [to, from, message, mood]);
 
   const verifyRecipient = async () => {
     if (!recipientUsername.trim()) {
@@ -56,282 +73,255 @@ Return null. */
 
     try {
       setCheckingRecipient(true);
-
       const result = await searchRecipient(recipientUsername);
-      /*result = {
-  success: true,
-  data: {
-    exists: true,
-    username: "_dummy_2026"
-  }
-} */
       setRecipientStatus(result.data);
-      /*{recipientStatus?.exists && (
-  <p>✅ Recipient verified.</p>
-)} this becaomes true */
-      // After setRecipientStatus(), React re-renders.
-      // If recipientStatus.exists is true, this condition becomes true,
-      // so the "Recipient verified" message is displayed.
-
       setAllowPending(false);
     } catch (error) {
       console.error(error);
     } finally {
       setCheckingRecipient(false);
-    } //finally runs whether try succeeded or failed.this setcheckingrecipent bring back "checking..." to normal button
+    }
   };
 
   if (!user) {
     return (
-      <div className="container">
-        <div className="form">
-          <button onClick={() => navigate("/inbox")}>
-        Go to Inbox
-      </button>
-          <h2>Login to submit confession</h2>
-          {/*
-Google doesn't directly give us the user's name/email.
-It gives a digitally signed identity token called a "credential".
+      <div className="wl-auth-gate">
+        <div className="wl-auth-gate__card wl-card wl-fade-up">
+          <div className="wl-auth-gate__mark">
+            <SignalMarkIcon />
+          </div>
+          <h2 className="wl-display">Log in to confess</h2>
+          <p className="wl-auth-gate__sub">One tap with Google — quick, then straight to sending.</p>
 
-We can't trust it on the frontend, so we send the credential
-to the backend (/api/v1/auth/google). The backend verifies
-the token with Google, and if it's valid, returns our own JWT
-and the user's information.
-*/}
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              try {
-                const res = await fetch(`${API}/api/v1/auth/google`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    credential: credentialResponse.credential,
-                  }),
-                });
+          <div className="wl-auth-gate__google">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                try {
+                  const res = await fetch(`${API}/api/v1/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ credential: credentialResponse.credential }),
+                  });
 
-                const data = await res.json();
+                  const data = await res.json();
 
-                if (!data.success) {
-                  alert(data.message);
-                  return;
+                  if (!data.success) {
+                    alert(data.message);
+                    return;
+                  }
+                  localStorage.setItem("token", data.data.token);
+                  localStorage.setItem("user", JSON.stringify(data.data.user));
+
+                  connectSocket();
+                  window.location.reload();
+                } catch (err) {
+                  console.error(err);
+                  alert("Login failed");
                 }
-                localStorage.setItem("token", data.data.token);
-                localStorage.setItem("user", JSON.stringify(data.data.user));
+              }}
+              onError={() => {
+                alert("Google Login Failed");
+              }}
+            />
+          </div>
 
-                // Create socket connection immediately
-                connectSocket();
-
-                window.location.reload();
-              } catch (err) {
-                console.error(err);
-                alert("Login failed");
-              }
-            }}
-            onError={() => {
-              alert("Google Login Failed");
-            }}
-          />
+          <button className="wl-btn wl-btn-ghost" onClick={() => navigate("/inbox")}>
+            Go to inbox instead
+          </button>
         </div>
       </div>
     );
   }
 
-const handleSubmit = async () => {
-  if (!recipientStatus) {
-    alert("Please verify the recipient first.");
-    return;
-  }
+  const handleSubmit = async () => {
+    if (!recipientStatus) {
+      alert("Please verify the recipient first.");
+      return;
+    }
 
-  if (!message.trim()) {
-    alert("Message is required.");
-    return;
-  }
+    if (!message.trim()) {
+      alert("Message is required.");
+      return;
+    }
 
-  if (
-    !recipientStatus.exists &&
-    !allowPending
-  ) {
-    alert(
-      "This recipient hasn't joined yet. Click Send Anyway first."
-    );
-    return;
-  }
+    if (!recipientStatus.exists && !allowPending) {
+      alert("This recipient hasn't joined yet. Click Send Anyway first.");
+      return;
+    }
 
-  try {
-    setSubmitting(true);
+    try {
+      setSubmitting(true);
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await new Promise((resolve) => {
-  setTimeout(resolve, 0);
-});
+      const data = await submitConfession(
+        recipientUsername,
+        to,
+        message,
+        from,
+        !recipientStatus.exists,
+        publicConsent,
+        mood
+      );
 
-    const data = await submitConfession(
-      recipientUsername,
-      to,
-      message,
-      from,
-      !recipientStatus.exists,
-      publicConsent
-    );
+      console.log("CONFESSION CREATED:", data);
 
-    console.log(
-      "CONFESSION CREATED:",
-      data
-    );
+      alert(
+        recipientStatus.exists
+          ? "Confession submitted!"
+          : "Confession saved! It will be delivered if they join within 7 days."
+      );
 
-    alert(
-      recipientStatus.exists
-        ? "Confession submitted!"
-        : "Confession saved! It will be delivered if they join within 7 days."
-    );
-
-    // Reset form
-    setTo("");
-    setRecipientUsername("");
-    setMessage("");
-    setFrom("");
-    setRecipientStatus(null);
-    setAllowPending(false);
-    setPublicConsent(false);
-
-  } catch (error) {
-    console.error(
-      "SUBMIT CONFESSION ERROR:",
-      error
-    );
-
-    alert(
-      error.message ||
-        "Unable to submit confession."
-    );
-  } finally {
-    setSubmitting(false);
-  }
-};
+      setTo("");
+      setRecipientUsername("");
+      setMessage("");
+      setFrom("");
+      setRecipientStatus(null);
+      setAllowPending(false);
+      setPublicConsent(false);
+    } catch (error) {
+      console.error("SUBMIT CONFESSION ERROR:", error);
+      alert(error.message || "Unable to submit confession.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="container">
-      <div className="form">
-        <p>Logged in as {user.email}</p>
-        <label>Name / Hint of person</label>
+    <div className="wl-confess">
+      <div className="wl-confess__form">
+        <div className="wl-confess__you wl-fade-up">
+          <div className="wl-confess__you-mark"><SignalMarkIcon /></div>
+          <div>
+            <div className="wl-confess__you-label">SENDING AS</div>
+            <div className="wl-confess__you-name">{user.email}</div>
+          </div>
+        </div>
+
+        <div className="wl-eyebrow">NEW CONFESSION</div>
+        <h1 className="wl-display wl-confess__heading">Say it. Stay unknown.</h1>
+
+        <div className="wl-trust-banner">
+          <ShieldIcon />
+          <span>They'll only ever see your anonymous name — never your Instagram — unless you choose to reveal it later.</span>
+        </div>
+
+        <label className="wl-field-label">Recipient's Instagram username</label>
+        <div className="wl-input-row">
+          <span className="wl-input-row__prefix">@</span>
+          <input
+            type="text"
+            value={recipientUsername}
+            onChange={(e) => {
+              setRecipientUsername(e.target.value);
+              setRecipientStatus(null);
+              setAllowPending(false);
+              setPublicConsent(false);
+            }}
+            placeholder="their_instagram_username"
+          />
+        </div>
+
+        <button className="wl-btn wl-btn-outline wl-confess__verify-btn" onClick={verifyRecipient} disabled={checkingRecipient}>
+          {checkingRecipient ? "Checking..." : "Verify recipient"}
+        </button>
+
+        {recipientStatus?.exists && (
+          <div className="wl-status-pill wl-status-pill--ok">Verified — ready to send</div>
+        )}
+
+        {recipientStatus && !recipientStatus.exists && (
+          <div className="wl-status-card">
+            <p>They haven't joined Wavelength yet. We'll hold this for 7 days and deliver it the moment they do.</p>
+            <button className="wl-btn wl-btn-outline" onClick={() => setAllowPending(true)}>Send anyway</button>
+          </div>
+        )}
+
+        <label className="wl-field-label">
+          Hint <span className="wl-field-label__optional">(optional — e.g. "B3 division")</span>
+        </label>
         <input
           type="text"
+          className="wl-plain-input"
           value={to}
-          onChange={(e) => {
-            // Recipient changed, so previous verification is no longer valid.
-            // Reset verification status and require the user to verify again.
-            setTo(e.target.value);
-            // setRecipientStatus(null);
-            // setAllowPending(false);
-            // setPublicConsent(false);
-            placeholder="e.g. Someone special"
-          }}
+          onChange={(e) => setTo(e.target.value)}
+          placeholder="e.g. Someone special"
         />
 
-        <label>Recipient Instagram Username</label>
-
-<input
-  type="text"
-  value={recipientUsername}
-  onChange={(e) => {
-    setRecipientUsername(e.target.value);
-    setRecipientStatus(null);
-    setAllowPending(false);
-    setPublicConsent(false);
-  }}
-  placeholder="@instagram_username"
-/>
-        <p
-          style={{
-            color: "#666",
-            fontSize: "14px",
-            marginBottom: "8px",
-          }}
-        >
-          You must verify the recipient before sending a confession.
-        </p>
-        <button onClick={verifyRecipient} disabled={checkingRecipient}>
-          {checkingRecipient ? "Checking..." : "Verify Recipient"}
-        </button>
-        {recipientStatus?.exists && (
-          <p style={{ color: "green" }}>
-            ✅ Recipient verified. You can now send your confession.
-          </p>
-        )}
-        {recipientStatus && !recipientStatus.exists && (
-          <>
-            <p style={{ color: "orange" }}>
-              ⚠️ This user hasn't joined ConfessionVault yet. You can still send
-              your confession. We'll securely store it for up to 7 days and
-              automatically deliver it if they join.
-            </p>
-
-            <button onClick={() => setAllowPending(true)}>Send Anyway</button>
-          </>
-        )}
-        <label>Message</label>
+        <label className="wl-field-label">Message</label>
         <textarea
+          className="wl-note"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          placeholder="Say what you can't say out loud."
         />
-        <label>From</label>
-        <textarea value={from} onChange={(e) => setFrom(e.target.value)}
-        placeholder="B3 Division" />
-        <button onClick={downloadPages}>Download Pages</button>
-        //checkbox for public post consent
-        {recipientStatus && (
-  <label
-    style={{
-      display: "flex",
-      gap: 8,
-      alignItems: "flex-start",
-      marginTop: 15,
-      marginBottom: 15,
-    }}
-  >
-    <input
-      type="checkbox"
-      checked={publicConsent}
-      onChange={(e) =>
-        setPublicConsent(e.target.checked)
-      }
-    />
+        <div className="wl-char-count wl-mono">{message.length} / 500</div>
 
-    <span>
-      I'm okay with this confession being shared
-      publicly if they also choose to share it.
-    </span>
-  </label>
-)}
+        <label className="wl-field-label">From (optional context, e.g. your division)</label>
+        <textarea
+          className="wl-plain-textarea"
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+          placeholder="B3 Division"
+        />
+
+        <label className="wl-field-label">
+          Mood <span className="wl-field-label__optional">(sets the look if this gets posted)</span>
+        </label>
+        <div className="wl-mood-row">
+          {MOODS.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              className={`wl-mood-chip ${mood === m.id ? "active" : ""}`}
+              onClick={() => setMood(m.id)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        {recipientStatus && (
+          <label className="wl-seal-row">
+            <input type="checkbox" checked={publicConsent} onChange={(e) => setPublicConsent(e.target.checked)} />
+            <span className="wl-seal-box">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M4 12l5 5L20 6" /></svg>
+            </span>
+            <span className="wl-seal-label">I'm okay with this confession being shared publicly if they also choose to share it.</span>
+          </label>
+        )}
+
         <button
-  disabled={
-    !recipientStatus ||
-    checkingRecipient ||
-    submitting ||
-    !message.trim() ||
-    (
-      !recipientStatus.exists &&
-      !allowPending
-    )
-  }
-  onClick={handleSubmit}
->
-  {submitting
-    ? "Submitting..."
-    : "Submit Confession"}
-</button>
+          className="wl-btn wl-btn-primary wl-btn-block wl-confess__submit"
+          disabled={
+            !recipientStatus ||
+            checkingRecipient ||
+            submitting ||
+            !message.trim() ||
+            (!recipientStatus.exists && !allowPending)
+          }
+          onClick={handleSubmit}
+        >
+          {submitting ? "Sending..." : "Send it anonymously"}
+        </button>
+
+        <p className="wl-confess__footer-note">Someone on your campus might be thinking about you too.</p>
       </div>
 
-      <div className="preview-wrapper" id="previewWrapper" />
+      <div className="wl-preview-panel">
+        <div className="wl-eyebrow">LIVE PREVIEW</div>
+        <div className="preview-wrapper" id="previewWrapper" />
+        <button className="wl-btn wl-btn-ghost" onClick={downloadPages}>Save image</button>
+      </div>
 
-      <div className="template" id="template" style={{ display: "none" }}>
+      <div
+        className="template"
+        id="template"
+        style={{ display: "none", backgroundImage: `url(${MOODS.find((m) => m.id === mood).file})` }}
+      >
         <div className="to">
           <h2 className="previewTo">Someone</h2>
         </div>
-
         <div className="message"></div>
-
         <div className="from">
           <h3 className="previewFrom">Unknown</h3>
         </div>

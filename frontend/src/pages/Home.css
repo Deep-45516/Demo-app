@@ -1,0 +1,129 @@
+.wl-confess{
+  min-height:100%; box-sizing:border-box;
+  display:flex; flex-wrap:wrap; gap:28px;
+  padding:28px 20px 100px;
+  max-width:980px; margin:0 auto;
+}
+.wl-confess__form{ flex:1 1 380px; min-width:300px; max-width:460px; }
+
+.wl-confess__you{
+  display:flex; align-items:center; gap:10px; margin-bottom:20px;
+  padding:10px 14px; border-radius:var(--wl-r-pill);
+  background:rgba(255,255,255,0.04); border:1px solid var(--wl-line); width:fit-content;
+}
+.wl-confess__you-mark{
+  width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink)); color:#fff; flex-shrink:0;
+}
+.wl-confess__you-label{ font-family:'IBM Plex Mono', monospace; font-size:9px; letter-spacing:.1em; color:var(--wl-text-faint); }
+.wl-confess__you-name{ font-size:12.5px; color:var(--wl-text); font-weight:600; }
+
+.wl-confess__heading{ font-size:26px; margin:6px 0 16px; }
+
+.wl-trust-banner{
+  display:flex; align-items:flex-start; gap:10px; margin-bottom:22px; padding:13px 15px;
+  border-radius:var(--wl-r-md); background:rgba(77,238,234,0.07); border:1px solid rgba(77,238,234,0.22);
+  color:var(--wl-text-dim); font-size:12.5px; line-height:1.55;
+}
+.wl-trust-banner svg{ color:var(--wl-cyan); flex-shrink:0; margin-top:1px; }
+
+.wl-field-label{
+  display:block; margin:18px 0 8px; font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--wl-text-dim);
+}
+.wl-field-label__optional{ text-transform:none; letter-spacing:0; color:var(--wl-text-faint); font-size:11px; }
+
+.wl-input-row{
+  display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.045);
+  border:1px solid var(--wl-line); border-radius:var(--wl-r-md); padding:14px 16px; transition:border-color .2s ease;
+}
+.wl-input-row:focus-within{ border-color:var(--wl-signal); }
+.wl-input-row__prefix{ color:var(--wl-text-faint); font-weight:600; }
+.wl-input-row input{ border:none; background:none; outline:none; color:var(--wl-text); font-family:'Space Grotesk'; font-size:14.5px; width:100%; }
+.wl-input-row input::placeholder{ color:var(--wl-text-faint); }
+
+.wl-plain-input, .wl-plain-textarea{
+  width:100%; box-sizing:border-box; background:rgba(255,255,255,0.045); border:1px solid var(--wl-line);
+  border-radius:var(--wl-r-md); padding:14px 16px; color:var(--wl-text); font-family:'Space Grotesk'; font-size:14.5px;
+  outline:none; transition:border-color .2s ease;
+}
+.wl-plain-input:focus, .wl-plain-textarea:focus{ border-color:var(--wl-signal); }
+.wl-plain-textarea{ min-height:64px; resize:vertical; }
+
+.wl-confess__verify-btn{ margin-top:12px; width:100%; }
+
+.wl-status-pill{
+  margin-top:12px; display:inline-flex; align-items:center; gap:6px;
+  font-size:12.5px; font-weight:600; padding:8px 14px; border-radius:var(--wl-r-pill);
+}
+.wl-status-pill--ok{ background:rgba(84,198,184,0.12); color:var(--wl-cyan); border:1px solid rgba(84,198,184,0.3); }
+
+.wl-status-card{
+  margin-top:12px; padding:14px 16px; border-radius:var(--wl-r-md);
+  background:rgba(255,190,90,0.07); border:1px solid rgba(255,190,90,0.25);
+}
+.wl-status-card p{ margin:0 0 10px; font-size:12.5px; color:var(--wl-text-dim); line-height:1.5; }
+
+.wl-note{
+  width:100%; min-height:120px; resize:none; box-sizing:border-box;
+  background:linear-gradient(180deg, var(--wl-paper), #EDE7DA);
+  color:var(--wl-ink); border:none; border-radius:var(--wl-r-lg); padding:18px;
+  font-family:'Fraunces', serif; font-style:italic; font-size:15px; line-height:1.5; outline:none;
+}
+.wl-note::placeholder{ color:#8A8272; }
+.wl-char-count{ text-align:right; font-size:10px; color:var(--wl-text-faint); margin-top:6px; }
+
+.wl-mood-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.wl-mood-chip{
+  font-family:'Space Grotesk'; font-size:12.5px; font-weight:600; color:var(--wl-text-dim);
+  background:rgba(255,255,255,0.04); border:1px solid var(--wl-line); border-radius:var(--wl-r-pill);
+  padding:9px 16px; cursor:pointer; transition:all .2s ease;
+}
+.wl-mood-chip:hover{ border-color:rgba(255,255,255,0.25); }
+.wl-mood-chip.active{
+  background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink)); color:#fff; border-color:transparent;
+}
+
+.wl-seal-row{
+  display:flex; align-items:flex-start; gap:12px; margin:20px 0; cursor:pointer; user-select:none;
+}
+.wl-seal-row input{ position:absolute; opacity:0; width:0; height:0; }
+.wl-seal-box{
+  width:22px; height:22px; border-radius:50%; border:1.5px solid var(--wl-text-faint);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; transition:all .2s ease;
+}
+.wl-seal-box svg{ opacity:0; transform:scale(.5); transition:all .2s ease; }
+.wl-seal-row input:checked + .wl-seal-box{ background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink)); border-color:transparent; }
+.wl-seal-row input:checked + .wl-seal-box svg{ opacity:1; transform:scale(1); }
+.wl-seal-label{ font-size:12.5px; color:var(--wl-text-dim); line-height:1.45; }
+
+.wl-confess__submit{ margin-top:6px; }
+.wl-confess__footer-note{
+  text-align:center; margin-top:16px; font-family:'Fraunces', serif; font-style:italic;
+  font-size:12.5px; color:var(--wl-text-faint);
+}
+
+.wl-preview-panel{
+  flex:1 1 280px; min-width:260px; max-width:340px;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+.wl-preview-panel .preview-wrapper{
+  width:100%; display:flex; flex-direction:column; gap:16px; align-items:center;
+}
+
+/* -- auth gate -- */
+.wl-auth-gate{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+.wl-auth-gate__card{ width:100%; max-width:360px; padding:32px 26px; text-align:center; }
+.wl-auth-gate__mark{
+  width:44px; height:44px; margin:0 auto 16px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, rgba(124,92,252,0.22), rgba(255,77,141,0.12));
+  border:1px solid rgba(124,92,252,0.22); color:var(--wl-signal-bright);
+}
+.wl-auth-gate__card h2{ font-size:20px; margin:0 0 8px; }
+.wl-auth-gate__sub{ font-size:13px; color:var(--wl-text-dim); margin:0 0 22px; }
+.wl-auth-gate__google{ display:flex; justify-content:center; margin-bottom:16px; }
+
+@media (max-width:720px){
+  .wl-confess{ flex-direction:column; padding:20px 16px 96px; }
+  .wl-preview-panel{ max-width:100%; order:-1; }
+}
