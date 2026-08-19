@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Wavelength Confession</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 500px; height: 706px; background: #0A0A12; }
+
+  /*
+    This box is 500x706 CSS px — identical to the Puppeteer viewport
+    in generateImages.js, and identical to the .template rule in the
+    frontend's template.css. Keep all three in sync if this ever
+    changes, or the live preview and the final image will drift apart.
+  */
+  .template{
+    position: relative;
+    width: 500px;
+    height: 706px;
+    overflow: hidden;
+    background-image: url("{{BACKGROUND_IMAGE}}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Fraunces', serif;
+  }
+
+  .to, .from{
+    position: absolute;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .to{ top: 34px; left: 38px; }
+  .from{ bottom: 46px; right: 38px; flex-direction: row-reverse; }
+
+  .tpl-label{
+    font-style: italic;
+    font-weight: 500;
+    font-size: 19px;
+    color: #F3F1F8;
+    opacity: .8;
+    white-space: nowrap;
+  }
+
+  .previewTo, .previewFrom{
+    font-style: italic;
+    font-weight: 500;
+    font-size: 19px;
+    color: #F3F1F8;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .message{
+    position: absolute;
+    left: 52px;
+    right: 52px;
+    top: 118px;
+    bottom: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-style: italic;
+    color: #F3F1F8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body>
+  <div class="template">
+    <div class="to">
+      <span class="tpl-label">To,</span>
+      <span class="previewTo">{{TO}}</span>
+    </div>
+
+    <div class="message">{{MESSAGE}}</div>
+
+    <div class="from">
+      <span class="tpl-label">From,</span>
+      <span class="previewFrom">{{FROM}}</span>
+    </div>
+  </div>
+</body>
+</html>

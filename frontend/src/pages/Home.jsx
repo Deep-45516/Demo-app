@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import "../wavelength.css";
 import "./Home.css";
+import "./template.css";
 
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
@@ -24,15 +25,24 @@ function SignalMarkIcon() {
 
 function ShieldIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 3l7 3v5c0 4.5-2.8 8.3-7 10-4.2-1.7-7-5.5-7-10V6l7-3z" />
       <path d="M9 12l2 2 4-4" />
     </svg>
   );
 }
 
-// Mood picker — changes which background the generated postcard/story
-// image uses. Add the matching PNGs to /public before wiring goes live.
+function ChevronIcon({ open }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+      style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .2s ease" }}>
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+// Mood picker — changes which background the backend's image
+// generator uses (see generateImages.js / THEME_FILES).
 const MOODS = [
   { id: "signal", label: "Mystery", file: "/wavelength-template-signal.png" },
   { id: "love", label: "Love", file: "/wavelength-template-love.png" },
@@ -51,6 +61,10 @@ export default function Home() {
   const [checkingRecipient, setCheckingRecipient] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [mood, setMood] = useState("signal");
+
+  // UI-only state: purely controls what's shown, never affects what's submitted.
+  const [showMore, setShowMore] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
@@ -188,129 +202,132 @@ export default function Home() {
 
   return (
     <div className="wl-confess">
-      <div className="wl-confess__form">
-        <div className="wl-confess__you wl-fade-up">
-          <div className="wl-confess__you-mark"><SignalMarkIcon /></div>
-          <div>
-            <div className="wl-confess__you-label">SENDING AS</div>
-            <div className="wl-confess__you-name">{user.email}</div>
-          </div>
+      <div className="wl-confess__you wl-fade-up">
+        <div className="wl-confess__you-mark"><SignalMarkIcon /></div>
+        <div>
+          <div className="wl-confess__you-label">SENDING AS</div>
+          <div className="wl-confess__you-name">{user.email}</div>
         </div>
-
-        <div className="wl-eyebrow">NEW CONFESSION</div>
-        <h1 className="wl-display wl-confess__heading">Say it. Stay unknown.</h1>
-
-        <div className="wl-trust-banner">
-          <ShieldIcon />
-          <span>They'll only ever see your anonymous name — never your Instagram — unless you choose to reveal it later.</span>
-        </div>
-
-        <label className="wl-field-label">Recipient's Instagram username</label>
-        <div className="wl-input-row">
-          <span className="wl-input-row__prefix">@</span>
-          <input
-            type="text"
-            value={recipientUsername}
-            onChange={(e) => {
-              setRecipientUsername(e.target.value);
-              setRecipientStatus(null);
-              setAllowPending(false);
-              setPublicConsent(false);
-            }}
-            placeholder="their_instagram_username"
-          />
-        </div>
-
-        <button className="wl-btn wl-btn-outline wl-confess__verify-btn" onClick={verifyRecipient} disabled={checkingRecipient}>
-          {checkingRecipient ? "Checking..." : "Verify recipient"}
-        </button>
-
-        {recipientStatus?.exists && (
-          <div className="wl-status-pill wl-status-pill--ok">Verified — ready to send</div>
-        )}
-
-        {recipientStatus && !recipientStatus.exists && (
-          <div className="wl-status-card">
-            <p>They haven't joined Wavelength yet. We'll hold this for 7 days and deliver it the moment they do.</p>
-            <button className="wl-btn wl-btn-outline" onClick={() => setAllowPending(true)}>Send anyway</button>
-          </div>
-        )}
-
-        <label className="wl-field-label">
-          Hint <span className="wl-field-label__optional">(optional — e.g. "B3 division")</span>
-        </label>
-        <input
-          type="text"
-          className="wl-plain-input"
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-          placeholder="e.g. Someone special"
-        />
-
-        <label className="wl-field-label">Message</label>
-        <textarea
-          className="wl-note"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Say what you can't say out loud."
-        />
-        <div className="wl-char-count wl-mono">{message.length} / 500</div>
-
-        <label className="wl-field-label">From (optional context, e.g. your division)</label>
-        <textarea
-          className="wl-plain-textarea"
-          value={from}
-          onChange={(e) => setFrom(e.target.value)}
-          placeholder="B3 Division"
-        />
-
-        <label className="wl-field-label">
-          Mood <span className="wl-field-label__optional">(sets the look if this gets posted)</span>
-        </label>
-        <div className="wl-mood-row">
-          {MOODS.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              className={`wl-mood-chip ${mood === m.id ? "active" : ""}`}
-              onClick={() => setMood(m.id)}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-
-        {recipientStatus && (
-          <label className="wl-seal-row">
-            <input type="checkbox" checked={publicConsent} onChange={(e) => setPublicConsent(e.target.checked)} />
-            <span className="wl-seal-box">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M4 12l5 5L20 6" /></svg>
-            </span>
-            <span className="wl-seal-label">I'm okay with this confession being shared publicly if they also choose to share it.</span>
-          </label>
-        )}
-
-        <button
-          className="wl-btn wl-btn-primary wl-btn-block wl-confess__submit"
-          disabled={
-            !recipientStatus ||
-            checkingRecipient ||
-            submitting ||
-            !message.trim() ||
-            (!recipientStatus.exists && !allowPending)
-          }
-          onClick={handleSubmit}
-        >
-          {submitting ? "Sending..." : "Send it anonymously"}
-        </button>
-
-        <p className="wl-confess__footer-note">Someone on your campus might be thinking about you too.</p>
       </div>
 
-      <div className="wl-preview-panel">
-        <div className="wl-eyebrow">LIVE PREVIEW</div>
+      <h1 className="wl-display wl-confess__heading">Say it. Stay unknown.</h1>
+
+      <div className="wl-trust-banner">
+        <ShieldIcon />
+        <span>Only your anonymous name is ever shown — never your Instagram, unless you choose to reveal it later.</span>
+      </div>
+
+      <label className="wl-field-label">Recipient's Instagram username</label>
+      <div className="wl-input-row">
+        <span className="wl-input-row__prefix">@</span>
+        <input
+          type="text"
+          value={recipientUsername}
+          onChange={(e) => {
+            setRecipientUsername(e.target.value);
+            setRecipientStatus(null);
+            setAllowPending(false);
+            setPublicConsent(false);
+          }}
+          placeholder="their_instagram_username"
+        />
+      </div>
+
+      <button className="wl-btn wl-btn-outline wl-confess__verify-btn" onClick={verifyRecipient} disabled={checkingRecipient}>
+        {checkingRecipient ? "Checking..." : "Verify recipient"}
+      </button>
+
+      {recipientStatus?.exists && (
+        <div className="wl-status-pill wl-status-pill--ok">Verified — ready to send</div>
+      )}
+
+      {recipientStatus && !recipientStatus.exists && (
+        <div className="wl-status-card">
+          <p>They haven't joined Wavelength yet. We'll hold this for 7 days and deliver it the moment they do.</p>
+          <button className="wl-btn wl-btn-outline" onClick={() => setAllowPending(true)}>Send anyway</button>
+        </div>
+      )}
+
+      <label className="wl-field-label">Message</label>
+      <textarea
+        className="wl-note"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Say what you can't say out loud."
+      />
+      <div className="wl-char-count wl-mono">{message.length} / 500</div>
+
+      <label className="wl-field-label">Mood</label>
+      <div className="wl-mood-row">
+        {MOODS.map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            className={`wl-mood-chip ${mood === m.id ? "active" : ""}`}
+            onClick={() => setMood(m.id)}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      <button type="button" className="wl-disclosure" onClick={() => setShowMore((v) => !v)}>
+        <span>{showMore ? "Hide extra detail" : "Add a hint or context (optional)"}</span>
+        <ChevronIcon open={showMore} />
+      </button>
+      {showMore && (
+        <div className="wl-disclosure__body wl-fade-up">
+          <label className="wl-field-label">Hint <span className="wl-field-label__optional">(optional)</span></label>
+          <input
+            type="text"
+            className="wl-plain-input"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            placeholder="e.g. Someone special"
+          />
+          <label className="wl-field-label">From <span className="wl-field-label__optional">(optional)</span></label>
+          <textarea
+            className="wl-plain-textarea"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            placeholder="B3 Division"
+          />
+        </div>
+      )}
+
+      {recipientStatus && (
+        <label className="wl-seal-row">
+          <input type="checkbox" checked={publicConsent} onChange={(e) => setPublicConsent(e.target.checked)} />
+          <span className="wl-seal-box">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M4 12l5 5L20 6" /></svg>
+          </span>
+          <span className="wl-seal-label">I'm okay with this confession being shared publicly if they also choose to share it.</span>
+        </label>
+      )}
+
+      <button
+        className="wl-btn wl-btn-primary wl-btn-block wl-confess__submit"
+        disabled={
+          !recipientStatus ||
+          checkingRecipient ||
+          submitting ||
+          !message.trim() ||
+          (!recipientStatus.exists && !allowPending)
+        }
+        onClick={handleSubmit}
+      >
+        {submitting ? "Sending..." : "Send it anonymously"}
+      </button>
+
+      <p className="wl-confess__footer-note">Someone on your campus might be thinking about you too.</p>
+
+      <button type="button" className="wl-disclosure" onClick={() => setShowPreview((v) => !v)}>
+        <span>{showPreview ? "Hide preview" : "Preview the postcard"}</span>
+        <ChevronIcon open={showPreview} />
+      </button>
+      <div className={`wl-preview-panel ${showPreview ? "open" : ""}`}>
         <div className="preview-wrapper" id="previewWrapper" />
-        <button className="wl-btn wl-btn-ghost" onClick={downloadPages}>Save image</button>
+        <button className="wl-btn wl-btn-ghost wl-btn-block" onClick={downloadPages}>Save image</button>
       </div>
 
       <div
@@ -319,10 +336,12 @@ export default function Home() {
         style={{ display: "none", backgroundImage: `url(${MOODS.find((m) => m.id === mood).file})` }}
       >
         <div className="to">
+          <span className="tpl-label">To,</span>
           <h2 className="previewTo">Someone</h2>
         </div>
         <div className="message"></div>
         <div className="from">
+          <span className="tpl-label">From,</span>
           <h3 className="previewFrom">Unknown</h3>
         </div>
       </div>
