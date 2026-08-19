@@ -41,22 +41,24 @@ export const receiveWebhook = async (req, res) => {
       status: "pending",
     });
 
-    console.log(
-      "Pending sessions:",
-      pendingSessions.map((s) => ({
-        code: s.code,
-        username: s.enteredUsername,
-      })),
-    );
-    const session = await VerificationSession.findOne({
-      code: text,
-      status: "pending",
-    });
+const session = await VerificationSession.findOne({
+  code: text,
+  status: "pending",
+});
 
-    if (!session) {
-      console.log("No verification session found");
-      return res.sendStatus(200);
-    }
+if (!session) {
+  // The code may already have been processed.
+  // Meta can deliver the same webhook more than once.
+  console.log(
+    `No pending verification session for code ${text}. ` +
+    `It may already be verified, expired, or invalid.`
+  );
+
+  // IMPORTANT:
+  // Always acknowledge the webhook.
+  // Do not return 500 for duplicate webhook delivery.
+  return res.sendStatus(200);
+}
 
     console.log("Verification code matched.");
     // Next step:

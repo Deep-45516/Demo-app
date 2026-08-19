@@ -221,13 +221,27 @@ export default function InstagramVerification() {
           return;
         }
       } catch (error) {
-        console.error("Verification polling error:", error);
-        clearPolling();
-        if (mountedRef.current) {
-          setError("We couldn't check your verification. Please try again.");
-          setState(VERIFICATION_STATES.ERROR);
-        }
-      } finally {
+  console.error(
+    "Temporary verification polling error:",
+    error
+  );
+
+  /*
+   * IMPORTANT:
+   *
+   * A polling request can fail temporarily because of:
+   *
+   * - Render waking up
+   * - temporary network issue
+   * - mobile browser connection change
+   * - request timeout
+   *
+   * Do NOT immediately destroy the verification process.
+   *
+   * The next polling interval will try again.
+   */
+
+} finally {
         checking = false;
       }
     }, 2000);
