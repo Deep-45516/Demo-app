@@ -1,9 +1,7 @@
 @import url('./wavelength.css');
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 20px;
-  background-color: rgb(113, 29, 29);
+  padding: 0px;
 }
 
 /* Layout */
