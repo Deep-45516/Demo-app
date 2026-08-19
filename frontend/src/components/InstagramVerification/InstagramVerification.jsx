@@ -283,7 +283,7 @@ export default function InstagramVerification() {
 
     timeoutRef.current = setTimeout(() => {
       window.location.replace("/");
-    }, 1100);
+    }, 3100);
   }
 
   async function handleCopy() {
