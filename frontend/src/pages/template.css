@@ -6,7 +6,7 @@
    the text fits. If you change one, change both.
    ========================================================= */
 
-.template {
+.template{
   position: relative;
   width: 500px;
   height: 706px;
@@ -14,51 +14,44 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  font-family: "Fraunces", serif;
+  font-family: 'Fraunces', serif;
   border-radius: 18px;
-  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,.6);
   flex-shrink: 0;
 }
 
 .template .to,
-.template .from {
+.template .from{
   position: absolute;
   display: flex;
   align-items: baseline;
   gap: 6px;
 }
-.template .to {
-  top: 34px;
-  left: 38px;
-}
-.template .from {
-  bottom: 46px;
-  right: 38px;
-  flex-direction: row-reverse;
-}
+.template .to{ top: 34px; left: 38px; }
+.template .from{ bottom: 46px; right: 38px; flex-direction: row-reverse; }
 
-.template .tpl-label {
+.template .tpl-label{
   font-style: italic;
   font-weight: 500;
   font-size: 19px;
-  color: #f3f1f8;
-  opacity: 0.8;
+  color: #F3F1F8;
+  opacity: .8;
   white-space: nowrap;
 }
 
 .template .previewTo,
-.template .previewFrom {
+.template .previewFrom{
   font-style: italic;
   font-weight: 500;
   font-size: 19px;
-  color: #f3f1f8;
+  color: #F3F1F8;
   max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.template .message {
+.template .message{
   position: absolute;
   left: 52px;
   right: 52px;
@@ -69,7 +62,7 @@
   justify-content: center;
   text-align: center;
   font-style: italic;
-  color: #f3f1f8;
+  color: #F3F1F8;
   white-space: pre-wrap;
   word-break: break-word;
   overflow: hidden;
@@ -82,7 +75,7 @@
    shrink to fit a phone. The negative margin collapses the
    blank space transform leaves behind in normal document flow.
    ========================================================= */
-#previewWrapper {
+#previewWrapper{
   --pc-scale: min(1, calc((100vw - 48px) / 500px));
   display: flex;
   flex-direction: column;
@@ -90,7 +83,7 @@
   gap: 18px;
   width: 100%;
 }
-#previewWrapper .template {
+#previewWrapper .template{
   transform: scale(var(--pc-scale));
   transform-origin: top center;
   margin-bottom: calc(-706px * (1 - var(--pc-scale)));
