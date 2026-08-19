@@ -45,6 +45,7 @@ export default function AppLayout() {
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("anonymousProfile");
     disconnectSocket();
     navigate("/instagram", { replace: true });
   }

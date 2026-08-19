@@ -276,6 +276,11 @@ export default function InstagramVerification() {
       throw new Error("Anonymous identity could not be loaded.");
     }
 
+    localStorage.setItem(
+  "anonymousProfile",
+  JSON.stringify(profile)
+);
+
     if (!mountedRef.current) return;
 
     setAnonymousName(profile.anonymousName);

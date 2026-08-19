@@ -51,6 +51,10 @@ const MOODS = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const [anonymousProfile] = useState(() => {
+  const stored = localStorage.getItem("anonymousProfile");
+  return stored ? JSON.parse(stored) : null;
+});
   const [to, setTo] = useState("");
   const [recipientUsername, setRecipientUsername] = useState("");
   const [from, setFrom] = useState("");
@@ -206,7 +210,9 @@ export default function Home() {
         <div className="wl-confess__you-mark"><SignalMarkIcon /></div>
         <div>
           <div className="wl-confess__you-label">SENDING AS</div>
-          <div className="wl-confess__you-name">{user.email}</div>
+          <div className="wl-confess__you-name">
+  {anonymousProfile?.anonymousName || "Anonymous"}
+</div>
         </div>
       </div>
 
