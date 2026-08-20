@@ -1,4 +1,4 @@
-//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\Chat.jsx
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\Chat.jsx.
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../wavelength.css"
