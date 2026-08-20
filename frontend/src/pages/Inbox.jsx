@@ -1,40 +1,41 @@
-//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\Inbox.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { getConversations } from "../chat/chat.js";
-import "../wavelength.css"
+import "../wavelength.css";
+import "./Inbox.css";
+import StaticAvatar, { hueFromString } from "../components/StaticAvatar.jsx";
+
 import { getInbox } from "../inbox";
 import {
   subscribeToNewConfession,
   unsubscribeFromNewConfession,
 } from "../socket";
 
+function StatusTag({ action }) {
+  if (action === "curious") return <span className="wl-tag wl-tag--curious">👀 Curious</span>;
+  if (action === "not_interested") return <span className="wl-tag wl-tag--not-interested">Not interested</span>;
+  return <span className="wl-tag wl-tag--waiting">⏳ Waiting</span>;
+}
+
 export default function Inbox() {
   const navigate = useNavigate();
 
   const [tab, setTab] = useState("received");
-
   const [received, setReceived] = useState([]);
   const [sent, setSent] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // const [conversations, setConversations] = useState([]);
 
   useEffect(() => {
     loadInbox();
-    // loadConversations();
+
     async function handleNewConfession(data) {
       console.log("🔥 EVENT");
       console.log(data);
-
       await loadInbox();
-
       console.log("🔥 Inbox Reloaded");
     }
 
     subscribeToNewConfession(handleNewConfession);
-    
 
     return () => {
       unsubscribeFromNewConfession(handleNewConfession);
@@ -44,9 +45,7 @@ export default function Inbox() {
   async function loadInbox() {
     try {
       setLoading(true);
-
       const response = await getInbox();
-
       setReceived(response.data.received || []);
       setSent(response.data.sent || []);
     } catch (error) {
@@ -56,124 +55,89 @@ export default function Inbox() {
       setLoading(false);
     }
   }
-//   async function loadConversations() {
-//   try {
-//     const response =
-//       await getConversations();
-
-//     setConversations(
-//       response.data || []
-//     );
-//   } catch (error) {
-//     console.error(
-//       "Unable to load conversations:",
-//       error
-//     );
-//   }
-// }
 
   const list = tab === "received" ? received : sent;
 
   if (loading) {
-    return <p>Loading inbox...</p>;
+    return (
+      <div className="wl-inbox">
+        <div className="wl-empty wl-fade-up">
+          <div className="wl-eq" style={{ justifyContent: "center", marginBottom: 14 }}>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p className="wl-mono">Loading inbox…</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="wl-inbox">
+        <div className="wl-error-banner">{error}</div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: 30 }}>
-      <h2>Inbox</h2>
+    <div className="wl-inbox">
+      <div className="wl-eyebrow" style={{ marginBottom: 10 }}>INBOX</div>
+      <h1 className="wl-display wl-inbox__heading">Every signal you've caught.</h1>
 
-      <button onClick={() => setTab("received")}>
-        Received ({received.length})
-      </button>
+      <div className="wl-segment wl-inbox__segment">
+        <button className={tab === "received" ? "active" : ""} onClick={() => setTab("received")}>
+          Received ({received.length})
+        </button>
+        <button className={tab === "sent" ? "active" : ""} onClick={() => setTab("sent")}>
+          Sent ({sent.length})
+        </button>
+      </div>
 
-      <button onClick={() => setTab("sent")}>Sent ({sent.length})</button>
-
-      <hr />
-
-      {list.length === 0 && <p>No {tab} confessions yet.</p>}
-
-      {list.map((confession) => (
-        <div
-          key={confession._id}
-          onClick={() => navigate(`/confessions/${confession._id}`)}
-          style={{
-            border: "1px solid #555",
-            padding: 15,
-            marginBottom: 10,
-            cursor: "pointer",
-          }}
-        >
-          <strong>
-            {tab === "received"
-              ? confession.senderAnonymousName
-              : `@${confession.recipientInstagramUsername}`}
-          </strong>
-
-          <p>{new Date(confession.createdAt).toLocaleString()}</p>
-
-          {tab === "received" && (
-  <small>
-    {confession.recipientAction}
-  </small>
-)}
-
-{tab === "sent" && (
-  <small>
-    {confession.recipientAction === "curious"
-      ? "👀 Curious"
-      : confession.recipientAction === "not_interested"
-      ? "Not interested"
-      : "⏳ Waiting for response"}
-  </small>
-)}
+      {list.length === 0 && (
+        <div className="wl-empty wl-fade-up">
+          <p className="wl-display">
+            {tab === "received" ? "No signals yet." : "Nothing sent yet."}
+          </p>
+          <p className="wl-mono" style={{ fontSize: 11 }}>
+            {tab === "received" ? "Someone out there might be listening." : "Send the first one from Confess."}
+          </p>
         </div>
-      ))}
-      {/* <hr />
+      )}
 
-<h2>Chats</h2>
+      <div className="wl-stagger">
+        {list.map((confession) => {
+          const label =
+            tab === "received"
+              ? confession.senderAnonymousName
+              : `@${confession.recipientInstagramUsername}`;
 
-{conversations.length === 0 && (
-  <p>No active chats.</p>
-)}
+          return (
+            <div
+              key={confession._id}
+              className="wl-row wl-fade-up"
+              onClick={() => navigate(`/confessions/${confession._id}`)}
+            >
+              {tab === "received" ? (
+                <StaticAvatar size={44} hue={hueFromString(confession.senderAnonymousName)} />
+              ) : (
+                <StaticAvatar size={44} initial={confession.recipientInstagramUsername} />
+              )}
 
-{conversations.map((conversation) => (
-  <div
-    key={conversation._id}
-    onClick={() =>
-      navigate(
-        `/chat/${conversation._id}`
-      )
-    }
-    style={{
-      border: "1px solid #555",
-      padding: 15,
-      marginBottom: 10,
-      cursor: "pointer",
-    }}
-  >
-    <strong>
-      {conversation.displayName}
-    </strong>
-
-    <p>
-      {conversation.lastMessage?.text ||
-        "No messages yet"}
-    </p>
-
-    {conversation.lastMessageAt && (
-      <small>
-        {new Date(
-          conversation.lastMessageAt
-        ).toLocaleString()}
-      </small>
-    )}
-  </div>
-))} */}
+              <div className="wl-row__meta">
+                <div className="wl-row__top">
+                  <span className="wl-row__name">{label}</span>
+                  <span className="wl-row__time wl-mono">
+                    {new Date(confession.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                  </span>
+                </div>
+                <div className="wl-row__status">
+                  <StatusTag action={confession.recipientAction} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
-    
   );
 }

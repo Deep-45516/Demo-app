@@ -1,12 +1,20 @@
-//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\ConfessionDetails.jsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "../wavelength.css"
+import "../wavelength.css";
+import "./ConfessionDetails.css";
+import StaticAvatar, { hueFromString } from "../components/StaticAvatar.jsx";
+
 import { getConfession, updateConfessionAction } from "../inbox";
-
 import { getSocket, connectSocket } from "../socket";
-
 import { publishConfessionPublicly } from "../publicPost.js";
+
+function BackIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  );
+}
 
 export default function ConfessionDetails() {
   const { id } = useParams();
@@ -19,26 +27,20 @@ export default function ConfessionDetails() {
   const [conversationId, setConversationId] = useState(null);
   const [publicPosting, setPublicPosting] = useState(false);
 
-  // Current logged-in user
   const storedUser = localStorage.getItem("user");
-
   const user = storedUser ? JSON.parse(storedUser) : null;
 
   useEffect(() => {
     loadConfession();
 
     const socket = getSocket() || connectSocket();
-
     if (!socket) return;
 
     function handleConfessionUpdated(data) {
-      if (data.confessionId !== id) {
-        return;
-      }
+      if (data.confessionId !== id) return;
 
       setConfession((current) => {
         if (!current) return current;
-
         return {
           ...current,
           recipientAction: data.recipientAction,
@@ -50,13 +52,10 @@ export default function ConfessionDetails() {
     }
 
     function handlePublicPostUpdated(data) {
-      if (String(data.confessionId) !== String(id)) {
-        return;
-      }
+      if (String(data.confessionId) !== String(id)) return;
 
       setConfession((current) => {
         if (!current) return current;
-
         return {
           ...current,
           visibility: "public",
@@ -68,7 +67,6 @@ export default function ConfessionDetails() {
     }
 
     socket.on("confession-updated", handleConfessionUpdated);
-
     socket.on("public-post-updated", handlePublicPostUpdated);
 
     return () => {
@@ -81,20 +79,13 @@ export default function ConfessionDetails() {
     try {
       setLoading(true);
       setError("");
-      console.log("1. Loading confession:", id);
       const response = await getConfession(id);
-      console.log("2. API response:", response);
-
       setConfession(response.data);
-
       setConversationId(response.data.conversationId || null);
-      console.log("3. Confession loaded:", response.data);
     } catch (error) {
       console.error("CONFESSION LOAD ERROR:", error);
-
       setError(error.message || "Unable to load confession.");
     } finally {
-      console.log("4. Loading finished");
       setLoading(false);
     }
   }
@@ -105,20 +96,11 @@ export default function ConfessionDetails() {
     try {
       setActionLoading(true);
       setError("");
-
       const response = await updateConfessionAction(confession._id, action);
-      console.log("ACTION RESPONSE:", response.data);
-
-      console.log("CONVERSATION ID:", response.data.conversationId);
-
-      // Update React state immediately.
-      // No page reload and no second GET request.
       setConfession(response.data);
-
       setConversationId(response.data.conversationId || null);
     } catch (error) {
       console.error(error);
-
       setError(error.message || "Unable to respond.");
     } finally {
       setActionLoading(false);
@@ -131,13 +113,10 @@ export default function ConfessionDetails() {
     try {
       setPublicPosting(true);
       setError("");
-
       const response = await publishConfessionPublicly(confession._id);
-
       setConfession(response.data);
     } catch (error) {
       console.error(error);
-
       setError(error.message || "Unable to share confession publicly.");
     } finally {
       setPublicPosting(false);
@@ -145,206 +124,142 @@ export default function ConfessionDetails() {
   }
 
   if (loading) {
-    return <p>Loading confession...</p>;
+    return (
+      <div className="wl-details">
+        <div className="wl-empty wl-fade-up">
+          <div className="wl-eq" style={{ justifyContent: "center", marginBottom: 14 }}>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p className="wl-mono">Loading confession…</p>
+        </div>
+      </div>
+    );
   }
 
   if (error && !confession) {
-    return <p>{error}</p>;
+    return (
+      <div className="wl-details">
+        <div className="wl-error-banner">{error}</div>
+      </div>
+    );
   }
 
   if (!confession) {
-    return <p>Confession not found.</p>;
+    return (
+      <div className="wl-details">
+        <div className="wl-empty">
+          <p className="wl-display">Confession not found.</p>
+        </div>
+      </div>
+    );
   }
 
-  // These checks are for UI only.
-  // Backend authorization is the real security.
   const isSender = confession.senderUser === user?._id;
-
   const isRecipient = confession.recipientUser === user?._id;
 
   return (
-    <div style={{ padding: 30 }}>
-      <button onClick={() => navigate("/inbox")}>← Back to Inbox</button>
+    <div className="wl-details">
+      <button className="wl-details__back" onClick={() => navigate("/inbox")}>
+        <BackIcon /> Inbox
+      </button>
 
-      <h2>Confession</h2>
+      <div className="wl-details__who wl-fade-up">
+        <StaticAvatar size={40} hue={hueFromString(confession.senderAnonymousName)} />
+        <div>
+          <div className="wl-row__name">{confession.senderAnonymousName}</div>
+          <div className="wl-mono" style={{ fontSize: 10.5, color: "var(--wl-text-faint)" }}>
+            TO @{confession.recipientInstagramUsername}
+          </div>
+        </div>
+      </div>
 
-      <p>
-        From: <strong>{confession.senderAnonymousName}</strong>
-      </p>
+      {error && <div className="wl-error-banner">{error}</div>}
 
-      <p>
-        To: <strong>@{confession.recipientInstagramUsername}</strong>
-      </p>
-
-      <p>{confession.message}</p>
+      <div className="wl-paper-card wl-details__card wl-fade-up">
+        <p>{confession.message}</p>
+      </div>
 
       {confession.imageUrls?.map((url) => (
-        <img
-          key={url}
-          src={url}
-          alt="Confession"
-          style={{
-            width: "100%",
-            maxWidth: 500,
-            display: "block",
-            marginBottom: 15,
-          }}
-        />
+        <img key={url} src={url} alt="Confession" className="wl-details__image" />
       ))}
 
-      <p>Sent: {new Date(confession.createdAt).toLocaleString()}</p>
+      <p className="wl-mono wl-details__timestamp">
+        SENT {new Date(confession.createdAt).toLocaleString()}
+      </p>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* =========================
-          RECIPIENT VIEW
-          ========================= */}
-
+      {/* ========================= RECIPIENT VIEW ========================= */}
       {isRecipient && (
-        <div
-          style={{
-            marginTop: 30,
-            borderTop: "1px solid #ccc",
-            paddingTop: 20,
-          }}
-        >
-          <h3>Your Response</h3>
+        <div className="wl-details__section wl-fade-up">
+          <div className="wl-eyebrow">YOUR RESPONSE</div>
 
           {confession.recipientAction === "pending" && (
             <>
-              <p>Are you curious about who sent this confession?</p>
-
-              <button
-                disabled={actionLoading}
-                onClick={() => handleAction("curious")}
-              >
-                {actionLoading ? "Updating..." : "👀 Curious"}
-              </button>
-
-              <button
-                disabled={actionLoading}
-                onClick={() => handleAction("not_interested")}
-                style={{
-                  marginLeft: 10,
-                }}
-              >
-                {actionLoading ? "Updating..." : "Not Interested"}
-              </button>
+              <p className="wl-details__prompt">Curious who sent this?</p>
+              <div className="wl-details__actions">
+                <button className="wl-btn wl-btn-primary" disabled={actionLoading} onClick={() => handleAction("curious")}>
+                  {actionLoading ? "Updating..." : "👀 Curious"}
+                </button>
+                <button className="wl-btn wl-btn-ghost" disabled={actionLoading} onClick={() => handleAction("not_interested")}>
+                  Not interested
+                </button>
+              </div>
             </>
           )}
 
           {confession.recipientAction === "curious" && (
-  <>
-    <p>👀 You said you're curious.</p>
-
-    {conversationId && (
-      <button
-        onClick={() =>
-          navigate(`/chat/${conversationId}`)
-        }
-      >
-        💬 Open Conversation
-      </button>
-    )}
-  </>
-)}
-
-{/* =========================
-    PUBLIC POST
-    ========================= */}
-
-{confession.publicConsent &&
-  !confession.publicPosted && (
-    <div
-      style={{
-        marginTop: 20,
-        padding: 15,
-        border: "1px solid #ccc",
-        borderRadius: 10,
-      }}
-    >
-      <p>
-        📸 You both agreed that this confession
-        can be shared publicly.
-      </p>
-
-      <button
-        disabled={publicPosting}
-        onClick={handlePublicPost}
-      >
-        {publicPosting
-          ? "Sharing on Instagram..."
-          : "📸 Share on Instagram"}
-      </button>
-    </div>
-  )}
-
-{confession.publicPosted && (
-  <div
-    style={{
-      marginTop: 20,
-      padding: 15,
-      border: "1px solid #ccc",
-      borderRadius: 10,
-    }}
-  >
-    <p>
-      ✨ This confession is now public.
-    </p>
-
-    <p>
-      You both chose to share this moment.
-    </p>
-
-    <a
-      href={`https://www.instagram.com/wit_confessions.26/`}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      View on Instagram
-    </a>
-  </div>
-)}
-
-          {confession.recipientAction === "not_interested" && (
-            <p>You're not interested in this confession.</p>
-          )}
-        </div>
-      )}
-
-      {/* =========================
-          SENDER VIEW
-          ========================= */}
-
-      {isSender && (
-        <div
-          style={{
-            marginTop: 30,
-            borderTop: "1px solid #ccc",
-            paddingTop: 20,
-          }}
-        >
-          <h3>Recipient Response</h3>
-
-          {confession.recipientAction === "pending" && (
-            <p>⏳ Waiting for their response.</p>
-          )}
-
-          {confession.recipientAction === "curious" && (
             <>
-              <p>👀 They're curious about you.</p>
-
+              <span className="wl-tag wl-tag--curious">👀 You're curious</span>
               {conversationId && (
-                <button onClick={() => navigate(`/chat/${conversationId}`)}>
-                  💬 Continue Conversation
+                <button className="wl-btn wl-btn-primary wl-btn-block" style={{ marginTop: 14 }} onClick={() => navigate(`/chat/${conversationId}`)}>
+                  Open conversation
                 </button>
               )}
             </>
           )}
 
           {confession.recipientAction === "not_interested" && (
-            <p>They aren't interested.</p>
+            <span className="wl-tag wl-tag--not-interested">Not interested</span>
           )}
+
+          {confession.publicConsent && !confession.publicPosted && (
+            <div className="wl-details__public-card wl-fade-up">
+              <p>You both agreed this confession can be shared publicly.</p>
+              <button className="wl-btn wl-btn-outline" disabled={publicPosting} onClick={handlePublicPost}>
+                {publicPosting ? "Sharing on Instagram..." : "Share on Instagram"}
+              </button>
+            </div>
+          )}
+
+          {confession.publicPosted && (
+            <div className="wl-details__public-card wl-fade-up">
+              <p>✨ This confession is now public. You both chose to share this moment.</p>
+              <a href="https://www.instagram.com/wit_confessions.26/" target="_blank" rel="noopener noreferrer" className="wl-btn wl-btn-outline" style={{ textDecoration: "none" }}>
+                View on Instagram
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================= SENDER VIEW ========================= */}
+      {isSender && (
+        <div className="wl-details__section wl-fade-up">
+          <div className="wl-eyebrow">RECIPIENT RESPONSE</div>
+
+          {confession.recipientAction === "pending" && <span className="wl-tag wl-tag--waiting">⏳ Waiting for their response</span>}
+
+          {confession.recipientAction === "curious" && (
+            <>
+              <span className="wl-tag wl-tag--curious">👀 They're curious about you</span>
+              {conversationId && (
+                <button className="wl-btn wl-btn-primary wl-btn-block" style={{ marginTop: 14 }} onClick={() => navigate(`/chat/${conversationId}`)}>
+                  Continue conversation
+                </button>
+              )}
+            </>
+          )}
+
+          {confession.recipientAction === "not_interested" && <span className="wl-tag wl-tag--not-interested">They aren't interested</span>}
         </div>
       )}
     </div>

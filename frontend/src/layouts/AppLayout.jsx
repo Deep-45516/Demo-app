@@ -45,7 +45,6 @@ export default function AppLayout() {
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    localStorage.removeItem("anonymousProfile");
     disconnectSocket();
     navigate("/instagram", { replace: true });
   }
@@ -76,6 +75,24 @@ export default function AppLayout() {
           <span>Inbox</span>
         </NavLink>
       </nav>
+
+      {/* Shared static-noise filter — every anonymous avatar across the
+          app references #wl-static-filter. Defined once here since this
+          shell wraps every page. */}
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+        <defs>
+          <filter id="wl-static-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n">
+              <animate attributeName="baseFrequency" values="0.9;0.76;0.9" dur="0.6s" repeatCount="indefinite" />
+            </feTurbulence>
+            <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.85  0 0 0 0 0.8  0 0 0 0 1  0 0 0 0.9 0" />
+          </filter>
+          <linearGradient id="wl-avatar-gradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#7C5CFC" />
+            <stop offset="1" stopColor="#FF4D8D" />
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
   );
 }
