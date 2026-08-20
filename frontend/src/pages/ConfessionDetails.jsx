@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../wavelength.css";
 import "./ConfessionDetails.css";
-import { StaticAvatar, hueFromString } from "../components/StaticAvatar.jsx";
+import StaticAvatar, { hueFromString } from "../components/InstagramVerification/StaticAvatar.jsx";
 
 import { getConfession, updateConfessionAction } from "../inbox";
 import { getSocket, connectSocket } from "../socket";
