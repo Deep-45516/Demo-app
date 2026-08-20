@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../wavelength.css";
-import "./Inbox.css";
+import "./inbox.css";
 import StaticAvatar, { hueFromString } from "../components/StaticAvatar.jsx";
 
 import { getInbox } from "../inbox";
