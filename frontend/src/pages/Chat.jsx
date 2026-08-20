@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "../wavelength.css";
 import "./Chat.css";
-import StaticAvatar, { hueFromString } from "../components/StaticAvatar.jsx";
+import StaticAvatar, { hueFromString } from "../components/InstagramVerification/StaticAvatar.jsx";
 
 import { getMessages, sendMessage } from "../chat/chat.js";
 import { requestReveal, respondToReveal } from "../reveal/reveal.js";
