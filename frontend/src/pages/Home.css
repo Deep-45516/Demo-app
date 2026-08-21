@@ -654,45 +654,30 @@
 .wl-preview-arrow {
   font-size: 16px;
   color: var(--wl-text-faint);
-
-  transition:
-    transform 0.2s ease,
-    color 0.2s ease;
-}
-
-.wl-preview-trigger:hover .wl-preview-arrow {
-  color: var(--wl-text);
-  transform: translate(2px, -2px);
 }
 
 
 /* ---------------------------------------------------------
-   MODAL BACKDROP
+   MODAL
    --------------------------------------------------------- */
 
 .wl-preview-modal {
   position: fixed;
-
   inset: 0;
 
-  z-index: 100;
+  z-index: 9999;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding:
-    20px
-    18px
-    calc(20px + env(safe-area-inset-bottom));
+  padding: 14px;
 
   box-sizing: border-box;
 
-  background: rgba(5, 5, 10, 0.92);
+  background: rgba(5, 5, 10, 0.94);
 
   backdrop-filter: blur(18px);
-
-  animation: wlPreviewBackdrop 0.22s ease both;
 }
 
 
@@ -702,16 +687,14 @@
 
 .wl-preview-modal__content {
   width: 100%;
-  max-width: 520px;
+  height: 100%;
 
-  max-height: 100%;
+  max-width: 540px;
 
   display: flex;
   flex-direction: column;
 
-  animation: wlPreviewEnter 0.3s
-    cubic-bezier(.2, .8, .2, 1)
-    both;
+  box-sizing: border-box;
 }
 
 
@@ -721,34 +704,31 @@
 
 .wl-preview-modal__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
 
   flex-shrink: 0;
 
-  margin-bottom: 16px;
+  padding: 4px 0 14px;
 }
 
 .wl-preview-modal__eyebrow {
+  display: block;
+
   font-family: "IBM Plex Mono", monospace;
-
   font-size: 9px;
-
   letter-spacing: 0.14em;
 
   color: var(--wl-pink);
 }
 
 .wl-preview-modal__title {
-  margin: 5px 0 0;
+  margin: 4px 0 0;
 
   font-family: "Fraunces", serif;
-
   font-style: italic;
-
   font-weight: 500;
-
-  font-size: 22px;
+  font-size: 21px;
 
   color: var(--wl-text);
 }
@@ -761,42 +741,24 @@
   align-items: center;
   justify-content: center;
 
-  flex-shrink: 0;
+  padding: 0;
 
   border-radius: 50%;
-
   border: 1px solid var(--wl-line);
 
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
 
-  color: var(--wl-text-dim);
+  color: var(--wl-text);
 
   font-size: 25px;
-  font-weight: 300;
-
   line-height: 1;
 
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.15s ease;
-}
-
-.wl-preview-modal__close:hover {
-  background: rgba(255, 255, 255, 0.1);
-
-  color: var(--wl-text);
-}
-
-.wl-preview-modal__close:active {
-  transform: scale(0.92);
 }
 
 
 /* ---------------------------------------------------------
-   PREVIEW STAGE
+   PREVIEW AREA
    --------------------------------------------------------- */
 
 .wl-preview-modal__stage {
@@ -804,124 +766,60 @@
 
   min-height: 0;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-  overflow: auto;
+  display: block;
 
-  padding: 4px;
+  padding: 5px 0 20px;
 
   box-sizing: border-box;
-
-  /*
-   * Allows the postcard to be completely visible
-   * even when its generated dimensions are larger
-   * than the phone viewport.
-   */
-}
-
-
-/* ---------------------------------------------------------
-   THE GENERATED POSTCARD
-   --------------------------------------------------------- */
-
-.wl-preview-modal__stage .preview-wrapper {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
 }
 
 
 /*
- * If pageGenerator.js creates an image/canvas,
- * make sure it scales down to fit the screen.
- */
+   IMPORTANT:
+   Do NOT set transform/scale here.
 
-.wl-preview-modal__stage .preview-wrapper img,
-.wl-preview-modal__stage .preview-wrapper canvas {
-  display: block;
+   template.css already handles:
+   500 × 706 → responsive scaling.
+*/
 
-  max-width: 100%;
-  max-height: 68vh;
-
-  width: auto;
-  height: auto;
-
-  object-fit: contain;
-
-  border-radius: 10px;
-
-  box-shadow:
-    0 25px 70px -20px rgba(0, 0, 0, 0.8);
-
-  animation: wlPreviewCard 0.35s
-    cubic-bezier(.2, .8, .2, 1)
-    both;
+.wl-preview-modal__stage #previewWrapper {
+  width: 100%;
 }
 
 
 /* ---------------------------------------------------------
-   ACTIONS
+   GENERATED POSTCARD
+   --------------------------------------------------------- */
+
+.wl-preview-modal__stage #previewWrapper .template {
+  display: block !important;
+  visibility: visible !important;
+
+  position: relative;
+
+  flex-shrink: 0;
+}
+
+
+/* ---------------------------------------------------------
+   BUTTONS
    --------------------------------------------------------- */
 
 .wl-preview-modal__actions {
-  display: flex;
-
-  gap: 10px;
-
   flex-shrink: 0;
 
-  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+
+  padding-top: 10px;
 }
 
 .wl-preview-modal__actions .wl-btn {
   flex: 1;
-
   min-height: 48px;
-}
-
-
-/* ---------------------------------------------------------
-   ANIMATIONS
-   --------------------------------------------------------- */
-
-@keyframes wlPreviewBackdrop {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes wlPreviewEnter {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes wlPreviewCard {
-  from {
-    opacity: 0;
-    transform: scale(0.94);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 
@@ -932,11 +830,7 @@
 @media (max-width: 480px) {
 
   .wl-preview-modal {
-    padding: 16px 14px;
-  }
-
-  .wl-preview-modal__header {
-    margin-bottom: 10px;
+    padding: 10px;
   }
 
   .wl-preview-modal__title {
@@ -944,18 +838,9 @@
   }
 
   .wl-preview-modal__stage {
-    padding: 0;
+    padding-top: 0;
   }
 
-  .wl-preview-modal__stage .preview-wrapper img,
-  .wl-preview-modal__stage .preview-wrapper canvas {
-    max-width: 100%;
-    max-height: 72vh;
-  }
-
-  .wl-preview-modal__actions {
-    margin-top: 12px;
-  }
 }
 
 
@@ -966,87 +851,8 @@
 @media (prefers-reduced-motion: reduce) {
 
   .wl-preview-modal,
-  .wl-preview-modal__content,
-  .wl-preview-modal__stage img,
-  .wl-preview-modal__stage canvas {
+  .wl-preview-modal__content {
     animation: none;
   }
-}
 
-/* =========================================================
-   GENERATED POSTCARD INSIDE FULLSCREEN PREVIEW
-   ========================================================= */
-
-.wl-preview-modal__stage {
-  flex: 1;
-  min-height: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: auto;
-
-  padding: 8px;
-
-  box-sizing: border-box;
-}
-
-/*
- * pageGenerator.js creates:
- *
- * previewWrapper
- *    └── .template
- *
- * So we style .template directly.
- */
-
-.wl-preview-modal__stage .preview-wrapper {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-}
-
-/*
- * The actual generated postcard.
- */
-
-.wl-preview-modal__stage .preview-wrapper .template {
-  display: block !important;
-
-  visibility: visible !important;
-
-  position: relative;
-
-  flex-shrink: 0;
-
-  transform-origin: center center;
-
-  box-shadow:
-    0 25px 70px -20px rgba(0, 0, 0, 0.8);
-
-  border-radius: 10px;
-
-  overflow: hidden;
-}
-
-
-/*
- * If your template has fixed dimensions,
- * this forces its contents to remain inside it.
- */
-
-.wl-preview-modal__stage .preview-wrapper .template * {
-  box-sizing: border-box;
-}
-
-.wl-preview-modal__stage .preview-wrapper {
-  flex-direction: column;
-  gap: 24px;
-
-  padding: 10px 0 20px;
 }

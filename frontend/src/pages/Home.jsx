@@ -130,49 +130,15 @@ export default function Home() {
 useEffect(() => {
   if (!showPreview) return;
 
-  const renderPreview = () => {
-    generatePages(to, from, message, mood);
-
-    requestAnimationFrame(() => {
-      const wrapper = document.getElementById("previewWrapper");
-
-      if (!wrapper) return;
-
-      const pages = wrapper.querySelectorAll(".template");
-
-      pages.forEach((page) => {
-        const availableWidth =
-          wrapper.clientWidth - 16;
-
-        const availableHeight =
-          window.innerHeight * 0.70;
-
-        const pageWidth = page.offsetWidth;
-        const pageHeight = page.offsetHeight;
-
-        if (!pageWidth || !pageHeight) return;
-
-        const scale = Math.min(
-          availableWidth / pageWidth,
-          availableHeight / pageHeight,
-          1
-        );
-
-        page.style.transform = `scale(${scale})`;
-
-        /*
-         * Transform doesn't affect normal layout size,
-         * so compensate for the scaled height.
-         */
-        page.style.marginBottom =
-          `${-(pageHeight * (1 - scale))}px`;
+  const timer = setTimeout(() => {
+    document.fonts.ready.then(() => {
+      requestAnimationFrame(() => {
+        generatePages(to, from, message, mood);
       });
     });
-  };
+  }, 50);
 
-  document.fonts.ready.then(() => {
-    requestAnimationFrame(renderPreview);
-  });
+  return () => clearTimeout(timer);
 }, [to, from, message, mood, showPreview]);
 
   const verifyRecipient = async () => {
@@ -590,7 +556,6 @@ useEffect(() => {
   >
     <div className="wl-preview-modal__content">
 
-      {/* HEADER */}
       <div className="wl-preview-modal__header">
         <div>
           <span className="wl-preview-modal__eyebrow">
@@ -606,13 +571,11 @@ useEffect(() => {
           type="button"
           className="wl-preview-modal__close"
           onClick={() => setShowPreview(false)}
-          aria-label="Close preview"
         >
           ×
         </button>
       </div>
 
-      {/* FULL PREVIEW */}
       <div className="wl-preview-modal__stage">
         <div
           className="preview-wrapper"
@@ -620,9 +583,7 @@ useEffect(() => {
         />
       </div>
 
-      {/* ACTIONS */}
       <div className="wl-preview-modal__actions">
-
         <button
           className="wl-btn wl-btn-outline"
           onClick={() => setShowPreview(false)}
@@ -636,7 +597,6 @@ useEffect(() => {
         >
           Save image ↓
         </button>
-
       </div>
 
     </div>
