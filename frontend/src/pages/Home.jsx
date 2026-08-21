@@ -530,36 +530,78 @@ export default function Home() {
 
       {/* PREVIEW */}
       <button
-        type="button"
-        className="wl-disclosure wl-preview-trigger"
-        onClick={() => setShowPreview((v) => !v)}
-      >
-        <span>
-          {showPreview
-            ? "Hide postcard"
-            : "Preview your postcard"}
-        </span>
+  type="button"
+  className="wl-disclosure wl-preview-trigger"
+  onClick={() => setShowPreview(true)}
+>
+  <span>Preview your postcard</span>
 
-        <ChevronIcon open={showPreview} />
-      </button>
+  <span className="wl-preview-arrow">↗</span>
+</button>
 
-      <div
-        className={`wl-preview-panel ${
-          showPreview ? "open" : ""
-        }`}
-      >
+{showPreview && (
+  <div
+    className="wl-preview-modal"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowPreview(false);
+      }
+    }}
+  >
+    <div className="wl-preview-modal__content">
+
+      {/* HEADER */}
+      <div className="wl-preview-modal__header">
+        <div>
+          <span className="wl-preview-modal__eyebrow">
+            POSTCARD PREVIEW
+          </span>
+
+          <h2 className="wl-preview-modal__title">
+            Your transmission
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          className="wl-preview-modal__close"
+          onClick={() => setShowPreview(false)}
+          aria-label="Close preview"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* FULL PREVIEW */}
+      <div className="wl-preview-modal__stage">
         <div
           className="preview-wrapper"
           id="previewWrapper"
         />
+      </div>
+
+      {/* ACTIONS */}
+      <div className="wl-preview-modal__actions">
 
         <button
-          className="wl-btn wl-btn-ghost wl-btn-block"
+          className="wl-btn wl-btn-outline"
+          onClick={() => setShowPreview(false)}
+        >
+          Back
+        </button>
+
+        <button
+          className="wl-btn wl-btn-primary"
           onClick={downloadPages}
         >
-          Save image
+          Save image ↓
         </button>
+
       </div>
+
+    </div>
+  </div>
+)}
 
       {/* HIDDEN TEMPLATE — KEEP FOR IMAGE GENERATION */}
       <div

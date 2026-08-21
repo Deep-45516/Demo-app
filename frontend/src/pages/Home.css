@@ -549,25 +549,7 @@
   margin-top: 20px;
 }
 
-.wl-preview-panel {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
 
-  margin-top: 0;
-
-  transition:
-    max-height 0.45s ease,
-    opacity 0.3s ease,
-    margin-top 0.4s ease;
-}
-
-.wl-preview-panel.open {
-  max-height: 1000px;
-  opacity: 1;
-
-  margin-top: 14px;
-}
 
 /* ---------------------------------------------------------
    AUTH
@@ -658,5 +640,335 @@
   .wl-mood-chip,
   .wl-confess__submit {
     transition: none;
+  }
+}
+
+/* =========================================================
+   FULL SCREEN POSTCARD PREVIEW
+   ========================================================= */
+
+.wl-preview-trigger {
+  margin-top: 20px;
+}
+
+.wl-preview-arrow {
+  font-size: 16px;
+  color: var(--wl-text-faint);
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.wl-preview-trigger:hover .wl-preview-arrow {
+  color: var(--wl-text);
+  transform: translate(2px, -2px);
+}
+
+
+/* ---------------------------------------------------------
+   MODAL BACKDROP
+   --------------------------------------------------------- */
+
+.wl-preview-modal {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    20px
+    18px
+    calc(20px + env(safe-area-inset-bottom));
+
+  box-sizing: border-box;
+
+  background: rgba(5, 5, 10, 0.92);
+
+  backdrop-filter: blur(18px);
+
+  animation: wlPreviewBackdrop 0.22s ease both;
+}
+
+
+/* ---------------------------------------------------------
+   MODAL CONTENT
+   --------------------------------------------------------- */
+
+.wl-preview-modal__content {
+  width: 100%;
+  max-width: 520px;
+
+  max-height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  animation: wlPreviewEnter 0.3s
+    cubic-bezier(.2, .8, .2, 1)
+    both;
+}
+
+
+/* ---------------------------------------------------------
+   HEADER
+   --------------------------------------------------------- */
+
+.wl-preview-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  flex-shrink: 0;
+
+  margin-bottom: 16px;
+}
+
+.wl-preview-modal__eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+
+  font-size: 9px;
+
+  letter-spacing: 0.14em;
+
+  color: var(--wl-pink);
+}
+
+.wl-preview-modal__title {
+  margin: 5px 0 0;
+
+  font-family: "Fraunces", serif;
+
+  font-style: italic;
+
+  font-weight: 500;
+
+  font-size: 22px;
+
+  color: var(--wl-text);
+}
+
+.wl-preview-modal__close {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  border: 1px solid var(--wl-line);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: var(--wl-text-dim);
+
+  font-size: 25px;
+  font-weight: 300;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.wl-preview-modal__close:hover {
+  background: rgba(255, 255, 255, 0.1);
+
+  color: var(--wl-text);
+}
+
+.wl-preview-modal__close:active {
+  transform: scale(0.92);
+}
+
+
+/* ---------------------------------------------------------
+   PREVIEW STAGE
+   --------------------------------------------------------- */
+
+.wl-preview-modal__stage {
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: auto;
+
+  padding: 4px;
+
+  box-sizing: border-box;
+
+  /*
+   * Allows the postcard to be completely visible
+   * even when its generated dimensions are larger
+   * than the phone viewport.
+   */
+}
+
+
+/* ---------------------------------------------------------
+   THE GENERATED POSTCARD
+   --------------------------------------------------------- */
+
+.wl-preview-modal__stage .preview-wrapper {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+
+/*
+ * If pageGenerator.js creates an image/canvas,
+ * make sure it scales down to fit the screen.
+ */
+
+.wl-preview-modal__stage .preview-wrapper img,
+.wl-preview-modal__stage .preview-wrapper canvas {
+  display: block;
+
+  max-width: 100%;
+  max-height: 68vh;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 25px 70px -20px rgba(0, 0, 0, 0.8);
+
+  animation: wlPreviewCard 0.35s
+    cubic-bezier(.2, .8, .2, 1)
+    both;
+}
+
+
+/* ---------------------------------------------------------
+   ACTIONS
+   --------------------------------------------------------- */
+
+.wl-preview-modal__actions {
+  display: flex;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+
+  margin-top: 16px;
+}
+
+.wl-preview-modal__actions .wl-btn {
+  flex: 1;
+
+  min-height: 48px;
+}
+
+
+/* ---------------------------------------------------------
+   ANIMATIONS
+   --------------------------------------------------------- */
+
+@keyframes wlPreviewBackdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wlPreviewEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes wlPreviewCard {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 480px) {
+
+  .wl-preview-modal {
+    padding: 16px 14px;
+  }
+
+  .wl-preview-modal__header {
+    margin-bottom: 10px;
+  }
+
+  .wl-preview-modal__title {
+    font-size: 19px;
+  }
+
+  .wl-preview-modal__stage {
+    padding: 0;
+  }
+
+  .wl-preview-modal__stage .preview-wrapper img,
+  .wl-preview-modal__stage .preview-wrapper canvas {
+    max-width: 100%;
+    max-height: 72vh;
+  }
+
+  .wl-preview-modal__actions {
+    margin-top: 12px;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .wl-preview-modal,
+  .wl-preview-modal__content,
+  .wl-preview-modal__stage img,
+  .wl-preview-modal__stage canvas {
+    animation: none;
   }
 }
