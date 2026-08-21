@@ -972,3 +972,81 @@
     animation: none;
   }
 }
+
+/* =========================================================
+   GENERATED POSTCARD INSIDE FULLSCREEN PREVIEW
+   ========================================================= */
+
+.wl-preview-modal__stage {
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: auto;
+
+  padding: 8px;
+
+  box-sizing: border-box;
+}
+
+/*
+ * pageGenerator.js creates:
+ *
+ * previewWrapper
+ *    └── .template
+ *
+ * So we style .template directly.
+ */
+
+.wl-preview-modal__stage .preview-wrapper {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+/*
+ * The actual generated postcard.
+ */
+
+.wl-preview-modal__stage .preview-wrapper .template {
+  display: block !important;
+
+  visibility: visible !important;
+
+  position: relative;
+
+  flex-shrink: 0;
+
+  transform-origin: center center;
+
+  box-shadow:
+    0 25px 70px -20px rgba(0, 0, 0, 0.8);
+
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+
+/*
+ * If your template has fixed dimensions,
+ * this forces its contents to remain inside it.
+ */
+
+.wl-preview-modal__stage .preview-wrapper .template * {
+  box-sizing: border-box;
+}
+
+.wl-preview-modal__stage .preview-wrapper {
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 10px 0 20px;
+}

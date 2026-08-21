@@ -127,13 +127,53 @@ export default function Home() {
     return stored ? JSON.parse(stored) : null;
   });
 
-  useEffect(() => {
-    document.fonts.ready.then(() => {
-      requestAnimationFrame(() => {
-        generatePages(to, from, message, mood);
+useEffect(() => {
+  if (!showPreview) return;
+
+  const renderPreview = () => {
+    generatePages(to, from, message, mood);
+
+    requestAnimationFrame(() => {
+      const wrapper = document.getElementById("previewWrapper");
+
+      if (!wrapper) return;
+
+      const pages = wrapper.querySelectorAll(".template");
+
+      pages.forEach((page) => {
+        const availableWidth =
+          wrapper.clientWidth - 16;
+
+        const availableHeight =
+          window.innerHeight * 0.70;
+
+        const pageWidth = page.offsetWidth;
+        const pageHeight = page.offsetHeight;
+
+        if (!pageWidth || !pageHeight) return;
+
+        const scale = Math.min(
+          availableWidth / pageWidth,
+          availableHeight / pageHeight,
+          1
+        );
+
+        page.style.transform = `scale(${scale})`;
+
+        /*
+         * Transform doesn't affect normal layout size,
+         * so compensate for the scaled height.
+         */
+        page.style.marginBottom =
+          `${-(pageHeight * (1 - scale))}px`;
       });
     });
-  }, [to, from, message, mood]);
+  };
+
+  document.fonts.ready.then(() => {
+    requestAnimationFrame(renderPreview);
+  });
+}, [to, from, message, mood, showPreview]);
 
   const verifyRecipient = async () => {
     if (!recipientUsername.trim()) {
