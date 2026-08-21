@@ -1,5 +1,13 @@
-import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { useRef, useState, useEffect } from "react";
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\layouts\AppLayout.jsx
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import { useRef } from "react";
+
 import "../wavelength.css";
 import "./AppLayout.css";
 import { disconnectSocket } from "../socket";
@@ -40,67 +48,76 @@ function LogoutIcon() {
   );
 }
 
-// Order of the swipeable tabs. Only these two routes get the
-// swipe gesture and slide animation — everything else (chat,
-// confession detail) is a "drill in" screen reached by tapping,
-// not swiping, so it stays out of this list on purpose.
-const TAB_ORDER = ["/", "/inbox"];
-
 export default function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [slideDir, setSlideDir] = useState("left");
-  const prevPathRef = useRef(location.pathname);
-  const prevIndexRef = useRef(TAB_ORDER.indexOf(location.pathname));
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
+  const isSwiping = useRef(false);
 
-  useEffect(() => {
-    if (location.pathname === prevPathRef.current) return;
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
 
-    const newIndex = TAB_ORDER.indexOf(location.pathname);
-    const oldIndex = prevIndexRef.current;
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+    isSwiping.current = false;
+  };
 
-    if (newIndex !== -1 && oldIndex !== -1) {
-      setSlideDir(newIndex > oldIndex ? "left" : "right");
+  const handleTouchMove = (e) => {
+    if (touchStartX.current === null) return;
+
+    const touch = e.touches[0];
+
+    const diffX = touch.clientX - touchStartX.current;
+    const diffY = touch.clientY - touchStartY.current;
+
+    /*
+     * Only treat it as a swipe when the horizontal
+     * movement is stronger than the vertical movement.
+     */
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      isSwiping.current = true;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!isSwiping.current || touchStartX.current === null) {
+      touchStartX.current = null;
+      touchStartY.current = null;
+      return;
     }
 
-    prevPathRef.current = location.pathname;
-    prevIndexRef.current = newIndex;
-  }, [location.pathname]);
+    const touch = e.changedTouches[0];
 
-  // Swipe-to-switch between Confess and Inbox. Ignored if the
-  // touch starts on an input/textarea (so it never fights text
-  // selection or cursor placement while someone is typing).
-  const touchRef = useRef({ x: 0, y: 0, active: false });
+    const diffX = touch.clientX - touchStartX.current;
 
-  function handleTouchStart(e) {
-    const tag = e.target.tagName;
-    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    const SWIPE_THRESHOLD = 70;
 
-    const currentIndex = TAB_ORDER.indexOf(location.pathname);
-    if (currentIndex === -1) return; // not on a swipeable tab
+    /*
+     * Currently:
+     *
+     * /       = Confess
+     * /inbox   = Inbox
+     *
+     * Swipe LEFT  -> Inbox
+     * Swipe RIGHT -> Confess
+     */
 
-    const t = e.touches[0];
-    touchRef.current = { x: t.clientX, y: t.clientY, active: true };
-  }
+    if (Math.abs(diffX) >= SWIPE_THRESHOLD) {
+      if (diffX < 0 && location.pathname !== "/inbox") {
+        navigate("/inbox");
+      }
 
-  function handleTouchEnd(e) {
-    if (!touchRef.current.active) return;
-    touchRef.current.active = false;
-
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchRef.current.x;
-    const dy = t.clientY - touchRef.current.y;
-
-    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-
-    const currentIndex = TAB_ORDER.indexOf(location.pathname);
-    if (dx < 0 && currentIndex < TAB_ORDER.length - 1) {
-      navigate(TAB_ORDER[currentIndex + 1]);
-    } else if (dx > 0 && currentIndex > 0) {
-      navigate(TAB_ORDER[currentIndex - 1]);
+      if (diffX > 0 && location.pathname === "/inbox") {
+        navigate("/");
+      }
     }
-  }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+    isSwiping.current = false;
+  };
 
   function logout() {
     localStorage.removeItem("token");
@@ -121,11 +138,23 @@ export default function AppLayout() {
         </button>
       </header>
 
-      <main className="wl-shell__main" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-        <div key={location.pathname} className={`wl-page-slide wl-slide-${slideDir}`}>
-          <Outlet />
-        </div>
-      </main>
+      <main
+  className="wl-shell__main"
+  onTouchStart={handleTouchStart}
+  onTouchMove={handleTouchMove}
+  onTouchEnd={handleTouchEnd}
+>
+  <div
+    key={location.pathname}
+    className={`wl-page-transition ${
+      location.pathname === "/inbox"
+        ? "wl-page-transition--inbox"
+        : "wl-page-transition--confess"
+    }`}
+  >
+    <Outlet />
+  </div>
+</main>
 
       <nav className="wl-shell__nav">
         <NavLink to="/" end className={({ isActive }) => `wl-shell__navlink ${isActive ? "active" : ""}`}>
@@ -150,8 +179,8 @@ export default function AppLayout() {
             <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.85  0 0 0 0 0.8  0 0 0 0 1  0 0 0 0.9 0" />
           </filter>
           <linearGradient id="wl-avatar-gradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#F0B85C" />
-            <stop offset="1" stopColor="#C97355" />
+            <stop offset="0" stopColor="#7C5CFC" />
+            <stop offset="1" stopColor="#FF4D8D" />
           </linearGradient>
         </defs>
       </svg>
