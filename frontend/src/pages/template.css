@@ -1,116 +1,90 @@
+/* =========================================================
+   Wavelength — postcard template
+   This geometry MUST match Backend/src/templates/template.html
+   exactly (500x706, same offsets, same font-size) or the live
+   preview and the final generated image will disagree on how
+   the text fits. If you change one, change both.
+   ========================================================= */
+
 .template{
-      width:794px;
-      height:1123px;
-
-      position:relative;
-
-      background-image:url("{{BACKGROUND_IMAGE}}");
-
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-
-      overflow:hidden;
-    }
-
-    .previewTo{
-      font-family:'Lilita One', cursive;
-
-      position:absolute;
-
-      top:11%;
-      left:14.3%;
-
-      margin:0;
-
-      font-size:19px;
-
-      opacity:0.85;
-
-      letter-spacing:1px;
-    }
-
-    .message{
-  position:absolute;
-      font-weight:400;
-  top:17%;
-  left:16%;
-
-  width:70%;
-  height:69%;
-
-  font-family:'League Spartan', sans-serif;
-
-  text-align:center;
-
-  overflow:hidden;
-
-  white-space:pre-wrap;
-  word-break:break-word;
-
-  line-height:1.8;
-
-  font-size:42px;
-
-  display:block;
-  box-sizing:border-box;
-}.message {
-  position:absolute;
-  font-weight:400;
-  font-style: italic;
-  color: #F3F1F8;
-
-  top:17%;
-  left:16%;
-
-  width:70%;
-  height:100%;
-
-  font-family:'League Spartan', sans-serif;
-
-  text-align:center;
-  overflow:hidden;
-
-  white-space:pre-wrap;
-  word-break:break-word;
-
-  line-height:1.8;
-  font-size:42px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  box-sizing:border-box;
+  position: relative;
+  width: 500px;
+  height: 706px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: 'Fraunces', serif;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,.6);
+  flex-shrink: 0;
 }
 
-    .previewFrom{
-      font-family:'Lilita One', cursive;
+.template .to,
+.template .from{
+  position: absolute;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.template .to{ top: 34px; left: 38px; }
+.template .from{ bottom: 46px; right: 38px; flex-direction: row-reverse; }
 
-      opacity:0.85;
-      color: #F3F1F8;
+.template .tpl-label{
+  font-style: italic;
+  font-weight: 500;
+  font-size: 19px;
+  color: #F3F1F8;
+  opacity: .8;
+  white-space: nowrap;
+}
 
-      margin:0;
+.template .previewTo,
+.template .previewFrom{
+  font-style: italic;
+  font-weight: 500;
+  font-size: 19px;
+  color: #faffb6ed;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-      text-align:center;
+.template .message{
+  position: absolute;
+  left: 52px;
+  right: 52px;
+  top: 118px;
+  bottom: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-style: italic;
+  color: #faffb6ed;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: hidden;
+}
 
-      white-space:pre-line;
-      word-break:break-word;
-
-      line-height:1;
-
-      letter-spacing:1px;
-
-      font-size:22px;
-    }
-
-    .from{
-      position:absolute;
-
-      top:91%;
-      left:77.5%;
-
-      transform:translateX(-50%);
-
-      width:260px;
-    }
+/* =========================================================
+   Responsive display only. transform:scale() never changes
+   clientWidth/clientHeight, so pageGenerator.js still measures
+   a true 500x706 box every time — only the pixels on screen
+   shrink to fit a phone. The negative margin collapses the
+   blank space transform leaves behind in normal document flow.
+   ========================================================= */
+#previewWrapper{
+  --pc-scale: min(1, calc((100vw - 48px) / 500px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+#previewWrapper .template{
+  transform: scale(var(--pc-scale));
+  transform-origin: top center;
+  margin-bottom: calc(-706px * (1 - var(--pc-scale)));
+}
