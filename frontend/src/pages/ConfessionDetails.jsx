@@ -175,9 +175,9 @@ export default function ConfessionDetails() {
 
       {error && <div className="wl-error-banner">{error}</div>}
 
-      <div className="wl-paper-card wl-details__card wl-fade-up">
+      {/* <div className="wl-paper-card wl-details__card wl-fade-up">
         <p>{confession.message}</p>
-      </div>
+      </div> */}
 
       {confession.imageUrls?.map((url) => (
         <img key={url} src={url} alt="Confession" className="wl-details__image" />
