@@ -65,12 +65,22 @@ msgBox.style.justifyContent = "center";
 msgBox.style.textAlign = "center";
 
 // Step 1: shrink font + spacing together
-while (msgBox.scrollHeight > msgBox.clientHeight && fontSize > MIN_FONT) {
+while (
+  (
+    msgBox.scrollHeight > msgBox.clientHeight ||
+    msgBox.scrollWidth > msgBox.clientWidth
+  ) &&
+  fontSize > MIN_FONT
+) {
   fontSize--;
+
   msgBox.style.fontSize = fontSize + "px";
 
   lineHeight -= 0.015;
-  if (lineHeight < 1.1) lineHeight = 1.1;
+
+  if (lineHeight < 1.1) {
+    lineHeight = 1.1;
+  }
 
   msgBox.style.lineHeight = lineHeight;
 }
@@ -81,9 +91,17 @@ while (msgBox.scrollHeight > msgBox.clientHeight && fontSize > MIN_FONT) {
 // Step 2: cut text for next page
 let lastGoodText = visibleText;
 
-while (msgBox.scrollHeight > msgBox.clientHeight && visibleText.length > 0) {
+while (
+  (
+    msgBox.scrollHeight > msgBox.clientHeight ||
+    msgBox.scrollWidth > msgBox.clientWidth
+  ) &&
+  visibleText.length > 0
+) {
   lastGoodText = visibleText;
+
   visibleText = visibleText.slice(0, -1);
+
   msgBox.innerText = visibleText;
 }
 
@@ -92,11 +110,24 @@ if (visibleText.length === 0 && lastGoodText.length > 0) {
   visibleText = lastGoodText;
 }
 
-  clone.style.visibility = "visible";
+// Keep page breaks clean whenever possible.
+if (
+  visibleText.length < text.length &&
+  visibleText.includes(" ")
+) {
+  const cleanText = trimToWord(visibleText);
 
-  return {
-    usedLength: visibleText.length
-  };
+  if (cleanText.length > 0) {
+    visibleText = cleanText;
+    msgBox.innerText = visibleText;
+  }
+}
+
+clone.style.visibility = "visible";
+
+return {
+  usedLength: visibleText.length
+};
 }
 
 function trimToWord(text) {
