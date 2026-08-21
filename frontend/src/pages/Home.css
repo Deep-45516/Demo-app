@@ -78,7 +78,13 @@
   cursor:pointer; transition:transform .15s ease, background .2s ease, color .2s ease;
 }
 .wl-mood-chip:active{ transform:scale(.95); }
-.wl-mood-chip.active{ background:var(--wl-signal); color:var(--wl-ink); border-color:transparent; }
+.wl-mood-chip.active{ background: linear-gradient(
+    135deg,
+    var(--wl-signal),
+    var(--wl-pink)
+  );
+
+  color: white; border-color:transparent; }
 
 .wl-disclosure{
   width:100%; display:flex; align-items:center; justify-content:space-between;
