@@ -78,13 +78,21 @@
   cursor:pointer; transition:transform .15s ease, background .2s ease, color .2s ease;
 }
 .wl-mood-chip:active{ transform:scale(.95); }
-.wl-mood-chip.active{ background: linear-gradient(
-    135deg,
-    var(--wl-signal),
-    var(--wl-pink)
-  );
+.wl-mood-chip.active {
+  background:
+    linear-gradient(
+      135deg,
+      var(--wl-signal),
+      var(--wl-pink)
+    );
 
-  color: white; border-color:transparent; }
+  color: #fff;
+
+  border-color: transparent;
+
+  box-shadow:
+    0 8px 20px -10px rgba(124, 92, 252, 0.7);
+}
 
 .wl-disclosure{
   width:100%; display:flex; align-items:center; justify-content:space-between;
