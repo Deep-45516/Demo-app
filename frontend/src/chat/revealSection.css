@@ -1,6 +1,6 @@
 .rs-banner{
   margin-bottom:20px; padding:16px 18px; border-radius:var(--wl-r-md);
-  background:rgba(124,92,252,0.09); border:1px solid rgba(124,92,252,0.3);
+  background:rgba(226,162,61,0.10); border:1px solid rgba(226,162,61,0.32);
 }
 .rs-banner strong{ color:var(--wl-signal-bright); font-size:14px; }
 .rs-banner p{ margin:6px 0 0; font-size:13px; color:var(--wl-text-dim); line-height:1.5; }
@@ -23,8 +23,8 @@
 
 .rs-revealed{
   margin-bottom:20px; padding:26px 22px; border-radius:var(--wl-r-lg);
-  background:linear-gradient(180deg, var(--wl-void-2), rgba(124,92,252,0.06));
-  border:1px solid rgba(124,92,252,0.25); text-align:center;
+  background:linear-gradient(180deg, var(--wl-void-2), rgba(226,162,61,0.06));
+  border:1px solid rgba(226,162,61,0.28); text-align:center;
 }
 .rs-revealed .rs-icon{ font-size:24px; margin-bottom:6px; }
 .rs-revealed strong{ font-size:17px; color:var(--wl-text); display:block; margin-bottom:8px; }

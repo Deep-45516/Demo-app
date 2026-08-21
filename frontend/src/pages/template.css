@@ -1,9 +1,9 @@
 /* =========================================================
    Wavelength — postcard template
    This geometry MUST match Backend/src/templates/template.html
-   exactly (500x706, same offsets, same font-size) or the live
-   preview and the final generated image will disagree on how
-   the text fits. If you change one, change both.
+   exactly (500x706, same offsets, same font, same color) or the
+   live preview and the final generated image will disagree.
+   If you change one, change both.
    ========================================================= */
 
 .template{
@@ -34,7 +34,7 @@
   font-style: italic;
   font-weight: 500;
   font-size: 19px;
-  color: #F3F1F8;
+  color: #F4EFE3;
   opacity: .8;
   white-space: nowrap;
 }
@@ -44,7 +44,7 @@
   font-style: italic;
   font-weight: 500;
   font-size: 19px;
-  color: #faffb6ed;
+  color: #F4EFE3;
   max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
@@ -62,7 +62,7 @@
   justify-content: center;
   text-align: center;
   font-style: italic;
-  color: #faffb6ed;
+  color: #F4EFE3;
   white-space: pre-wrap;
   word-break: break-word;
   overflow: hidden;
@@ -72,11 +72,12 @@
    Responsive display only. transform:scale() never changes
    clientWidth/clientHeight, so pageGenerator.js still measures
    a true 500x706 box every time — only the pixels on screen
-   shrink to fit a phone. The negative margin collapses the
-   blank space transform leaves behind in normal document flow.
+   shrink to fit. This calc() is just the fallback before
+   Home.jsx's ResizeObserver corrects --pc-scale precisely
+   against the real container (fixes edge clipping in modals).
    ========================================================= */
 #previewWrapper{
-  --pc-scale: min(1, calc((100vw - 48px) / 500px));
+  --pc-scale: min(1, calc((100vw - 64px) / 500px));
   display: flex;
   flex-direction: column;
   align-items: center;

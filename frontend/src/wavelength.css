@@ -1,29 +1,29 @@
 /* =========================================================
-C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
    Wavelength — shared design tokens & primitives
-   Replaces the earlier "ConfessionVault" theme.css entirely.
-   Import this once (e.g. top of index.css) before any
-   component-specific stylesheet.
+   Warm/amber system — deliberately not another violet-on-black
+   AI-app palette. One flat accent color carries the interactive
+   chrome; gradients are reserved for the avatar texture and the
+   reveal moment only.
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root{
-  --wl-void:#0A0A12;
-  --wl-void-2:#131120;
-  --wl-line:rgba(255,255,255,0.09);
+  --wl-void:#10160F;
+  --wl-void-2:#182018;
+  --wl-line:rgba(255,255,255,0.08);
 
-  --wl-signal:#7C5CFC;
-  --wl-signal-bright:#9B82FF;
-  --wl-pink:#FF4D8D;
-  --wl-cyan:#4DEEEA;
+  --wl-signal:#E2A23D;        /* warm amber — the one flat accent */
+  --wl-signal-bright:#F0B85C;
+  --wl-pink:#C97355;          /* muted rust/terracotta — secondary warmth */
+  --wl-cyan:#8FB596;          /* soft sage — verified / live / success */
 
-  --wl-paper:#F4EFE6;
-  --wl-ink:#241F2B;
+  --wl-paper:#F4EFE3;
+  --wl-ink:#26201A;
 
-  --wl-text:#F3F1F8;
-  --wl-text-dim:#9A97AC;
-  --wl-text-faint:#5C5A70;
+  --wl-text:#F1EEE3;
+  --wl-text-dim:#A6A192;
+  --wl-text-faint:#68655A;
 
   --wl-r-lg:22px;
   --wl-r-md:14px;
@@ -52,10 +52,10 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
 .wl-btn:active{ transform:scale(.97); }
 .wl-btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
 .wl-btn-primary{
-  background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink));
-  color:#fff; box-shadow:0 14px 28px -12px rgba(124,92,252,.55);
+  background:var(--wl-signal);
+  color:var(--wl-ink); box-shadow:0 14px 28px -14px rgba(226,162,61,.5);
 }
-.wl-btn-primary:hover:not(:disabled){ box-shadow:0 18px 34px -10px rgba(124,92,252,.7); }
+.wl-btn-primary:hover:not(:disabled){ box-shadow:0 18px 32px -12px rgba(226,162,61,.65); }
 .wl-btn-outline{ background:rgba(255,255,255,.045); color:var(--wl-text); border:1px solid var(--wl-line); }
 .wl-btn-outline:hover:not(:disabled){ border-color:rgba(255,255,255,.25); }
 .wl-btn-ghost{ background:none; color:var(--wl-text-dim); }
@@ -64,7 +64,7 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
 /* -- surfaces -- */
 .wl-card{ background:rgba(255,255,255,0.045); border:1px solid var(--wl-line); border-radius:var(--wl-r-lg); }
 .wl-paper-card{
-  background:linear-gradient(180deg, var(--wl-paper), #EDE7DA);
+  background:linear-gradient(180deg, var(--wl-paper), #E9E1D0);
   border-radius:var(--wl-r-lg); color:var(--wl-ink); box-shadow:0 20px 40px -18px rgba(0,0,0,.5);
 }
 
@@ -73,10 +73,10 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
 .wl-sbars span{ width:3px; background:var(--wl-text-faint); border-radius:1px; }
 .wl-sbars span:nth-child(1){ height:4px; } .wl-sbars span:nth-child(2){ height:7px; }
 .wl-sbars span:nth-child(3){ height:10px; } .wl-sbars span:nth-child(4){ height:13px; }
-.wl-sbars[data-level="1"] span:nth-child(1){ background:var(--wl-pink); }
-.wl-sbars[data-level="2"] span:nth-child(-n+2){ background:var(--wl-pink); }
-.wl-sbars[data-level="3"] span:nth-child(-n+3){ background:var(--wl-pink); }
-.wl-sbars[data-level="4"] span{ background:var(--wl-pink); }
+.wl-sbars[data-level="1"] span:nth-child(1){ background:var(--wl-signal); }
+.wl-sbars[data-level="2"] span:nth-child(-n+2){ background:var(--wl-signal); }
+.wl-sbars[data-level="3"] span:nth-child(-n+3){ background:var(--wl-signal); }
+.wl-sbars[data-level="4"] span{ background:var(--wl-signal); }
 
 /* -- equalizer: "listening" / live status -- */
 .wl-eq{ display:flex; align-items:flex-end; gap:2.5px; height:16px; }
@@ -101,7 +101,9 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
    Shared primitives for Inbox / ConfessionDetails / Chat
    ========================================================= */
 
-/* -- static-noise avatar: the visual language for "anonymous" -- */
+/* -- static-noise avatar: the visual language for "anonymous" --
+   The one place a gradient stays — it's a small abstract texture,
+   not interactive chrome, so it doesn't read as templated. */
 .wl-avatar{
   position:relative; border-radius:50%; overflow:hidden; flex-shrink:0;
   background:var(--wl-void-2);
@@ -109,8 +111,8 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
 .wl-avatar svg{ position:absolute; inset:0; width:100%; height:100%; }
 .wl-avatar-initial{
   position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-family:'Space Grotesk'; font-weight:700; color:#fff;
-  background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink));
+  font-family:'Space Grotesk'; font-weight:700; color:var(--wl-ink);
+  background:linear-gradient(135deg, var(--wl-signal-bright), var(--wl-pink));
 }
 
 /* -- segmented control -- */
@@ -120,7 +122,7 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
   font-family:'Space Grotesk'; font-size:12.5px; font-weight:600; color:var(--wl-text-dim);
   cursor:pointer; transition:all .2s ease;
 }
-.wl-segment button.active{ background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink)); color:#fff; }
+.wl-segment button.active{ background:var(--wl-signal); color:var(--wl-ink); }
 
 /* -- list rows -- */
 .wl-row{ display:flex; align-items:center; gap:12px; padding:13px 8px; border-radius:16px; cursor:pointer; transition:background .2s ease; }
@@ -135,28 +137,28 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
 
 /* -- status pills (used across inbox/details/chat) -- */
 .wl-tag{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:5px 11px; border-radius:var(--wl-r-pill); }
-.wl-tag--waiting{ background:rgba(255,190,90,0.12); color:#FFC875; }
-.wl-tag--curious{ background:rgba(84,198,184,0.12); color:var(--wl-cyan); }
-.wl-tag--not-interested{ background:rgba(216,105,92,0.1); color:#E8977F; }
+.wl-tag--waiting{ background:rgba(226,162,61,0.14); color:var(--wl-signal-bright); }
+.wl-tag--curious{ background:rgba(143,181,150,0.14); color:var(--wl-cyan); }
+.wl-tag--not-interested{ background:rgba(201,115,85,0.12); color:var(--wl-pink); }
 
 /* -- message-limit progress -- */
 .wl-limit{ margin-bottom:14px; }
 .wl-limit__top{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--wl-text-faint); margin-bottom:6px; letter-spacing:.05em; }
 .wl-limit__track{ height:4px; border-radius:2px; background:rgba(255,255,255,0.08); overflow:hidden; }
-.wl-limit__fill{ height:100%; background:linear-gradient(90deg, var(--wl-signal), var(--wl-pink)); border-radius:2px; transition:width .3s ease; }
+.wl-limit__fill{ height:100%; background:var(--wl-signal); border-radius:2px; transition:width .3s ease; }
 
 /* -- chat bubbles -- */
 .wl-bubble{ max-width:78%; padding:11px 15px; border-radius:18px; font-size:13.5px; line-height:1.45; }
 .wl-bubble--them{ align-self:flex-start; background:rgba(255,255,255,0.06); color:var(--wl-text); border-bottom-left-radius:6px; }
-.wl-bubble--me{ align-self:flex-end; background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink)); color:#fff; border-bottom-right-radius:6px; }
+.wl-bubble--me{ align-self:flex-end; background:var(--wl-signal); color:var(--wl-ink); border-bottom-right-radius:6px; }
 .wl-bubble__time{ font-family:'IBM Plex Mono', monospace; font-size:9px; opacity:.6; margin-top:4px; display:block; }
 
 /* -- empty / loading / error states -- */
 .wl-empty{ text-align:center; padding:50px 20px; color:var(--wl-text-faint); }
 .wl-empty .wl-display{ font-size:16px; color:var(--wl-text-dim); margin-bottom:6px; }
 .wl-error-banner{
-  padding:12px 15px; border-radius:var(--wl-r-md); background:rgba(216,105,92,0.08);
-  border:1px solid rgba(216,105,92,0.25); color:#E8A79E; font-size:12.5px; margin-bottom:14px;
+  padding:12px 15px; border-radius:var(--wl-r-md); background:rgba(201,115,85,0.1);
+  border:1px solid rgba(201,115,85,0.3); color:#E3AC97; font-size:12.5px; margin-bottom:14px;
 }
 
 /* -- staggered list entrance -- */
@@ -170,4 +172,19 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
 
 @media (prefers-reduced-motion: reduce){
   .wl-stagger > *{ animation:none !important; }
+}
+
+/* =========================================================
+   Route slide transition (Confess <-> Inbox), driven by
+   AppLayout's swipe handler and by normal tab taps alike.
+   ========================================================= */
+.wl-page-slide{
+  animation-duration:.32s; animation-timing-function:cubic-bezier(.22,.61,.36,1); animation-fill-mode:both;
+}
+.wl-slide-left{ animation-name:wlSlideInLeft; }
+.wl-slide-right{ animation-name:wlSlideInRight; }
+@keyframes wlSlideInLeft{ from{ transform:translateX(28px); opacity:0; } to{ transform:translateX(0); opacity:1; } }
+@keyframes wlSlideInRight{ from{ transform:translateX(-28px); opacity:0; } to{ transform:translateX(0); opacity:1; } }
+@media (prefers-reduced-motion: reduce){
+  .wl-page-slide{ animation:none !important; }
 }

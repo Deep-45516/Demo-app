@@ -3,17 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <title>Wavelength Confession</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap');
 
+<!-- link tags load more reliably than @import inside headless
+     Chrome/Puppeteer, and preconnect shaves the DNS/TLS round trip -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+
+<style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 500px; height: 706px; background: #0A0A12; }
+  html, body { width: 500px; height: 706px; background: #10160F; }
 
   /*
     This box is 500x706 CSS px — identical to the Puppeteer viewport
-    in generateImages.js, and identical to the .template rule in the
-    frontend's template.css. Keep all three in sync if this ever
-    changes, or the live preview and the final image will drift apart.
+    in generateImages.js, and identical to .template in the
+    frontend's template.css. Keep all three in sync, or the live
+    preview and the final image will drift apart.
   */
   .template{
     position: relative;
@@ -24,7 +29,7 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', Georgia, serif;
   }
 
   .to, .from{
@@ -40,7 +45,7 @@
     font-style: italic;
     font-weight: 500;
     font-size: 19px;
-    color: #F3F1F8;
+    color: #F4EFE3;
     opacity: .8;
     white-space: nowrap;
   }
@@ -49,7 +54,7 @@
     font-style: italic;
     font-weight: 500;
     font-size: 19px;
-    color: #F3F1F8;
+    color: #F4EFE3;
     max-width: 260px;
     white-space: nowrap;
     overflow: hidden;
@@ -67,7 +72,7 @@
     justify-content: center;
     text-align: center;
     font-style: italic;
-    color: #F3F1F8;
+    color: #F4EFE3;
     white-space: pre-wrap;
     word-break: break-word;
     overflow: hidden;
