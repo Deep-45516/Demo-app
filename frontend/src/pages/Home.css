@@ -17,7 +17,13 @@
 }
 .wl-confess__you-mark{
   width:24px; height:24px; display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; border-radius:50%; background:var(--wl-signal); color:var(--wl-ink);
+  flex-shrink:0; border-radius:50%; background: linear-gradient(
+    135deg,
+    var(--wl-signal),
+    var(--wl-pink)
+  );
+
+  color: white;;
 }
 .wl-confess__you-name{ font-size:12px; font-weight:600; color:var(--wl-text); }
 
