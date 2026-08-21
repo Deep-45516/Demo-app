@@ -1,4 +1,5 @@
 /* =========================================================
+//home.css
    Wavelength — Confess. Clean, mobile-first, message box
    reachable without scrolling past decoration.
    ========================================================= */
@@ -158,4 +159,24 @@
 
 @media (prefers-reduced-motion: reduce){
   .wl-note, .wl-mood-chip, .wl-confess__submit{ transition:none; }
+}
+
+.wl-preview-modal__stage {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 5px 0 20px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+}
+
+.wl-preview-modal__stage #previewWrapper {
+  min-width: 0;
 }
