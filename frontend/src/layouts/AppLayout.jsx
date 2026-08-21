@@ -1,4 +1,13 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\layouts\AppLayout.jsx
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import { useRef } from "react";
+
 import "../wavelength.css";
 import "./AppLayout.css";
 import { disconnectSocket } from "../socket";
@@ -41,6 +50,74 @@ function LogoutIcon() {
 
 export default function AppLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
+  const isSwiping = useRef(false);
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+    isSwiping.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    if (touchStartX.current === null) return;
+
+    const touch = e.touches[0];
+
+    const diffX = touch.clientX - touchStartX.current;
+    const diffY = touch.clientY - touchStartY.current;
+
+    /*
+     * Only treat it as a swipe when the horizontal
+     * movement is stronger than the vertical movement.
+     */
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      isSwiping.current = true;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!isSwiping.current || touchStartX.current === null) {
+      touchStartX.current = null;
+      touchStartY.current = null;
+      return;
+    }
+
+    const touch = e.changedTouches[0];
+
+    const diffX = touch.clientX - touchStartX.current;
+
+    const SWIPE_THRESHOLD = 70;
+
+    /*
+     * Currently:
+     *
+     * /       = Confess
+     * /inbox   = Inbox
+     *
+     * Swipe LEFT  -> Inbox
+     * Swipe RIGHT -> Confess
+     */
+
+    if (Math.abs(diffX) >= SWIPE_THRESHOLD) {
+      if (diffX < 0 && location.pathname !== "/inbox") {
+        navigate("/inbox");
+      }
+
+      if (diffX > 0 && location.pathname === "/inbox") {
+        navigate("/");
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+    isSwiping.current = false;
+  };
 
   function logout() {
     localStorage.removeItem("token");
@@ -61,9 +138,23 @@ export default function AppLayout() {
         </button>
       </header>
 
-      <main className="wl-shell__main">
-        <Outlet />
-      </main>
+      <main
+  className="wl-shell__main"
+  onTouchStart={handleTouchStart}
+  onTouchMove={handleTouchMove}
+  onTouchEnd={handleTouchEnd}
+>
+  <div
+    key={location.pathname}
+    className={`wl-page-transition ${
+      location.pathname === "/inbox"
+        ? "wl-page-transition--inbox"
+        : "wl-page-transition--confess"
+    }`}
+  >
+    <Outlet />
+  </div>
+</main>
 
       <nav className="wl-shell__nav">
         <NavLink to="/" end className={({ isActive }) => `wl-shell__navlink ${isActive ? "active" : ""}`}>
