@@ -19,7 +19,7 @@
 }
 .rs-pending strong{ font-size:14px; color:var(--wl-text); display:flex; align-items:center; gap:8px; }
 .rs-pending p{ margin:6px 0 14px; font-size:13px; color:var(--wl-text-dim); line-height:1.5; }
-.rs-pending .wl-btn{ margin-right:8px; }
+.rs-pending .wl-btn{ margin-right:14px; }
 
 .rs-revealed{
   margin-bottom:20px; padding:26px 22px; border-radius:var(--wl-r-lg);

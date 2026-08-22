@@ -30,14 +30,14 @@
 .template .to{ top: 34px; left: 38px; }
 .template .from{ bottom: 46px; right: 38px; flex-direction: row-reverse; }
 
-.template .tpl-label{
+/* .template .tpl-label{
   font-style: italic;
   font-weight: 500;
   font-size: 19px;
   color: #F4EFE3;
   opacity: .8;
   white-space: nowrap;
-}
+} */
 
 .template .previewTo,
 .template .previewFrom{
@@ -49,6 +49,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.template .previewFrom{
+  top: 12px;
+  left-margin:3px; 
+}
+
+.template .previewTo{
+  bottom: 4px;
+  right-margin:3px; 
 }
 
 .template .message {
