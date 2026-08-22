@@ -254,57 +254,37 @@ export default function Home() {
       <section className="wl-section">
         <label className="wl-field-label">Who's this for?</label>
 
-        <div className={`wl-input-row ${
-  recipientVerified
-    ? "is-verified"
-    : recipientVerificationLoading
-      ? "is-checking"
-      : recipientVerificationError
-        ? "is-error"
-        : ""
-}`}>
-
+<div className={`wl-input-row ${recipientStatus?.exists ? "is-verified" : ""}`}>
   <span className="wl-input-row__prefix">@</span>
 
   <input
     type="text"
-    value={recipient}
+    value={recipientUsername}
     onChange={(e) => {
-      setRecipient(e.target.value);
+      setRecipientUsername(e.target.value);
+      setRecipientStatus(null);
+      setAllowPending(false);
+      setPublicConsent(false);
     }}
-    placeholder="instagram username"
+    placeholder="their_username"
+    autoComplete="off"
   />
 
   <button
     type="button"
     className="wl-recipient-verify"
-    onClick={handleVerifyRecipient}
-    disabled={recipientVerificationLoading || !recipient.trim()}
-    aria-label={
-      recipientVerified
-        ? "Recipient verified"
-        : recipientVerificationLoading
-          ? "Checking recipient"
-          : "Verify recipient"
-    }
+    onClick={verifyRecipient}
+    disabled={checkingRecipient || !recipientUsername.trim()}
+    aria-label="Check recipient"
   >
-    {recipientVerificationLoading ? (
+    {checkingRecipient ? (
       <span className="wl-verify-spinner" />
-    ) : recipientVerified ? (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M5 12.5 9.5 17 19 7.5" />
-      </svg>
-    ) : recipientVerificationError ? (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 7l10 10M17 7 7 17" />
-      </svg>
+    ) : recipientStatus?.exists ? (
+      "✓"
     ) : (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M5 12.5 9.5 17 19 7.5" />
-      </svg>
+      "➤"
     )}
   </button>
-
 </div>
 
         {recipientStatus?.exists && (

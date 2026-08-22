@@ -1,5 +1,161 @@
 .wl-inbox{
-  max-width:460px; margin:0 auto; padding:24px 18px 40px; box-sizing:border-box;
+  max-width:460px; margin:0 auto; padding:14px 18px 40px; box-sizing:border-box;
 }
 .wl-inbox__heading{ font-size:23px; margin:2px 0 20px; }
-.wl-inbox__segment{ margin-bottom:25px; }
+/* =========================================================
+   Inbox — Sliding Received / Sent Segmented Control
+   ========================================================= */
+
+.wl-inbox__segment{
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 60px;
+
+  margin-bottom: 20px;
+  padding: 4px;
+
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: 32px;
+
+  overflow: hidden;
+
+  /* subtle depth */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.035),
+    0 8px 25px rgba(0,0,0,0.12);
+}
+
+
+/* ---------------------------------------------------------
+   Sliding active pill
+   --------------------------------------------------------- */
+
+.wl-inbox__segment::before{
+  content: "";
+
+  position: absolute;
+  top: 4px;
+  left: 4px;
+
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+
+  border-radius: 28px;
+
+  background: linear-gradient(
+    135deg,
+    var(--wl-signal),
+    var(--wl-pink)
+  );
+
+  box-shadow:
+    0 5px 16px rgba(124, 92, 252, 0.28),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+
+  transform: translate3d(0, 0, 0);
+
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  will-change: transform;
+
+  z-index: 0;
+}
+
+
+/* Move pill to Sent */
+
+.wl-inbox__segment:has(button:nth-child(2).active)::before{
+  transform: translate3d(100%, 0, 0);
+}
+
+
+/* ---------------------------------------------------------
+   Buttons
+   --------------------------------------------------------- */
+
+.wl-inbox__segment button{
+  position: relative;
+  z-index: 1;
+
+  flex: 1;
+  width: 50%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  outline: none;
+
+  background: transparent;
+
+  color: var(--wl-text-dim);
+
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    color 260ms ease,
+    transform 160ms ease;
+}
+
+
+/* Active text */
+
+.wl-inbox__segment button.active{
+  color: #fff;
+}
+
+
+/* Inactive text becomes slightly softer */
+
+.wl-inbox__segment button:not(.active){
+  color: rgba(255,255,255,0.58);
+}
+
+
+/* ---------------------------------------------------------
+   Click feedback
+   --------------------------------------------------------- */
+
+.wl-inbox__segment button:active{
+  transform: scale(0.96);
+}
+
+
+/* ---------------------------------------------------------
+   Keyboard accessibility
+   --------------------------------------------------------- */
+
+.wl-inbox__segment button:focus-visible{
+  outline: 2px solid rgba(255,255,255,0.55);
+  outline-offset: -3px;
+  border-radius: 28px;
+}
+
+
+/* ---------------------------------------------------------
+   Reduced motion
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce){
+
+  .wl-inbox__segment::before,
+  .wl-inbox__segment button{
+    transition: none;
+  }
+
+}

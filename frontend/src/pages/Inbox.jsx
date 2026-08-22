@@ -81,14 +81,16 @@ export default function Inbox() {
 
   return (
     <div className="wl-inbox">
-      <div className="wl-eyebrow" style={{ marginBottom: 10 }}>INBOX</div>
+      <div className="wl-eyebrow" style={{ marginBottom: 8 }}>INBOX</div>
       <h1 className="wl-display wl-inbox__heading">Every signal you've caught.</h1>
 
       <div className="wl-segment wl-inbox__segment">
-        <button className={tab === "received" ? "active" : ""} onClick={() => setTab("received")}>
+        <button className={tab === "received" ? "active" : ""} 
+        style={{ fontSize: 15 }}
+        onClick={() => setTab("received")}>
           Received ({received.length})
         </button>
-        <button className={tab === "sent" ? "active" : ""} onClick={() => setTab("sent")}>
+        <button className={tab === "sent" ? "active" : ""} style={{ fontSize: 15 }}onClick={() => setTab("sent")}>
           Sent ({sent.length})
         </button>
       </div>
