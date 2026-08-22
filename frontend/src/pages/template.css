@@ -52,12 +52,12 @@
 }
 .template .previewFrom{
   top: 12px;
-  left-margin:3px; 
+  margin-left:3px; 
 }
 
 .template .previewTo{
   bottom: 4px;
-  right-margin:3px; 
+  margin-right: 3px;
 }
 
 .template .message {
