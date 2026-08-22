@@ -14,7 +14,7 @@
   display:inline-flex; align-items:center; gap:8px;
   padding:6px 12px 6px 6px; border-radius:var(--wl-r-pill);
   background:rgba(255,255,255,0.04); border:1px solid var(--wl-line);
-  margin-bottom:16px;
+  margin-bottom:10 px;
 }
 .wl-confess__you-mark{
   width:24px; height:24px; display:flex; align-items:center; justify-content:center;
@@ -28,7 +28,7 @@
 }
 .wl-confess__you-name{ font-size:12px; font-weight:600; color:var(--wl-text); }
 
-.wl-confess__heading{ margin:0 0 22px; font-size:22px; line-height:1.25; }
+.wl-confess__heading{ margin:0 0 12px; font-size:22px; line-height:1.25; }
 
 .wl-section{ margin-bottom:22px; }
 
@@ -257,4 +257,68 @@
 
 .wl-preview-modal__stage #previewWrapper {
   min-width: 0;
+}
+
+.wl-floating-preview {
+  position: fixed;
+  right: 20px;
+  bottom: 310px;
+
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--wl-line);
+  border-radius: 50%;
+
+  background: rgba(20, 18, 16, 0.82);
+  backdrop-filter: blur(12px);
+
+  color: var(--wl-text);
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+
+  z-index: 1000;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.wl-floating-preview:hover {
+  transform: translateY(-2px);
+  background: rgba(35, 32, 29, 0.92);
+  border-color: var(--wl-text-faint);
+
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.42),
+    0 0 0 4px rgba(124, 92, 252, 0.08);
+}
+
+.wl-floating-preview:active {
+  transform: scale(0.92);
+}
+
+@media (max-width: 480px) {
+  .wl-floating-preview {
+    right: 16px;
+    bottom: 16px;
+    width: 46px;
+    height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wl-floating-preview {
+    transition: none;
+  }
 }

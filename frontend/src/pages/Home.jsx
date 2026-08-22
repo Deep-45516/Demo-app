@@ -266,7 +266,7 @@ export default function Home() {
       setAllowPending(false);
       setPublicConsent(false);
     }}
-    placeholder="their_username"
+    placeholder="their_Insta"
     autoComplete="off"
   />
 
@@ -372,10 +372,28 @@ export default function Home() {
         {submitting ? "Sending..." : "Send it anonymously"}
       </button>
 
-      <button type="button" className="wl-disclosure wl-preview-trigger" onClick={() => setShowPreview(true)}>
-        <span>Preview your postcard</span>
-        <span className="wl-preview-arrow">↗</span>
-      </button>
+      <button
+  type="button"
+  className="wl-floating-preview"
+  onClick={() => setShowPreview(true)}
+  aria-label="Preview postcard"
+  title="Preview postcard"
+>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+    <circle cx="12" cy="12" r="2.8" />
+  </svg>
+</button>
 
       {showPreview && (
         <div
