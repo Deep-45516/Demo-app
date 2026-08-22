@@ -3,6 +3,29 @@ import puppeteer from "puppeteer";
 import fs from "fs";
 import path from "path";
 
+let browserPromise = null;
+
+async function getBrowser() {
+  if (!browserPromise) {
+    browserPromise = puppeteer.launch({
+      headless: "new",
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--single-process",
+        "--no-zygote",
+      ],
+    }).catch((err) => {
+      browserPromise = null;
+      throw err;
+    });
+  }
+
+  return browserPromise;
+}
+
 export const generateImages = async ({
   to,
   from,
@@ -43,30 +66,7 @@ const base64Image =
   `data:image/png;base64,${imageBuffer.toString("base64")}`;
 
 
-let browser;
-
-try {
-
-  browser = await puppeteer.launch({
-    headless: "new",
-
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--single-process",
-      "--no-zygote"
-    ]
-  });
-
-} catch (err) {
-
-  console.log("PUPPETEER FAILED");
-  console.log(err);
-
-  throw err;
-}
+const browser = await getBrowser();
 
   const page = await browser.newPage();
 
@@ -235,8 +235,6 @@ const filePath = path.join(
 fs.writeFileSync(filePath, imageBuffer);
     imagePaths.push(filePath);
   }
-
-  await browser.close();
 
   return imagePaths;
 };

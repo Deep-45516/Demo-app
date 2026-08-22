@@ -173,12 +173,9 @@ STOP       create pending */
   "/temp/page1.jpg",
   "/temp/page2.jpg"
 ] */
-
-      const imageUrls = [];
-
-      for (const imagePath of imagePaths) {
-        imageUrls.push(await uploadImage(imagePath));
-      } /*finally imageUrls = [
+  const imageUrls = await Promise.all(
+  imagePaths.map((imagePath) => uploadImage(imagePath))
+); /*finally imageUrls = [
    "https://firebase...page1.jpg",
    "https://firebase...page2.jpg"
 ]; */
