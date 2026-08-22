@@ -38,22 +38,232 @@
 }
 .wl-field-label__optional{ margin-left:6px; text-transform:none; letter-spacing:0; color:var(--wl-text-faint); font-size:9.5px; }
 
-/* -- recipient input -- */
+/* =========================================================
+   Recipient input + inline verification
+   ========================================================= */
+
 .wl-input-row{
-  display:flex; align-items:center; gap:8px; min-height:48px; box-sizing:border-box;
-  padding:0 15px; background:rgba(255,255,255,0.045); border:1px solid var(--wl-line);
-  border-radius:var(--wl-r-md); transition:border-color .2s ease, background .2s ease,box-shadow 0.2s ease;;
-}
-.wl-input-row:focus-within{ border-color:var(--wl-signal); background:rgba(124, 92, 252, 0.05);box-shadow:0 0 0 3px rgba(124, 92, 252, 0.08); }
-.wl-input-row__prefix{ color:var(--wl-text-faint); font-weight:600; }
-.wl-input-row input{ flex:1; min-width:0; border:none; outline:none; background:none; color:var(--wl-text); font-family:'Space Grotesk'; font-size:16px; }
-.wl-input-row input::placeholder{ color:var(--wl-text-faint); }
-.wl-recipient-check{
-  width:20px; height:20px; display:flex; align-items:center; justify-content:center;
-  border-radius:50%; background:rgba(143,181,150,0.16); color:var(--wl-cyan); font-size:11px; font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-height:52px;
+  width:100%;
+  box-sizing:border-box;
+
+  padding:0 8px 0 15px;
+
+  background:rgba(255,255,255,0.045);
+  border:1px solid var(--wl-line);
+  border-radius:var(--wl-r-md);
+
+  transition:
+    border-color .25s ease,
+    background .25s ease,
+    box-shadow .25s ease,
+    transform .2s ease;
 }
 
-.wl-confess__verify-btn{ width:100%; min-height:44px; margin-top:9px; }
+.wl-input-row:focus-within{
+  border-color:var(--wl-signal);
+  background:rgba(124,92,252,0.055);
+  box-shadow:0 0 0 3px rgba(124,92,252,0.08);
+}
+
+.wl-input-row__prefix{
+  color:var(--wl-text-faint);
+  font-weight:600;
+  flex-shrink:0;
+}
+
+.wl-input-row input{
+  flex:1;
+  min-width:0;
+
+  border:none;
+  outline:none;
+  background:none;
+
+  color:var(--wl-text);
+
+  font-family:'Space Grotesk', sans-serif;
+  font-size:16px;
+}
+
+.wl-input-row input::placeholder{
+  color:var(--wl-text-faint);
+}
+
+
+/* =========================================================
+   Verification icon
+   ========================================================= */
+
+.wl-recipient-verify{
+  width:34px;
+  height:34px;
+
+  flex-shrink:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0;
+  border:none;
+  border-radius:50%;
+
+  background:rgba(255,255,255,0.06);
+  color:var(--wl-text-faint);
+
+  cursor:pointer;
+
+  transition:
+    transform .2s cubic-bezier(.2,.8,.2,1),
+    background .25s ease,
+    color .25s ease,
+    box-shadow .25s ease;
+}
+
+.wl-recipient-verify:hover:not(:disabled){
+  transform:scale(1.08);
+  background:rgba(124,92,252,0.15);
+  color:var(--wl-signal);
+}
+
+.wl-recipient-verify:active:not(:disabled){
+  transform:scale(.9);
+}
+
+.wl-recipient-verify:disabled{
+  cursor:default;
+  opacity:.45;
+}
+
+
+/* SVG */
+
+.wl-recipient-verify svg{
+  width:17px;
+  height:17px;
+
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+
+  transition:
+    transform .3s ease,
+    opacity .25s ease;
+}
+
+
+/* =========================================================
+   Checking
+   ========================================================= */
+
+.wl-input-row.is-checking{
+  border-color:rgba(124,92,252,.55);
+  background:rgba(124,92,252,.055);
+  box-shadow:0 0 0 3px rgba(124,92,252,.06);
+}
+
+.wl-input-row.is-checking .wl-recipient-verify{
+  color:var(--wl-signal);
+  background:rgba(124,92,252,.12);
+}
+
+
+/* spinning circle */
+
+.wl-verify-spinner{
+  width:16px;
+  height:16px;
+
+  border:2px solid rgba(255,255,255,.18);
+  border-top-color:var(--wl-signal);
+
+  border-radius:50%;
+
+  animation:wlVerifySpin .7s linear infinite;
+}
+
+@keyframes wlVerifySpin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   VERIFIED
+   ========================================================= */
+
+.wl-input-row.is-verified{
+  border-color:rgba(143,181,150,.5);
+  background:rgba(143,181,150,.045);
+  box-shadow:0 0 0 3px rgba(143,181,150,.05);
+}
+
+.wl-input-row.is-verified .wl-recipient-verify{
+  background:rgba(143,181,150,.16);
+  color:var(--wl-cyan);
+  box-shadow:0 0 14px rgba(143,181,150,.18);
+
+  animation:wlVerifyPop .35s cubic-bezier(.2,.8,.2,1);
+}
+
+.wl-input-row.is-verified .wl-recipient-verify svg{
+  transform:scale(1.08);
+}
+
+@keyframes wlVerifyPop{
+  0%{
+    transform:scale(.65);
+    opacity:.4;
+  }
+
+  70%{
+    transform:scale(1.12);
+  }
+
+  100%{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.wl-input-row.is-error{
+  border-color:rgba(220,90,90,.55);
+  background:rgba(220,90,90,.04);
+  box-shadow:0 0 0 3px rgba(220,90,90,.05);
+}
+
+.wl-input-row.is-error .wl-recipient-verify{
+  color:#e58b8b;
+  background:rgba(220,90,90,.12);
+
+  animation:wlVerifyError .3s ease;
+}
+
+@keyframes wlVerifyError{
+  0%,100%{
+    transform:translateX(0);
+  }
+
+  25%{
+    transform:translateX(-3px);
+  }
+
+  75%{
+    transform:translateX(3px);
+  }
+}
 
 .wl-success-message{ display:flex; align-items:center; gap:7px; margin-top:9px; font-size:11.5px; color:var(--wl-cyan); }
 .wl-success-message span{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(143,181,150,0.14); }

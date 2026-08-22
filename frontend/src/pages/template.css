@@ -24,11 +24,10 @@
 .template .from{
   position: absolute;
   display: flex;
-  align-items: baseline;
   gap: 6px;
 }
-.template .to{ top: 34px; left: 38px; }
-.template .from{ bottom: 46px; right: 38px; flex-direction: row-reverse; }
+.template .to{ top: 82px; left: 18px; }
+.template .from{ top: 618px; right: 25px; flex-direction: row-reverse; }
 
 /* .template .tpl-label{
   font-style: italic;
@@ -42,22 +41,13 @@
 .template .previewTo,
 .template .previewFrom{
   font-style: italic;
-  font-weight: 500;
+  font-weight: 00;
   font-size: 19px;
   color: #F4EFE3;
   max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.template .previewFrom{
-  top: 12px;
-  margin-left:3px; 
-}
-
-.template .previewTo{
-  bottom: 4px;
-  margin-right: 3px;
 }
 
 .template .message {

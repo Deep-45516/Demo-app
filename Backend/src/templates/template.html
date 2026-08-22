@@ -1,167 +1,155 @@
 //C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\Template.html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-  <meta charset="UTF-8" />
+    <!-- SAME FONTS AS FRONTEND -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- SAME FONTS AS FRONTEND -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&family=Lilita+One&display=swap"
+      rel="stylesheet"
+    />
 
-  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&family=Lilita+One&display=swap" rel="stylesheet">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-  <style>
+      body {
+        margin: 0;
+        padding: 0;
 
-    *{
-      box-sizing:border-box;
-    }
+        width: 794px;
+        height: 1123px;
 
-    body{
-      margin:0;
-      padding:0;
+        overflow: hidden;
 
-      width:794px;
-      height:1123px;
+        background: transparent;
+      }
 
-      overflow:hidden;
+      .template {
+        width: 794px;
+        height: 1123px;
 
-      background:transparent;
-    }
+        position: relative;
 
-    .template{
-      width:794px;
-      height:1123px;
+        background-image: url("{{BACKGROUND_IMAGE}}");
 
-      position:relative;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
 
-      background-image:url("{{BACKGROUND_IMAGE}}");
+        overflow: hidden;
+      }
 
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
+      .previewTo {
+        font-family: "Lilita One", cursive;
 
-      overflow:hidden;
-    }
+        position: absolute;
+        color: #f4efe3;
 
-    .previewTo{
-      font-family:'Lilita One', cursive;
+        top: 12%;
+        left: 4.3%;
 
-      position:absolute;
-      color: #faffb6ed;
+        margin: 0;
 
-      top:12%;
-      left:4.3%;
+        font-size: 19px;
 
-      margin:0;
+        opacity: 0.85;
 
-      font-size:19px;
+        letter-spacing: 1px;
+      }
 
-      opacity:0.85;
+      .message {
+        position: absolute;
+        font-weight: 400;
+        top: 11%;
+        left: 16%;
+        width: calc(100% - 104px);
+        max-width: calc(100% - 104px);
+        height: 100%;
 
-      letter-spacing:1px;
-    }
+        font-family: "League Spartan", sans-serif;
 
-    .message{
-  position:absolute;
-      font-weight:400;
-  top:17%;
-  left:16%;
+        text-align: center;
 
-  width:70%;
-  height:69%;
+        overflow: hidden;
 
-  font-family:'League Spartan', sans-serif;
+        white-space: pre-wrap;
+        word-break: break-word;
 
-  text-align:center;
+        line-height: 1.8;
 
-  overflow:hidden;
+        font-size: 42px;
 
-  white-space:pre-wrap;
-  word-break:break-word;
+        display: block;
+        box-sizing: border-box;
+      }
+      .message {
+        position: absolute;
+        font-weight: 400;
+        font-style: italic;
+        color: #f4efe3;
 
-  line-height:1.8;
+        width: 70%;
+        height: 100%;
 
-  font-size:42px;
+        font-family: "League Spartan", sans-serif;
 
-  display:block;
-  box-sizing:border-box;
-}.message {
-  position:absolute;
-  font-weight:400;
-  font-style: italic;
-  color: #faffb6ed;
+        text-align: center;
+        overflow: hidden;
 
-  top:17%;
-  left:16%;
+        white-space: pre-wrap;
+        word-break: break-word;
 
-  width:70%;
-  height:100%;
+        line-height: 1.8;
+        font-size: 44px;
 
-  font-family:'League Spartan', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-  text-align:center;
-  overflow:hidden;
+        box-sizing: border-box;
+      }
 
-  white-space:pre-wrap;
-  word-break:break-word;
+      .previewFrom {
+        font-family: "Lilita One", cursive;
+        opacity: 0.85;
+        color: #f4efe3;
+        margin: 0;
+        text-align: center;
+        white-space: pre-line;
+        word-break: break-word;
+        line-height: 1;
+        letter-spacing: 1px;
+        font-size: 24px;
+      }
 
-  line-height:1.8;
-  font-size:44px;
+      .from {
+        position: absolute;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+        top: 85%;
+        left: 86%;
 
-  box-sizing:border-box;
-}
+        transform: translateX(-50%);
 
-    .previewFrom{
-      font-family:'Lilita One', cursive;
-      opacity:0.85;
-      color: #faffb6ed;
-      margin:0;
-      text-align:center;
-      white-space:pre-line;
-      word-break:break-word;
-      line-height:1;
-      letter-spacing:1px;
-      font-size:24px;
-    }
+        width: 260px;
+      }
+    </style>
+  </head>
 
-    .from{
-      position:absolute;
+  <body>
+    <div class="template">
+      <div class="previewTo">{{TO}}</div>
 
-      top:84%;
-      left:81%;
+      <div class="message">{{MESSAGE}}</div>
 
-      transform:translateX(-50%);
-
-      width:260px;
-    }
-
-  </style>
-</head>
-
-<body>
-
-  <div class="template">
-
-    <div class="previewTo">
-      {{TO}}
-    </div>
-
-    <div class="message">
-      {{MESSAGE}}
-    </div>
-
-    <div class="from">
-      <div class="previewFrom">
-        {{FROM}}
+      <div class="from">
+        <div class="previewFrom">{{FROM}}</div>
       </div>
     </div>
-
-  </div>
-
-</body>
+  </body>
 </html>

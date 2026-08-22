@@ -254,28 +254,58 @@ export default function Home() {
       <section className="wl-section">
         <label className="wl-field-label">Who's this for?</label>
 
-        <div className="wl-input-row wl-recipient-input">
-          <span className="wl-input-row__prefix">@</span>
-          <input
-            type="text"
-            value={recipientUsername}
-            onChange={(e) => {
-              setRecipientUsername(e.target.value);
-              setRecipientStatus(null);
-              setAllowPending(false);
-              setPublicConsent(false);
-            }}
-            placeholder="their_username"
-            autoComplete="off"
-          />
-          {recipientStatus?.exists && <span className="wl-recipient-check">✓</span>}
-        </div>
+        <div className={`wl-input-row ${
+  recipientVerified
+    ? "is-verified"
+    : recipientVerificationLoading
+      ? "is-checking"
+      : recipientVerificationError
+        ? "is-error"
+        : ""
+}`}>
 
-        {!recipientStatus && (
-          <button className="wl-btn wl-btn-outline wl-confess__verify-btn" onClick={verifyRecipient} disabled={checkingRecipient}>
-            {checkingRecipient ? "Checking..." : "Check recipient"}
-          </button>
-        )}
+  <span className="wl-input-row__prefix">@</span>
+
+  <input
+    type="text"
+    value={recipient}
+    onChange={(e) => {
+      setRecipient(e.target.value);
+    }}
+    placeholder="instagram username"
+  />
+
+  <button
+    type="button"
+    className="wl-recipient-verify"
+    onClick={handleVerifyRecipient}
+    disabled={recipientVerificationLoading || !recipient.trim()}
+    aria-label={
+      recipientVerified
+        ? "Recipient verified"
+        : recipientVerificationLoading
+          ? "Checking recipient"
+          : "Verify recipient"
+    }
+  >
+    {recipientVerificationLoading ? (
+      <span className="wl-verify-spinner" />
+    ) : recipientVerified ? (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12.5 9.5 17 19 7.5" />
+      </svg>
+    ) : recipientVerificationError ? (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 7l10 10M17 7 7 17" />
+      </svg>
+    ) : (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12.5 9.5 17 19 7.5" />
+      </svg>
+    )}
+  </button>
+
+</div>
 
         {recipientStatus?.exists && (
           <div className="wl-success-message">
@@ -398,12 +428,11 @@ export default function Home() {
         style={{ display: "none", backgroundImage: `url(${MOODS.find((m) => m.id === mood).file})` }}
       >
         <div className="to">
-          <span className="tpl-label">To,</span>
+          
           <h2 className="previewTo">Someone</h2>
         </div>
         <div className="message"></div>
         <div className="from">
-          <span className="tpl-label">From,</span>
           <h3 className="previewFrom">Unknown</h3>
         </div>
       </div>
