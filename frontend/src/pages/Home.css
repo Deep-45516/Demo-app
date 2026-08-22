@@ -22,7 +22,8 @@
   border-radius: var(--wl-r-pill);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--wl-line);
-  margin-bottom: 10 px;
+  margin-bottom: 8px;
+  margin-top: -10px;
 }
 .wl-confess__you-mark {
   width: 24px;
@@ -54,7 +55,7 @@
 
 .wl-field-label {
   display: block;
-  margin: 0 6px 4px;
+  margin: 0 6px 6px;
   font-family: "IBM Plex Mono", monospace;
   font-size: 9.5px;
   letter-spacing: 0.1em;
@@ -605,13 +606,61 @@
   padding: 16px 16px 42px 16px;
   box-sizing: border-box;
 }
+.wl-note-wrapper {
+  position: relative;
+  width: 100%;
+}
 
-.wl-note-eye {
+.wl-note {
+  width: 100%;
+  min-height: 180px;
+  box-sizing: border-box;
+  padding: 18px 18px 55px;
+  resize: vertical;
+  border: none;
+  outline: none;
+  border-radius: var(--wl-r-lg);
+  background: linear-gradient(180deg, var(--wl-paper), #e9e1d0);
+  color: var(--wl-ink);
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.55;
+  box-shadow: 0 20px 40px -22px rgba(0, 0, 0, 0.65);
+}
+
+.wl-floating-preview {
   position: absolute;
-  left: 14px;
-  bottom: 12px;
+  right: 10px;
+  bottom: 10px;
 
-  font-size: 16px;
-  opacity: 0.65;
-  pointer-events: none;
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 1px solid var(--wl-line);
+  border-radius: 50%;
+
+  background: rgba(35, 33, 30, 0.92);
+  color: var(--wl-text);
+
+  cursor: pointer;
+  z-index: 2;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.wl-floating-preview:hover {
+  transform: translateY(-2px);
+  background: rgba(45, 42, 38, 0.96);
+}
+
+.wl-floating-preview:active {
+  transform: scale(0.92);
 }
