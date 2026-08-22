@@ -304,12 +304,38 @@ export default function Home() {
       {/* MESSAGE */}
       <section className="wl-section wl-message-section">
         <label className="wl-field-label">Say the thing</label>
-        <textarea
-          className="wl-note"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Say what you can't say out loud..."
-        />
+        <div className="wl-note-wrapper">
+  <textarea
+    className="wl-note"
+    value={message}
+    onChange={(e) => setMessage(e.target.value)}
+    placeholder="Say what you can't say out loud..."
+  />
+
+  <button
+    type="button"
+    className="wl-floating-preview"
+    onClick={() => setShowPreview(true)}
+    aria-label="Preview postcard"
+    title="Preview postcard"
+  >
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+      <circle cx="12" cy="12" r="2.8" />
+    </svg>
+  </button>
+</div>
+        
       </section>
 
       {/* MOOD */}
@@ -372,28 +398,7 @@ export default function Home() {
         {submitting ? "Sending..." : "Send it anonymously"}
       </button>
 
-      <button
-  type="button"
-  className="wl-floating-preview"
-  onClick={() => setShowPreview(true)}
-  aria-label="Preview postcard"
-  title="Preview postcard"
->
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
-    <circle cx="12" cy="12" r="2.8" />
-  </svg>
-</button>
+      
 
       {showPreview && (
         <div
