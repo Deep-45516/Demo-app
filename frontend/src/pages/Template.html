@@ -11,71 +11,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
 
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 500px; height: 706px; background: #10160F; }
+  
 
   /*
+  frontend
     This box is 500x706 CSS px — identical to the Puppeteer viewport
     in generateImages.js, and identical to .template in the
     frontend's template.css. Keep all three in sync, or the live
     preview and the final image will drift apart.
   */
-  .template{
-    position: relative;
-    width: 500px;
-    height: 706px;
-    overflow: hidden;
-    background-image: url("{{BACKGROUND_IMAGE}}");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    font-family: 'Fraunces', Georgia, serif;
-  }
-
-  .to, .from{
-    position: absolute;
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-  }
-
-
-  /* .tpl-label{
-    font-style: italic;
-    font-weight: 500;
-    font-size: 19px;
-    color: #F4EFE3;
-    opacity: .8;
-    white-space: nowrap;
-  } */
-
-  .previewTo, .previewFrom{
-    font-style: italic;
-    font-weight: 500;
-    font-size: 19px;
-    color: #F4EFE3;
-    max-width: 260px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .message{
-    position: absolute;
-    left: 52px;
-    right: 52px;
-    top: 118px;
-    bottom: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-style: italic;
-    color: #F4EFE3;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow: hidden;
-  }
+  
 </style>
 </head>
 <body>
@@ -89,7 +34,7 @@
 
     <div class="from">
       <!-- <span class="tpl-label">From,</span> -->
-      <!-- <span class="previewFrom">{{FROM}}</span> -->
+      <span class="previewFrom">{{FROM}}</span>
     </div>
   </div>
 </body>
