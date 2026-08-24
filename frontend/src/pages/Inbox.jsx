@@ -81,8 +81,8 @@ export default function Inbox() {
 
   return (
     <div className="wl-inbox">
-      <div className="wl-eyebrow" style={{ marginBottom: 8 }}>INBOX</div>
-      <h1 className="wl-display wl-inbox__heading">Every signal you've caught.</h1>
+      {/* <div className="wl-eyebrow" style={{ marginBottom: 8 }}>INBOX</div>
+      <h1 className="wl-display wl-inbox__heading">Every signal you've caught.</h1> */}
 
       <div className="wl-segment wl-inbox__segment">
         <button className={tab === "received" ? "active" : ""} 

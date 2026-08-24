@@ -24,7 +24,7 @@ function SignalMarkIcon() {
 
 function ConfessIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 12l9-9 9 9M5 10v10h14V10" />
     </svg>
   );
@@ -32,21 +32,21 @@ function ConfessIcon() {
 
 function InboxIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 7l9 6 9-6M4 5h16v14H4z" />
     </svg>
   );
 }
 
-function LogoutIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <path d="M16 17l5-5-5-5" />
-      <path d="M21 12H9" />
-    </svg>
-  );
-}
+// function LogoutIcon() {
+//   return (
+//     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+//       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+//       <path d="M16 17l5-5-5-5" />
+//       <path d="M21 12H9" />
+//     </svg>
+//   );
+// }
 
 export default function AppLayout() {
   const navigate = useNavigate();
@@ -119,24 +119,31 @@ export default function AppLayout() {
     isSwiping.current = false;
   };
 
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    disconnectSocket();
-    navigate("/instagram", { replace: true });
-  }
+  // function logout() {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("user");
+  //   disconnectSocket();
+  //   navigate("/instagram", { replace: true });
+  // }
 
   return (
     <div className="wl-shell">
-      <header className="wl-shell__header">
-        <div className="wl-shell__brand">
-          <SignalMarkIcon />
-          <span>Wavelength</span>
-        </div>
-        <button className="wl-shell__logout" onClick={logout} aria-label="Log out">
-          <LogoutIcon />
-        </button>
-      </header>
+      {/* <header className="wl-shell__header">
+      
+
+      </header> */}
+
+             {/* {location.pathname === "/" && (
+  <button
+    className="wl-shell__logout"
+    onClick={logout}
+    aria-label="Log out"
+  >
+    <LogoutIcon />
+  </button>
+)} */}
+
+      
 
       <main
   className="wl-shell__main"

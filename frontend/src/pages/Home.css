@@ -22,8 +22,8 @@
   border-radius: var(--wl-r-pill);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--wl-line);
-  margin-bottom: 8px;
   margin-top: -10px;
+  /* margin-bottom: 0%; */
 }
 .wl-confess__you-mark {
   width: 24px;
@@ -663,4 +663,25 @@
 
 .wl-floating-preview:active {
   transform: scale(0.92);
+}
+
+
+ .wl-shell__logout{
+  margin-top: -34px;
+  margin-left: 82%;
+  width:34px; height:34px; border-radius:50%; border:1px solid var(--wl-line); background:rgba(255,255,255,0.04);
+  color:var(--wl-text-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s ease;
+} 
+.wl-shell__logout:hover{ color:var(--wl-text); border-color:rgba(255,255,255,0.25); }
+
+.wl-shell__logout {
+
+  position: fixed;
+  flex-shrink: 0;
+}
+
+.wl-shell__header{margin-bottom: 10px;
+  position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px; background:rgba(10,10,18,0.75); backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--wl-line);
 }

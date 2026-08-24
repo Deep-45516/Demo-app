@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import { disconnectSocket } from "../socket";
 
 import "../wavelength.css";
 import "./Home.css";
@@ -42,6 +43,12 @@ const MOODS = [
 
 export default function Home() {
   const navigate = useNavigate();
+  function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  disconnectSocket();
+  navigate("/instagram", { replace: true });
+}
 
   const [anonymousProfile] = useState(() => {
     const stored = localStorage.getItem("anonymousProfile");
@@ -246,9 +253,19 @@ export default function Home() {
         <div className="wl-confess__you-name">
           {anonymousProfile?.anonymousName || "Anonymous"}
         </div>
+        
       </div>
+      <button
+    className="wl-shell__logout"
+    onClick={logout}
+    aria-label="Log out"
+  >
+    <LogoutIcon />
+  </button>
+      <header className="wl-shell__header">
+      </header>
 
-      <h1 className="wl-display wl-confess__heading">Say it, stay unknown.</h1>
+      {/* <h1 className="wl-display wl-confess__heading">Say it, stay unknown.</h1> */}
 
       {/* RECIPIENT */}
       <section className="wl-section">
@@ -440,5 +457,25 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
   );
 }

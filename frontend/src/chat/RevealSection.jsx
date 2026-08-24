@@ -1,3 +1,4 @@
+//revealsection.jsx
 import { useEffect, useState } from "react";
 import "./revealSection.css";
 

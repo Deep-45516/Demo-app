@@ -18,7 +18,16 @@ const VERIFICATION_STATES = {
 
 function SignalMarkIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="18" r="1.6" fill="currentColor" stroke="none" />
       <path d="M8.5 14.5a5 5 0 0 1 7 0" />
       <path d="M5.5 11.5a9 9 0 0 1 13 0" />
@@ -28,7 +37,17 @@ function SignalMarkIcon() {
 
 function LockIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <rect x="4" y="10" width="16" height="11" rx="2" />
       <path d="M8 10V7a4 4 0 0 1 8 0v3" />
     </svg>
@@ -37,7 +56,17 @@ function LockIcon() {
 
 function ShieldIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M12 3l7 3v5c0 4.5-2.8 8.3-7 10-4.2-1.7-7-5.5-7-10V6l7-3z" />
       <path d="M9 12l2 2 4-4" />
     </svg>
@@ -46,7 +75,17 @@ function ShieldIcon() {
 
 function InstagramIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none" />
@@ -56,7 +95,17 @@ function InstagramIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M5 12l4 4L19 6" />
     </svg>
   );
@@ -64,7 +113,17 @@ function CheckIcon() {
 
 function ArrowIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M5 12h14" />
       <path d="M13 6l6 6-6 6" />
     </svg>
@@ -189,7 +248,9 @@ export default function InstagramVerification() {
       checking = true;
 
       try {
-        const res = await fetch(`${API}/api/v1/auth/instagram/status/${verificationSessionId}`);
+        const res = await fetch(
+          `${API}/api/v1/auth/instagram/status/${verificationSessionId}`,
+        );
         const data = await res.json();
 
         if (!res.ok) {
@@ -201,7 +262,10 @@ export default function InstagramVerification() {
         if (status === "username_mismatch") {
           clearPolling();
           if (!mountedRef.current) return;
-          setError(data.data?.error || "The code was sent from a different Instagram account.");
+          setError(
+            data.data?.error ||
+              "The code was sent from a different Instagram account.",
+          );
           setState(VERIFICATION_STATES.ERROR);
           return;
         }
@@ -211,7 +275,10 @@ export default function InstagramVerification() {
           if (!mountedRef.current) return;
           setState(VERIFICATION_STATES.VERIFYING);
           const token = data.data?.token;
-          if (!token) throw new Error("Verification succeeded but login token was not received.");
+          if (!token)
+            throw new Error(
+              "Verification succeeded but login token was not received.",
+            );
           await completeLogin(token);
           return;
         }
@@ -221,38 +288,37 @@ export default function InstagramVerification() {
           return;
         }
       } catch (error) {
-  console.error(
-    "Temporary verification polling error:",
-    error
-  );
+        console.error("Temporary verification polling error:", error);
 
-  /*
-   * IMPORTANT:
-   *
-   * A polling request can fail temporarily because of:
-   *
-   * - Render waking up
-   * - temporary network issue
-   * - mobile browser connection change
-   * - request timeout
-   *
-   * Do NOT immediately destroy the verification process.
-   *
-   * The next polling interval will try again.
-   */
-
-} finally {
+        /*
+         * IMPORTANT:
+         *
+         * A polling request can fail temporarily because of:
+         *
+         * - Render waking up
+         * - temporary network issue
+         * - mobile browser connection change
+         * - request timeout
+         *
+         * Do NOT immediately destroy the verification process.
+         *
+         * The next polling interval will try again.
+         */
+      } finally {
         checking = false;
       }
     }, 2000);
 
-    timeoutRef.current = setTimeout(() => {
-      clearPolling();
-      if (mountedRef.current) {
-        setError("This verification code has expired.");
-        setState(VERIFICATION_STATES.EXPIRED);
-      }
-    }, 5 * 60 * 1000);
+    timeoutRef.current = setTimeout(
+      () => {
+        clearPolling();
+        if (mountedRef.current) {
+          setError("This verification code has expired.");
+          setState(VERIFICATION_STATES.EXPIRED);
+        }
+      },
+      5 * 60 * 1000,
+    );
   }
 
   async function completeLogin(token) {
@@ -276,10 +342,7 @@ export default function InstagramVerification() {
       throw new Error("Anonymous identity could not be loaded.");
     }
 
-    localStorage.setItem(
-  "anonymousProfile",
-  JSON.stringify(profile)
-);
+    localStorage.setItem("anonymousProfile", JSON.stringify(profile));
 
     if (!mountedRef.current) return;
 
@@ -340,11 +403,12 @@ export default function InstagramVerification() {
           <div className="wl-instagram-auth__success-icon">
             <CheckIcon />
           </div>
-          <h1 className="wl-display">You're tuned in.</h1>
-          <p className="wl-instagram-auth__success-label wl-mono">YOU'RE NOW KNOWN AS</p>
-          <h2 className="wl-instagram-auth__anonymous-name wl-display">{anonymousName}</h2>
-          <p className="wl-instagram-auth__success-message">Welcome to Wavelength.</p>
-          <p className="wl-instagram-auth__success-loading wl-mono">Taking you home...</p>
+          <p className="wl-instagram-auth__success-label wl-mono">
+            Your Secreat Name is
+          </p>
+          <h2 className="wl-instagram-auth__anonymous-name wl-display">
+            {anonymousName}
+          </h2>
         </section>
       </main>
     );
@@ -366,29 +430,43 @@ export default function InstagramVerification() {
             <SignalMarkIcon />
           </div>
           <p className="wl-instagram-auth__brand-name">Wavelength</p>
-          <p className="wl-instagram-auth__brand-subtitle">Anonymous, until you're not.</p>
+          {/* <p className="wl-instagram-auth__brand-subtitle">
+  Stay anonymous.
+</p> */}
         </header>
 
-        <div className="wl-eyebrow" style={{ justifyContent: "center", marginBottom: 12 }}>
+        {/* <div
+          className="wl-eyebrow"
+          style={{ justifyContent: "center", marginBottom: 12 }}
+        >
           <div className="wl-sbars" data-level={stepLevel}>
-            <span></span><span></span><span></span><span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
-          {verificationActive ? "STEP 2 — LISTEN" : "STEP 1 — TUNE IN"}
-        </div>
+          {verificationActive ? "STEP 2" : "STEP 1"}
+        </div> */}
 
         <h1 className="wl-instagram-auth__heading wl-display">
-          {verificationActive ? "Paste this in our DMs." : "Every campus has a frequency."}
+          {verificationActive ? "Send this code." : "Find your anonymous name."}
         </h1>
-        <p className="wl-instagram-auth__description">
+        {/* <p className="wl-instagram-auth__description">
           {verificationActive
-            ? "Send the code below and we'll bring you in the moment it lands."
-            : "Verify your Instagram to find yours."}
-        </p>
+  ? ""
+  : ""}
+        </p> */}
 
         <section className="wl-instagram-auth__card wl-card">
-          <label htmlFor="instagram-username" className="wl-instagram-auth__field-label">
-            Instagram username
-          </label>
+<label
+  htmlFor="instagram-username"
+  className="wl-instagram-auth__field-label"
+  aria-hidden={true}
+>
+  {verificationActive ? "" : "Instagram username"}
+</label>
+
+
 
           <div className="wl-instagram-auth__input-wrap">
             <span className="wl-instagram-auth__input-prefix">@</span>
@@ -419,64 +497,102 @@ export default function InstagramVerification() {
               disabled={state === VERIFICATION_STATES.GENERATING}
               onClick={handleGenerateCode}
             >
-              {state === VERIFICATION_STATES.GENERATING ? "Creating your code..." : (<>Continue <ArrowIcon /></>)}
+              {state === VERIFICATION_STATES.GENERATING ? (
+                "Creating your code..."
+              ) : (
+                <>
+                  Continue <ArrowIcon />
+                </>
+              )}
             </button>
           )}
 
           {!verificationActive && (
             <div className="wl-instagram-auth__privacy">
-              <span className="wl-instagram-auth__privacy-icon"><ShieldIcon /></span>
-              <span>Your Instagram is only used to verify your account. Your identity stays anonymous on Wavelength.</span>
+              <span className="wl-instagram-auth__privacy-icon">
+                <ShieldIcon />
+              </span>
+              <span>Private & anonymous.</span>
             </div>
           )}
 
           {verificationActive && (
-            <section className="wl-instagram-auth__verification wl-fade-up" aria-live="polite">
-              <h2 className="wl-instagram-auth__verification-title">Almost there</h2>
+            <section
+              className="wl-instagram-auth__verification wl-fade-up"
+              aria-live="polite"
+            >
+              {/* <h2 className="wl-instagram-auth__verification-title">Almost there</h2> */}
               <p className="wl-instagram-auth__verification-text">
-                Send this code from <strong>@{username}</strong> to{" "}
-                <span className="wl-instagram-auth__destination">@{BUSINESS_USERNAME}</span> on Instagram.
+                DM it {/* //from <strong>@{username}</strong>  */}
+                to{" "}
+                <span className="wl-instagram-auth__destination">
+                  @{BUSINESS_USERNAME}
+                </span>
               </p>
 
-              <div className="wl-instagram-auth__code wl-mono" aria-label={`Verification code ${code}`}>
-                {code}
-              </div>
+              <button
+  type="button"
+  className="wl-instagram-auth__code wl-mono"
+  onClick={handleCopy}
+  aria-label="Copy verification code"
+>
+  <span>{code}</span>
 
-              <div className="wl-instagram-auth__actions">
-                <button type="button" className="wl-btn wl-btn-outline wl-instagram-auth__secondary" onClick={handleCopy}>
-                  {copied ? "✓ Copied" : "Copy code"}
-                </button>
-                <button
-                  type="button"
-                  className="wl-btn wl-instagram-auth__instagram"
-                  disabled={openingInstagram}
-                  onClick={handleOpenInstagram}
-                >
-                  <InstagramIcon />
-                  {openingInstagram ? "Opening Instagram..." : "Open Instagram"}
-                </button>
-              </div>
+  <span className="wl-instagram-auth__copy-icon" aria-hidden="true">
+    {copied ? "   ✓" : "   ⧉"}
+  </span>
+</button>
+
+<div className="wl-instagram-auth__actions">
+  <button
+    type="button"
+    className="wl-btn wl-instagram-auth__instagram"
+    disabled={openingInstagram}
+    onClick={handleOpenInstagram}
+  >
+    <InstagramIcon />
+    {openingInstagram ? "Opening..." : "Open Instagram"}
+  </button>
+</div>
 
               {state === VERIFICATION_STATES.WAITING && (
                 <div className="wl-instagram-auth__status">
-                  <div className="wl-eq"><span></span><span></span><span></span><span></span><span></span></div>
-                  <span className="wl-mono">Listening for your signal…</span>
+                  <div className="wl-eq">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <span className="wl-mono">Waiting for verification...</span>
                 </div>
               )}
 
               {state === VERIFICATION_STATES.VERIFYING && (
                 <div className="wl-instagram-auth__status">
-                  <div className="wl-eq"><span></span><span></span><span></span><span></span><span></span></div>
+                  <div className="wl-eq">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                   <span className="wl-mono">Tuning in…</span>
                 </div>
               )}
 
-              {(state === VERIFICATION_STATES.ERROR || state === VERIFICATION_STATES.EXPIRED) && (
+              {(state === VERIFICATION_STATES.ERROR ||
+                state === VERIFICATION_STATES.EXPIRED) && (
                 <div className="wl-instagram-auth__error">{error}</div>
               )}
 
-              {(state === VERIFICATION_STATES.ERROR || state === VERIFICATION_STATES.EXPIRED) && (
-                <button type="button" className="wl-btn wl-btn-outline wl-btn-block wl-instagram-auth__retry" onClick={handleRetry}>
+              {(state === VERIFICATION_STATES.ERROR ||
+                state === VERIFICATION_STATES.EXPIRED) && (
+                <button
+                  type="button"
+                  className="wl-btn wl-btn-outline wl-btn-block wl-instagram-auth__retry"
+                  onClick={handleRetry}
+                >
                   Generate new code
                 </button>
               )}
