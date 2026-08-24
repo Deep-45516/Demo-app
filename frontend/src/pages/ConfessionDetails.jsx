@@ -195,6 +195,9 @@ export default function ConfessionDetails() {
           {confession.recipientAction === "pending" && (
             <>
               <p className="wl-details__prompt">Curious who sent this?</p>
+              <p className="wl-mono" style={{ fontSize: 10.5, color: "var(--wl-text-faint)", marginBottom: 12 }}>
+  Choosing curious starts an anonymous chat.
+</p>
               <div className="wl-details__actions">
                 <button className="wl-btn wl-btn-primary" disabled={actionLoading} onClick={() => handleAction("curious")}>
                   {actionLoading ? "Updating..." : "👀 Curious"}
@@ -246,7 +249,12 @@ export default function ConfessionDetails() {
         <div className="wl-details__section wl-fade-up">
           <div className="wl-eyebrow">RECIPIENT RESPONSE</div>
 
-          {confession.recipientAction === "pending" && <span className="wl-tag wl-tag--waiting">⏳ Waiting for their response</span>}
+          {confession.recipientAction === "pending" && (
+  <>
+    <span className="wl-tag wl-tag--waiting">⏳ Waiting for their response</span>
+    <p className="wl-details__prompt">If they're curious, a chat opens here automatically.</p>
+  </>
+)}
 
           {confession.recipientAction === "curious" && (
             <>
