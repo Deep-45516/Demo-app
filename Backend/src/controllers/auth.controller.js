@@ -1,3 +1,4 @@
+//auth.controller.js
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { ApiResponse } from "../utils/api-response.js";

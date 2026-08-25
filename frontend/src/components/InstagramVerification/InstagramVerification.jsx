@@ -449,8 +449,18 @@ export default function InstagramVerification() {
         </div> */}
 
         <h1 className="wl-instagram-auth__heading wl-display">
-          {verificationActive ? "Send this code." : "Find your anonymous name."}
-        </h1>
+  {verificationActive ? (
+    <>
+      Send this code to{" "}
+      <span className="wl-instagram-auth__destination">
+        @{BUSINESS_USERNAME}
+      </span>
+    </>
+  ) : (
+    "Find your anonymous name."
+  )}
+</h1>
+
         {/* <p className="wl-instagram-auth__description">
           {verificationActive
   ? ""
@@ -523,11 +533,11 @@ export default function InstagramVerification() {
             >
               {/* <h2 className="wl-instagram-auth__verification-title">Almost there</h2> */}
               <p className="wl-instagram-auth__verification-text">
-                DM it {/* //from <strong>@{username}</strong>  */}
-                to{" "}
+                DM it from <strong>@{username}</strong> 
+                {/* to{" "}
                 <span className="wl-instagram-auth__destination">
                   @{BUSINESS_USERNAME}
-                </span>
+                </span> */}
               </p>
 
               <button

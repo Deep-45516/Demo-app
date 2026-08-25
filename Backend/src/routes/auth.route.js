@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\Backend\src\routes\auth.route.js
 import { Router } from "express";
 import {
   adminLogin,
