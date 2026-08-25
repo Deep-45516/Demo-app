@@ -129,7 +129,7 @@ function ArrowIcon() {
     </svg>
   );
 }
-
+let backendWakePromise = null;
 export default function InstagramVerification() {
   const [state, setState] = useState(VERIFICATION_STATES.IDLE);
   const [username, setUsername] = useState("");
@@ -152,10 +152,27 @@ export default function InstagramVerification() {
       clearTimeout(timeoutRef.current);
     };
   }, []);
+  
 
-  useEffect(() => {
-    checkExistingLogin();
-  }, []);
+useEffect(() => {
+  wakeBackend();
+  checkExistingLogin();
+}, []);
+
+
+let backendWakePromise = null;
+
+function wakeBackend() {
+  if (!backendWakePromise) {
+    backendWakePromise = fetch(`${API}/api/v1/healthcheck`)
+      .catch((error) => {
+        console.log("Backend wake-up failed:", error);
+        return null;
+      });
+  }
+
+  return backendWakePromise;
+}
 
   async function checkExistingLogin() {
     const token = localStorage.getItem("token");
