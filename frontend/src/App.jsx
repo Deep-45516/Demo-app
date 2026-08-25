@@ -18,6 +18,10 @@ import AppLayout from "./layouts/AppLayout.jsx";
 
 function App() {
   useEffect(() => {
+    // Wake Render backend as soon as the frontend loads.
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/healthcheck`)
+      .catch(() => {});
+
     const token = localStorage.getItem("token");
 
     if (!token) {
