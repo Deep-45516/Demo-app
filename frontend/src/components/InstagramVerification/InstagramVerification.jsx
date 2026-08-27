@@ -526,49 +526,62 @@ export default function InstagramVerification() {
             </div>
           )}
 
-          {verificationActive && (
+            {verificationActive && (
   <section
     className="wl-instagram-auth__verification wl-fade-up"
     aria-live="polite"
   >
-    <img
-      src="/wyt-confessions.png"
-      alt=""
-      className="wl-instagram-auth__guide-image"
-    />
+    <p className="wl-instagram-auth__verification-text">
+                DM it from <strong>@{username}</strong> 
+                {/* to{" "}
+                <span className="wl-instagram-auth__destination">
+                  @{BUSINESS_USERNAME}
+                </span> */}
+              </p>
 
-    <div className="wl-instagram-auth__code-section">
-      <span className="wl-instagram-auth__code-label">
-        YOUR CODE
-      </span>
+    {/* Instagram reference image */}
+    <div className="wl-instagram-auth__reference">
+      <img
+        src="/wyt-confessions(1).png"
+        alt="How to send the verification code on Instagram"
+      />
+    </div>
 
-      <button
-        type="button"
-        className="wl-instagram-auth__code wl-mono"
-        onClick={handleCopy}
-        aria-label="Copy verification code"
-      >
-        <span>{code}</span>
-
-        <span
-          className="wl-instagram-auth__copy-icon"
-          aria-hidden="true"
-        >
-          {copied ? "✓" : "⧉"}
-        </span>
-      </button>
+    {/* Verification code */}
+    <div className="wl-instagram-auth__code-label wl-mono">
+      YOUR CODE
     </div>
 
     <button
       type="button"
-      className="wl-btn wl-instagram-auth__instagram"
-      disabled={openingInstagram}
-      onClick={handleOpenInstagram}
+      className="wl-instagram-auth__code wl-mono"
+      onClick={handleCopy}
+      aria-label="Copy verification code"
     >
-      <InstagramIcon />
-      {openingInstagram ? "Opening..." : "Open Instagram"}
+      <span>{code}</span>
+
+      <span
+        className="wl-instagram-auth__copy-icon"
+        aria-hidden="true"
+      >
+        {copied ? "✓" : "⧉"}
+      </span>
     </button>
 
+    {/* Instagram button */}
+    <div className="wl-instagram-auth__actions">
+      <button
+        type="button"
+        className="wl-btn wl-instagram-auth__instagram"
+        disabled={openingInstagram}
+        onClick={handleOpenInstagram}
+      >
+        <InstagramIcon />
+        {openingInstagram ? "Opening..." : "Open Instagram"}
+      </button>
+    </div>
+
+    {/* Verification status */}
     {state === VERIFICATION_STATES.WAITING && (
       <div className="wl-instagram-auth__status">
         <div className="wl-eq">

@@ -476,3 +476,149 @@
     margin-top: 14px;
   }
 }
+
+
+/* =========================================
+   INSTAGRAM VERIFICATION
+   ========================================= */
+
+.wl-instagram-auth__verification {
+  margin-top: 24px;
+}
+
+.wl-instagram-auth__verification-text {
+  margin: 0 0 18px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.72;
+}
+
+.wl-instagram-auth__verification-text strong {
+  font-weight: 500;
+  opacity: 1;
+}
+
+
+/* Instagram visual guide */
+
+.wl-instagram-auth__reference {
+  width: 58%;
+  max-width: 300px;
+  margin: 0 auto 24px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.wl-instagram-auth__reference img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 190px;
+  object-fit: contain;
+}
+
+
+/* Code label */
+
+.wl-instagram-auth__code-label {
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.45;
+}
+
+
+/* Code */
+
+.wl-instagram-auth__code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  width: 100%;
+  min-height: 54px;
+
+  padding: 12px 16px;
+  margin: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  font-size: 16px;
+  letter-spacing: 0.12em;
+
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.wl-instagram-auth__code:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.wl-instagram-auth__code:active {
+  transform: scale(0.99);
+}
+
+.wl-instagram-auth__copy-icon {
+  font-size: 15px;
+  opacity: 0.55;
+  letter-spacing: 0;
+}
+
+
+/* Instagram button */
+
+.wl-instagram-auth__actions {
+  margin-top: 14px;
+}
+
+.wl-instagram-auth__instagram {
+  width: 100%;
+  min-height: 48px;
+}
+
+
+/* Status */
+
+.wl-instagram-auth__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  margin-top: 20px;
+
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0.48;
+}
+
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .wl-instagram-auth__reference {
+    max-width: 270px;
+    margin-bottom: 20px;
+  }
+
+  .wl-instagram-auth__reference img {
+    max-height: 170px;
+  }
+
+  .wl-instagram-auth__verification-text {
+    font-size: 13px;
+  }
+}
