@@ -527,87 +527,98 @@ export default function InstagramVerification() {
           )}
 
           {verificationActive && (
-            <section
-              className="wl-instagram-auth__verification wl-fade-up"
-              aria-live="polite"
-            >
-              {/* <h2 className="wl-instagram-auth__verification-title">Almost there</h2> */}
-              <p className="wl-instagram-auth__verification-text">
-                DM it from <strong>@{username}</strong> 
-                {/* to{" "}
-                <span className="wl-instagram-auth__destination">
-                  @{BUSINESS_USERNAME}
-                </span> */}
-              </p>
-
-              <button
-  type="button"
-  className="wl-instagram-auth__code wl-mono"
-  onClick={handleCopy}
-  aria-label="Copy verification code"
->
-  <span>{code}</span>
-
-  <span className="wl-instagram-auth__copy-icon" aria-hidden="true">
-    {copied ? "   ✓" : "   ⧉"}
-  </span>
-</button>
-
-<div className="wl-instagram-auth__actions">
-  <button
-    type="button"
-    className="wl-btn wl-instagram-auth__instagram"
-    disabled={openingInstagram}
-    onClick={handleOpenInstagram}
+  <section
+    className="wl-instagram-auth__verification wl-fade-up"
+    aria-live="polite"
   >
-    <InstagramIcon />
-    {openingInstagram ? "Opening..." : "Open Instagram"}
-  </button>
-</div>
+    <img
+      src="/wyt-confessions.png"
+      alt=""
+      className="wl-instagram-auth__guide-image"
+    />
 
-              {state === VERIFICATION_STATES.WAITING && (
-                <div className="wl-instagram-auth__status">
-                  <div className="wl-eq">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                  <span className="wl-mono">Waiting for verification...</span>
-                </div>
-              )}
+    <div className="wl-instagram-auth__code-section">
+      <span className="wl-instagram-auth__code-label">
+        YOUR CODE
+      </span>
 
-              {state === VERIFICATION_STATES.VERIFYING && (
-                <div className="wl-instagram-auth__status">
-                  <div className="wl-eq">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                  <span className="wl-mono">Tuning in…</span>
-                </div>
-              )}
+      <button
+        type="button"
+        className="wl-instagram-auth__code wl-mono"
+        onClick={handleCopy}
+        aria-label="Copy verification code"
+      >
+        <span>{code}</span>
 
-              {(state === VERIFICATION_STATES.ERROR ||
-                state === VERIFICATION_STATES.EXPIRED) && (
-                <div className="wl-instagram-auth__error">{error}</div>
-              )}
+        <span
+          className="wl-instagram-auth__copy-icon"
+          aria-hidden="true"
+        >
+          {copied ? "✓" : "⧉"}
+        </span>
+      </button>
+    </div>
 
-              {(state === VERIFICATION_STATES.ERROR ||
-                state === VERIFICATION_STATES.EXPIRED) && (
-                <button
-                  type="button"
-                  className="wl-btn wl-btn-outline wl-btn-block wl-instagram-auth__retry"
-                  onClick={handleRetry}
-                >
-                  Generate new code
-                </button>
-              )}
-            </section>
-          )}
+    <button
+      type="button"
+      className="wl-btn wl-instagram-auth__instagram"
+      disabled={openingInstagram}
+      onClick={handleOpenInstagram}
+    >
+      <InstagramIcon />
+      {openingInstagram ? "Opening..." : "Open Instagram"}
+    </button>
+
+    {state === VERIFICATION_STATES.WAITING && (
+      <div className="wl-instagram-auth__status">
+        <div className="wl-eq">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <span className="wl-mono">
+          Waiting for verification
+        </span>
+      </div>
+    )}
+
+    {state === VERIFICATION_STATES.VERIFYING && (
+      <div className="wl-instagram-auth__status">
+        <div className="wl-eq">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <span className="wl-mono">
+          Verifying
+        </span>
+      </div>
+    )}
+
+    {(state === VERIFICATION_STATES.ERROR ||
+      state === VERIFICATION_STATES.EXPIRED) && (
+      <>
+        <div className="wl-instagram-auth__error">
+          {error}
+        </div>
+
+        <button
+          type="button"
+          className="wl-btn wl-btn-outline wl-btn-block wl-instagram-auth__retry"
+          onClick={handleRetry}
+        >
+          Generate new code
+        </button>
+      </>
+    )}
+  </section>
+)}
         </section>
       </div>
     </main>
