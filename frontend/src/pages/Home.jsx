@@ -18,7 +18,16 @@ const API = import.meta.env.VITE_BACKEND_URL;
 
 function SignalMarkIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="18" r="1.6" fill="currentColor" stroke="none" />
       <path d="M8.5 14.5a5 5 0 0 1 7 0" />
       <path d="M5.5 11.5a9 9 0 0 1 13 0" />
@@ -28,8 +37,20 @@ function SignalMarkIcon() {
 
 function ChevronIcon({ open }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-      style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .2s ease" }}>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{
+        transform: open ? "rotate(180deg)" : "none",
+        transition: "transform .2s ease",
+      }}
+    >
       <path d="M6 9l6 6 6-6" />
     </svg>
   );
@@ -44,11 +65,11 @@ const MOODS = [
 export default function Home() {
   const navigate = useNavigate();
   function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  disconnectSocket();
-  navigate("/instagram", { replace: true });
-}
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    disconnectSocket();
+    navigate("/instagram", { replace: true });
+  }
 
   const [anonymousProfile] = useState(() => {
     const stored = localStorage.getItem("anonymousProfile");
@@ -164,7 +185,7 @@ export default function Home() {
         from,
         !recipientStatus.exists,
         publicConsent,
-        mood
+        mood,
       );
 
       console.log("CONFESSION CREATED:", data);
@@ -172,7 +193,7 @@ export default function Home() {
       alert(
         recipientStatus.exists
           ? "Confession submitted!"
-          : "Confession saved! It will be delivered if they join within 7 days."
+          : "Confession saved! It will be delivered if they join within 7 days.",
       );
 
       setTo("");
@@ -210,7 +231,9 @@ export default function Home() {
                   const res = await fetch(`${API}/api/v1/auth/google`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ credential: credentialResponse.credential }),
+                    body: JSON.stringify({
+                      credential: credentialResponse.credential,
+                    }),
                   });
 
                   const data = await res.json();
@@ -236,7 +259,10 @@ export default function Home() {
             />
           </div>
 
-          <button className="wl-btn wl-btn-ghost" onClick={() => navigate("/inbox")}>
+          <button
+            className="wl-btn wl-btn-ghost"
+            onClick={() => navigate("/inbox")}
+          >
             Go to inbox instead
           </button>
         </div>
@@ -253,17 +279,15 @@ export default function Home() {
         <div className="wl-confess__you-name">
           {anonymousProfile?.anonymousName || "Anonymous"}
         </div>
-        
       </div>
       <button
-    className="wl-shell__logout"
-    onClick={logout}
-    aria-label="Log out"
-  >
-    <LogoutIcon />
-  </button>
-      <header className="wl-shell__header">
-      </header>
+        className="wl-shell__logout"
+        onClick={logout}
+        aria-label="Log out"
+      >
+        <LogoutIcon />
+      </button>
+      <header className="wl-shell__header"></header>
 
       {/* <h1 className="wl-display wl-confess__heading">Say it, stay unknown.</h1> */}
 
@@ -271,38 +295,40 @@ export default function Home() {
       <section className="wl-section">
         <label className="wl-field-label">Who's this for?</label>
 
-<div className={`wl-input-row ${recipientStatus?.exists ? "is-verified" : ""}`}>
-  <span className="wl-input-row__prefix">@</span>
+        <div
+          className={`wl-input-row ${recipientStatus?.exists ? "is-verified" : ""}`}
+        >
+          <span className="wl-input-row__prefix">@</span>
 
-  <input
-    type="text"
-    value={recipientUsername}
-    onChange={(e) => {
-      setRecipientUsername(e.target.value);
-      setRecipientStatus(null);
-      setAllowPending(false);
-      setPublicConsent(false);
-    }}
-    placeholder="their_Insta"
-    autoComplete="off"
-  />
+          <input
+            type="text"
+            value={recipientUsername}
+            onChange={(e) => {
+              setRecipientUsername(e.target.value);
+              setRecipientStatus(null);
+              setAllowPending(false);
+              setPublicConsent(false);
+            }}
+            placeholder="their_Insta"
+            autoComplete="off"
+          />
 
-  <button
-    type="button"
-    className="wl-recipient-verify"
-    onClick={verifyRecipient}
-    disabled={checkingRecipient || !recipientUsername.trim()}
-    aria-label="Check recipient"
-  >
-    {checkingRecipient ? (
-      <span className="wl-verify-spinner" />
-    ) : recipientStatus?.exists ? (
-      "✓"
-    ) : (
-      "➤"
-    )}
-  </button>
-</div>
+          <button
+            type="button"
+            className="wl-recipient-verify"
+            onClick={verifyRecipient}
+            disabled={checkingRecipient || !recipientUsername.trim()}
+            aria-label="Check recipient"
+          >
+            {checkingRecipient ? (
+              <span className="wl-verify-spinner" />
+            ) : recipientStatus?.exists ? (
+              "✓"
+            ) : (
+              "➤"
+            )}
+          </button>
+        </div>
 
         {recipientStatus?.exists && (
           <div className="wl-success-message">
@@ -312,47 +338,54 @@ export default function Home() {
 
         {recipientStatus && !recipientStatus.exists && (
           <div className="wl-status-card">
-            <p>Not on Wavelength yet — we'll hold this 7 days and deliver it if they join.</p>
-            <button className="wl-btn wl-btn-outline" onClick={() => setAllowPending(true)}>Send anyway</button>
+            <p>
+              Not on Wavelength yet — we'll hold this 7 days and deliver it if
+              they join.
+            </p>
+            <button
+              className="wl-btn wl-btn-outline"
+              onClick={() => setAllowPending(true)}
+            >
+              Send anyway
+            </button>
           </div>
         )}
       </section>
 
       {/* MESSAGE */}
       <section className="wl-section wl-message-section">
-        {/* <label className="wl-field-label">Say the thing</label> */}
+        /* <label className="wl-field-label">Say the thing</label> */
         <div className="wl-note-wrapper">
-  <textarea
-    className="wl-note"
-    value={message}
-    onChange={(e) => setMessage(e.target.value)}
-    placeholder="Say what you can't say out loud..."
-  />
+          <textarea
+            className="wl-note"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Say what you can't say out loud..."
+          />
 
-  <button
-    type="button"
-    className="wl-floating-preview"
-    onClick={() => setShowPreview(true)}
-    aria-label="Preview postcard"
-    title="Preview postcard"
-  >
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
-      <circle cx="12" cy="12" r="2.8" />
-    </svg>
-  </button>
-</div>
-        
+          <button
+            type="button"
+            className="wl-floating-preview"
+            onClick={() => setShowPreview(true)}
+            aria-label="Preview postcard"
+            title="Preview postcard"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+              <circle cx="12" cy="12" r="2.8" />
+            </svg>
+          </button>
+        </div>
       </section>
 
       {/* MOOD */}
@@ -372,8 +405,14 @@ export default function Home() {
         </div>
       </section>
 
-      <button type="button" className="wl-disclosure" onClick={() => setShowMore((v) => !v)}>
-        <span>{showMore ? "Hide extra details" : "+ Add a hint or context"}</span>
+      <button
+        type="button"
+        className="wl-disclosure"
+        onClick={() => setShowMore((v) => !v)}
+      >
+        <span>
+          {showMore ? "Hide extra details" : "+ Add a hint or context"}
+        </span>
         <ChevronIcon open={showMore} />
       </button>
 
@@ -382,22 +421,48 @@ export default function Home() {
           <label className="wl-field-label">
             Hint <span className="wl-field-label__optional">optional</span>
           </label>
-          <input type="text" className="wl-plain-input" value={to} onChange={(e) => setTo(e.target.value)} placeholder="e.g. SY B3 CSE" />
+          <input
+            type="text"
+            className="wl-plain-input"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            placeholder="e.g. SY B3 CSE"
+          />
 
           <label className="wl-field-label">
             From <span className="wl-field-label__optional">optional</span>
           </label>
-          <textarea className="wl-plain-textarea" value={from} onChange={(e) => setFrom(e.target.value)} placeholder="A.....a" />
+          <textarea
+            className="wl-plain-textarea"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            placeholder="A.....a"
+          />
         </div>
       )}
 
       {recipientStatus && (
         <label className="wl-seal-row">
-          <input type="checkbox" checked={publicConsent} onChange={(e) => setPublicConsent(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={publicConsent}
+            onChange={(e) => setPublicConsent(e.target.checked)}
+          />
           <span className="wl-seal-box">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M4 12l5 5L20 6" /></svg>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="3"
+            >
+              <path d="M4 12l5 5L20 6" />
+            </svg>
           </span>
-          <span className="wl-seal-label">I'm okay to share publicly if they agree too.</span>
+          <span className="wl-seal-label">
+            I'm okay to share publicly if they agree too.
+          </span>
         </label>
       )}
 
@@ -415,8 +480,6 @@ export default function Home() {
         {submitting ? "Sending..." : "Send it anonymously"}
       </button>
 
-      
-
       {showPreview && (
         <div
           className="wl-preview-modal"
@@ -426,8 +489,16 @@ export default function Home() {
         >
           <div className="wl-preview-modal__content">
             <div className="wl-preview-modal__header">
-              <h2 className="wl-preview-modal__title wl-display">Your transmission</h2>
-              <button type="button" className="wl-preview-modal__close" onClick={() => setShowPreview(false)}>×</button>
+              <h2 className="wl-preview-modal__title wl-display">
+                Your transmission
+              </h2>
+              <button
+                type="button"
+                className="wl-preview-modal__close"
+                onClick={() => setShowPreview(false)}
+              >
+                ×
+              </button>
             </div>
 
             <div className="wl-preview-modal__stage" ref={stageRef}>
@@ -435,8 +506,15 @@ export default function Home() {
             </div>
 
             <div className="wl-preview-modal__actions">
-              <button className="wl-btn wl-btn-outline" onClick={() => setShowPreview(false)}>Back</button>
-              <button className="wl-btn wl-btn-primary" onClick={downloadPages}>Save image</button>
+              <button
+                className="wl-btn wl-btn-outline"
+                onClick={() => setShowPreview(false)}
+              >
+                Back
+              </button>
+              <button className="wl-btn wl-btn-primary" onClick={downloadPages}>
+                Save image
+              </button>
             </div>
           </div>
         </div>
@@ -445,10 +523,12 @@ export default function Home() {
       <div
         className="template"
         id="template"
-        style={{ display: "none", backgroundImage: `url(${MOODS.find((m) => m.id === mood).file})` }}
+        style={{
+          display: "none",
+          backgroundImage: `url(${MOODS.find((m) => m.id === mood).file})`,
+        }}
       >
         <div className="to">
-          
           <h2 className="previewTo">Someone</h2>
         </div>
         <div className="message"></div>
