@@ -115,6 +115,7 @@ export default function Inbox() {
             tab === "received"
               ? confession.senderAnonymousName
               : `@${confession.recipientInstagramUsername}`;
+              console.log(confession.senderAnonymousName, "readAt:", confession.readAt);
 
           return (
             <div
