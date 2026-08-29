@@ -110,6 +110,7 @@ export default function Inbox() {
 
       <div className="wl-stagger">
         {list.map((confession) => {
+          console.log("CONFESSION:", confession);
           const label =
             tab === "received"
               ? confession.senderAnonymousName
