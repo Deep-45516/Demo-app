@@ -135,7 +135,7 @@ export default function Inbox() {
 
   {(confession.hasUnreadConfession ||
     confession.hasUnreadMessages) && (
-    <span className="unread-dot" />
+    <span className="wl-unread-dot" />
   )}
 </span>
                   <span className="wl-row__time wl-mono">
