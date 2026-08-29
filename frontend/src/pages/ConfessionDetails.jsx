@@ -3,8 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../wavelength.css";
 import "./ConfessionDetails.css";
 import StaticAvatar, { hueFromString } from "../components/InstagramVerification/StaticAvatar.jsx";
-
-import { getConfession, updateConfessionAction } from "../inbox";
+import {
+  getConfession,
+  updateConfessionAction,
+  markConfessionRead,
+} from "../inbox";
 import { getSocket, connectSocket } from "../socket";
 import { publishConfessionPublicly } from "../publicPost.js";
 
@@ -33,8 +36,13 @@ export default function ConfessionDetails() {
   useEffect(() => {
     loadConfession();
 
-    const socket = getSocket() || connectSocket();
-    if (!socket) return;
+    markConfessionRead(id).catch((error) => {
+    console.error("MARK CONFESSION READ ERROR:", error);
+  });
+
+  const socket = getSocket() || connectSocket();
+
+  if (!socket) return;
 
     function handleConfessionUpdated(data) {
       if (data.confessionId !== id) return;
@@ -200,7 +208,7 @@ export default function ConfessionDetails() {
 </p>
               <div className="wl-details__actions">
                 <button className="wl-btn wl-btn-primary" disabled={actionLoading} onClick={() => handleAction("curious")}>
-                  {actionLoading ? "Updating..." : "👀 Curious"}
+                  {actionLoading ? "Updating..." : "👀 Know them"}
                 </button>
                 <button className="wl-btn wl-btn-ghost" disabled={actionLoading} onClick={() => handleAction("not_interested")}>
                   Not interested
@@ -211,7 +219,7 @@ export default function ConfessionDetails() {
 
           {confession.recipientAction === "curious" && (
             <>
-              <span className="wl-tag wl-tag--curious">👀 You're curious</span>
+              <span className="wl-tag wl-tag--curious">👀 You're curious to know them.</span>
               {conversationId && (
                 <button className="wl-btn wl-btn-primary wl-btn-block" style={{ marginTop: 14 }} onClick={() => navigate(`/chat/${conversationId}`)}>
                   Open conversation
@@ -251,14 +259,14 @@ export default function ConfessionDetails() {
 
           {confession.recipientAction === "pending" && (
   <>
-    <span className="wl-tag wl-tag--waiting">⏳ Waiting for their response</span>
+    <span className="wl-tag wl-tag--waiting">⏳ They're taking time to decide.</span>
     <p className="wl-details__prompt">If they're curious, a chat opens here automatically.</p>
   </>
 )}
 
           {confession.recipientAction === "curious" && (
             <>
-              <span className="wl-tag wl-tag--curious">👀 They're curious about you</span>
+              <span className="wl-tag wl-tag--curious">👀 They'd like to know who you are.</span>
               {conversationId && (
                 <button className="wl-btn wl-btn-primary wl-btn-block" style={{ marginTop: 14 }} onClick={() => navigate(`/chat/${conversationId}`)}>
                   Continue conversation
@@ -267,7 +275,7 @@ export default function ConfessionDetails() {
             </>
           )}
 
-          {confession.recipientAction === "not_interested" && <span className="wl-tag wl-tag--not-interested">They aren't interested</span>}
+          {confession.recipientAction === "not_interested" && <span className="wl-tag wl-tag--not-interested">They've decided to leave it here for now.</span>}
         </div>
       )}
     </div>

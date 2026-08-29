@@ -129,7 +129,14 @@ export default function Inbox() {
 
               <div className="wl-row__meta">
                 <div className="wl-row__top">
-                  <span className="wl-row__name">{label}</span>
+                  <span className="wl-row__name">
+  {label}
+
+  {(confession.hasUnreadConfession ||
+    confession.hasUnreadMessages) && (
+    <span className="unread-dot" />
+  )}
+</span>
                   <span className="wl-row__time wl-mono">
                     {new Date(confession.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                   </span>

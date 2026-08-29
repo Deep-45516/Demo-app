@@ -535,6 +535,53 @@ router.post("/:id/public", verifyToken, async (req, res) => {
   }
 });
 
+// MARK CONFESSION AS READ
+router.patch("/:id/read", verifyToken, async (req, res) => {
+  try {
+    const confession = await Confession.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        recipientUser: req.user.id,
+        readAt: null,
+      },
+      {
+        readAt: new Date(),
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!confession) {
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          null,
+          "Confession already read or not found."
+        )
+      );
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        confession,
+        "Confession marked as read."
+      )
+    );
+  } catch (error) {
+    console.error("MARK CONFESSION READ ERROR:", error);
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message || "Unable to mark confession as read."
+      )
+    );
+  }
+});
+
 // GET ONE CONFESSION
 router.get("/:id", verifyToken, async (req, res) => {
   try {

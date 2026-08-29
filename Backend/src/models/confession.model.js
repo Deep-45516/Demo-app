@@ -70,6 +70,11 @@ const confessionSchema = new mongoose.Schema(
       default: "pending",
     },
 
+    readAt: {
+  type: Date,
+  default: null,
+},
+
     visibility: {
       type: String,
       enum: ["private", "anonymous", "public"],

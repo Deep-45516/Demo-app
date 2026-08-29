@@ -46,3 +46,9 @@ export function updateConfessionAction(
     }),
   });
 }
+
+export function markConfessionRead(confessionId) {
+  return request(`${confessionId}/read`, {
+    method: "PATCH",
+  });
+}

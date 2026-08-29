@@ -481,6 +481,31 @@ export async function getConversations(userId) {
             "anonymous",
           ],
         },
+
+        hasUnreadConfession: {
+  $and: [
+    {
+      $eq: ["$recipientUser", userObjectId],
+    },
+    {
+      $eq: ["$confession.readAt", null],
+    },
+  ],
+},
+
+hasUnreadMessages: {
+  $and: [
+    {
+      $ne: ["$lastMessage", null],
+    },
+    {
+      $ne: ["$lastMessage.senderUser", userObjectId],
+    },
+    {
+      $eq: ["$lastMessage.seenAt", null],
+    },
+  ],
+},
       },
     },
   ]);
