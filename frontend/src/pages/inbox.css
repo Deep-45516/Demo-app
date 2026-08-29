@@ -148,4 +148,4 @@
 
 }
 
-.wl-unread-dot{ width:8px; height:8px; border-radius:50%; background:var(--wl-pink); flex-shrink:0; display:inline-block; }
+.wl-unread-dot{ width:8px; height:8px; border-radius:50%; background:red; flex-shrink:0; display:inline-block; }
