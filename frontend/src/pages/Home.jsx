@@ -382,12 +382,12 @@ export default function Home() {
           <label className="wl-field-label">
             Hint <span className="wl-field-label__optional">optional</span>
           </label>
-          <input type="text" className="wl-plain-input" value={to} onChange={(e) => setTo(e.target.value)} placeholder="e.g. Someone special" />
+          <input type="text" className="wl-plain-input" value={to} onChange={(e) => setTo(e.target.value)} placeholder="e.g. SY B3 CSE" />
 
           <label className="wl-field-label">
             From <span className="wl-field-label__optional">optional</span>
           </label>
-          <textarea className="wl-plain-textarea" value={from} onChange={(e) => setFrom(e.target.value)} placeholder="B3 Division" />
+          <textarea className="wl-plain-textarea" value={from} onChange={(e) => setFrom(e.target.value)} placeholder="A.....a" />
         </div>
       )}
 
@@ -397,7 +397,7 @@ export default function Home() {
           <span className="wl-seal-box">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M4 12l5 5L20 6" /></svg>
           </span>
-          <span className="wl-seal-label">Okay to share publicly if they agree too.</span>
+          <span className="wl-seal-label">I'm okay to share publicly if they agree too.</span>
         </label>
       )}
 
