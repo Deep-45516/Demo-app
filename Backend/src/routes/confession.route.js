@@ -337,25 +337,24 @@ recipientUser = AAA   ✅ */
     const [received, sent] = await Promise.all([
       //promise run both query parellaly and give result , not wait 1 to complete and then next NO
       Confession.find({
-        recipientUser: userId, //this is recieved confessionss
-      }) //this finds the confession which has recipientUser as that user and shows senderanonymous name
-        .select(
-          "_id senderAnonymousName recipientAction deliveryStatus createdAt", //do not show entire confession yet
-        )
-        .sort({ createdAt: -1 })
-        .limit(50)
-        .lean(),
+    recipientUser: userId,
+  })
+    .select(
+      "_id senderAnonymousName recipientAction deliveryStatus createdAt readAt"
+    )
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean(),
 
       Confession.find({
-        //this is sent confessions
-        senderUser: userId,
-      })
-        .select(
-          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt",
-        )
-        .sort({ createdAt: -1 }) //Means sort by creation date,(-1 means decending order,new 1st)
-        .limit(50)
-        .lean(),
+    senderUser: userId,
+  })
+    .select(
+      "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
+    )
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean(),
     ]);
     /*Need to modify/save Mongoose document?
 → normal document may be useful
