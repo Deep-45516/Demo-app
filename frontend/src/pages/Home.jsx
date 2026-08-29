@@ -320,7 +320,7 @@ export default function Home() {
 
       {/* MESSAGE */}
       <section className="wl-section wl-message-section">
-        <label className="wl-field-label">Say the thing</label>
+        {/* <label className="wl-field-label">Say the thing</label> */}
         <div className="wl-note-wrapper">
   <textarea
     className="wl-note"
