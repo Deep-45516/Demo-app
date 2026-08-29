@@ -132,10 +132,8 @@ export default function Inbox() {
                 <div className="wl-row__top">
                   <span className="wl-row__name">
   {label}
-
-  {(confession.hasUnreadConfession ||
-    confession.hasUnreadMessages) && (
-    <span className="wl-unread-dot" />
+  {tab === "received" && !confession.readAt && (
+    <span className="wl-unread-dot" style={{ marginLeft: 6, verticalAlign: "middle" }} />
   )}
 </span>
                   <span className="wl-row__time wl-mono">
