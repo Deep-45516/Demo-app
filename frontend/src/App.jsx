@@ -1,5 +1,6 @@
+//App.jsx
 import { Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   connectSocket,
@@ -17,23 +18,36 @@ import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import AppLayout from "./layouts/AppLayout.jsx";
 
 function App() {
+    const [backendReady, setBackendReady] = useState(false);
+  const [healthcheckStartedAt] = useState(() => performance.now());
   useEffect(() => {
-    // Wake Render backend as soon as the frontend loads.
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/healthcheck`)
-      .catch(() => {});
+  // ONE backend request.
+  // This request both wakes Render and tells us
+  // whether the backend is responding quickly or slowly.
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/healthcheck`, {
+    cache: "no-store",
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Healthcheck failed");
+      }
 
-    const token = localStorage.getItem("token");
+      setBackendReady(true);
+    })
+    .catch(() => {});
 
-    if (!token) {
-      return;
-    }
+  const token = localStorage.getItem("token");
 
-    connectSocket();
+  if (!token) {
+    return;
+  }
 
-    return () => {
-      disconnectSocket();
-    };
-  }, []);
+  connectSocket();
+
+  return () => {
+    disconnectSocket();
+  };
+}, []);
 
   return (
     <Routes>
@@ -43,9 +57,14 @@ function App() {
           ========================= */}
 
       <Route
-        path="/instagram"
-        element={<InstagramVerification />}
-      />
+  path="/instagram"
+  element={
+    <InstagramVerification
+      backendReady={backendReady}
+      healthcheckStartedAt={healthcheckStartedAt}
+    />
+  }
+/>
 
       <Route
         path="/admin"

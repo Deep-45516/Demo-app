@@ -2,9 +2,32 @@ import { useEffect, useRef, useState } from "react";
 import "./InstagramVerification.css";
 import "../../wavelength.css";
 
+
 const API = import.meta.env.VITE_BACKEND_URL;
 
 const BUSINESS_USERNAME = "wit_confessions.26";
+const SHAYARI_DELAY = 1500;
+
+const SHAYARIS = [
+  `कभी-कभी दिल में बहुत कुछ होता है,
+बस कहने के लिए कोई अपना नहीं होता।`,
+
+  `हम चुप इसलिए नहीं हैं कि
+हमारे पास कहने को कुछ नहीं,
+बस हर किसी के सामने
+दिल खोलना आसान नहीं होता।`,
+
+  `कितनी अजीब बात है ना…
+दिल में बहुत कुछ होता है,
+मगर जब कोई पूछता है —
+"क्या हुआ?"
+तो बस "कुछ नहीं" निकलता है।`,
+
+  `हर बात हर किसी से नहीं कही जाती,
+कुछ बातें बस मन में रहती हैं…
+क्योंकि अपनों को खोने का डर,
+अजनबियों से कहने की हिम्मत दे देता है।`,
+];
 
 const VERIFICATION_STATES = {
   IDLE: "idle",
@@ -130,7 +153,16 @@ function ArrowIcon() {
   );
 }
 
-export default function InstagramVerification() {
+export default function InstagramVerification({
+  backendReady,
+  healthcheckStartedAt,
+}) {
+
+    const [startupState, setStartupState] = useState("checking");
+
+  const [shayariIndex] = useState(
+    () => Math.floor(Math.random() * SHAYARIS.length)
+  );
   const [state, setState] = useState(VERIFICATION_STATES.IDLE);
   const [username, setUsername] = useState("");
   const [sessionId, setSessionId] = useState(null);
@@ -143,6 +175,30 @@ export default function InstagramVerification() {
   const pollingRef = useRef(null);
   const timeoutRef = useRef(null);
   const mountedRef = useRef(true);
+
+  useEffect(() => {
+  // Server responded before the threshold.
+  // Don't show Shayari.
+  if (backendReady) {
+    setStartupState("ready");
+    return;
+  }
+
+  const elapsed = performance.now() - healthcheckStartedAt;
+
+  const remaining = Math.max(
+    0,
+    SHAYARI_DELAY - elapsed
+  );
+
+  const timer = setTimeout(() => {
+    if (!backendReady) {
+      setStartupState("shayari");
+    }
+  }, remaining);
+
+  return () => clearTimeout(timer);
+}, [backendReady, healthcheckStartedAt]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -421,6 +477,41 @@ export default function InstagramVerification() {
     state === VERIFICATION_STATES.EXPIRED;
 
   const stepLevel = verificationActive ? 2 : 1;
+
+
+  if (startupState === "checking") {
+  return (
+    <main className="wl-instagram-auth wl-startup-shell">
+      <div className="wl-startup-shell__mark">
+        <SignalMarkIcon />
+      </div>
+    </main>
+  );
+}
+
+if (startupState === "shayari") {
+  return (
+    <main className="wl-instagram-auth wl-shayari-screen">
+      <div className="wl-shayari-screen__glow" />
+
+      <section className="wl-shayari">
+        <div className="wl-shayari__brand">
+          <SignalMarkIcon />
+        </div>
+
+        <p className="wl-shayari__eyebrow">
+          कुछ बातें कही नहीं जातीं…
+        </p>
+
+        <p className="wl-shayari__text">
+          {SHAYARIS[shayariIndex]}
+        </p>
+
+        <div className="wl-shayari__line" />
+      </section>
+    </main>
+  );
+}
 
   return (
     <main className="wl-instagram-auth">
