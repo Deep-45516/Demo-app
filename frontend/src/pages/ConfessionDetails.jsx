@@ -234,7 +234,7 @@ export default function ConfessionDetails() {
 
           {confession.publicConsent && !confession.publicPosted && (
             <div className="wl-details__public-card wl-fade-up">
-              <p>You both agreed this confession can be shared publicly.</p>
+              <p>They're okay sharing on Wit Confessions, if you're comfortable too 🤍</p>
               <button className="wl-btn wl-btn-outline" disabled={publicPosting} onClick={handlePublicPost}>
                 {publicPosting ? "Sharing on Instagram..." : "Share on Instagram"}
               </button>

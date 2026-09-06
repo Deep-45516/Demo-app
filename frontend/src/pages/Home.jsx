@@ -477,7 +477,7 @@ export default function Home() {
             </svg>
           </span>
           <span className="wl-seal-label">
-            I'm okay to share publicly if they agree too.
+            Okay to post on Wit Confessions, if they're comfortable too 🤍
           </span>
         </label>
       )}
