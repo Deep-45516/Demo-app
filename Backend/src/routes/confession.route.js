@@ -321,38 +321,46 @@ router.get("/pending", verifyAdmin, async (req, res) => {
 router.get("/inbox", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
+    /*Confession 1
+senderUser = BBB
+recipientUser = AAA   ✅
 
-    const dbStart = Date.now();
 
+Confession 2
+senderUser = AAA
+recipientUser = CCC   ❌
+
+
+Confession 3
+senderUser = DDD
+recipientUser = AAA   ✅ */
     const [received, sent] = await Promise.all([
-      // Received confessions
+      //promise run both query parellaly and give result , not wait 1 to complete and then next NO
       Confession.find({
-        recipientUser: userId,
-      })
-        .select(
-          "_id senderAnonymousName recipientAction deliveryStatus createdAt readAt"
-        )
-        .sort({ createdAt: -1 })
-        .limit(50)
-        .lean(),
+    recipientUser: userId,
+  })
+    .select(
+      "_id senderAnonymousName recipientAction deliveryStatus createdAt readAt"
+    )
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean(),
 
-      // Sent confessions
       Confession.find({
-        senderUser: userId,
-      })
-        .select(
-          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
-        )
-        .sort({ createdAt: -1 })
-        .limit(50)
-        .lean(),
+    senderUser: userId,
+  })
+    .select(
+      "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
+    )
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean(),
     ]);
+    /*Need to modify/save Mongoose document?
+→ normal document may be useful
 
-    const dbTime = Date.now() - dbStart;
-
-    console.log(
-      `INBOX DB TIME: ${dbTime} ms`
-    );
+Just reading/displaying data?
+→ .lean() can be useful */
 
     return res.status(200).json(
       new ApiResponse(
@@ -361,8 +369,8 @@ router.get("/inbox", verifyToken, async (req, res) => {
           received,
           sent,
         },
-        "Inbox fetched successfully."
-      )
+        "Inbox fetched successfully.",
+      ),
     );
   } catch (error) {
     console.error("INBOX ERROR:", error);
@@ -370,11 +378,7 @@ router.get("/inbox", verifyToken, async (req, res) => {
     return res
       .status(500)
       .json(
-        new ApiResponse(
-          500,
-          null,
-          error.message || "Unable to fetch inbox."
-        )
+        new ApiResponse(500, null, error.message || "Unable to fetch inbox."),
       );
   }
 });

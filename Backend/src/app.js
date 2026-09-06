@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import instagramRouter from "./routes/instagram.route.js";
 import webhookRouter from "./routes/webhook.route.js";
+import testRoutes from "./routes/test.route.js";
 
 const app = express(); //creates the Express application instance.
 app.set("trust proxy", 1); //trust request come from render for each ip address can send linmited req per min / sec i.e rate limiting
@@ -46,4 +47,5 @@ app.use(
   "/api/v1/reveal",
   revealRouter
 );
+app.use("/api/v1/test", testRoutes);
 export default app;
