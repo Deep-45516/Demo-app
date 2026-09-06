@@ -337,12 +337,13 @@ export default function Home() {
               "➤"
             )}
           </button>
-          {validationError && (
+          
+        </div>
+        {validationError && (
   <div className="wl-confess__validation-error" role="alert">
     ⚠ {validationError}
   </div>
 )}
-        </div>
 
         {recipientStatus?.exists && (
           <div className="wl-success-message">
