@@ -17,13 +17,9 @@ import {
   notifyConfessionUpdated,
 } from "../socket/socketNotifier.js";
 import Conversation from "../models/conversation.model.js";
-import {
-  publishConfessionPublicly,
-} from "../services/publicPost.service.js";
+import { publishConfessionPublicly } from "../services/publicPost.service.js";
 
-import {
-  notifyPublicPostUpdated,
-} from "../socket/publicPost.socket.js";
+import { notifyPublicPostUpdated } from "../socket/publicPost.socket.js";
 
 /*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
@@ -75,28 +71,21 @@ returns null when nothing is found. in frontend */
 router.post("/", verifyToken, async (req, res) => {
   try {
     const {
-  recipientUsername,
-  to,
-  message,
-  from,
-  allowPending = false,
-  publicConsent = false,
-  theme = "signal",
-} = req.body; //basic take input from browser
+      recipientUsername,
+      to,
+      message,
+      from,
+      allowPending = false,
+      publicConsent = false,
+      theme = "signal",
+    } = req.body; //basic take input from browser
     console.log(req.body);
 
-    const allowedThemes = [
-  "signal",
-  "love",
-  "funny",
-];
+    const allowedThemes = ["signal", "love", "funny"];
 
-if (!allowedThemes.includes(theme)) {
-  throw new ApiError(
-    400,
-    "Invalid confession theme."
-  );
-}
+    if (!allowedThemes.includes(theme)) {
+      throw new ApiError(400, "Invalid confession theme.");
+    }
     // 🔥 generate image
 
     // 🔴 BASIC VALIDATION
@@ -109,24 +98,12 @@ if (!allowedThemes.includes(theme)) {
     ) {
       throw new ApiError(400, "Recipient username is required.");
 
-      if (
-  typeof to !== "string" ||
-  to.trim() === ""
-) {
-  throw new ApiError(
-    400,
-    "To name is required."
-  );
-}
-if (
-  typeof from !== "string" ||
-  from.trim() === ""
-) {
-  throw new ApiError(
-    400,
-    "From hint is required."
-  );
-}
+      if (typeof to !== "string" || to.trim() === "") {
+        throw new ApiError(400, "To name is required.");
+      }
+      if (typeof from !== "string" || from.trim() === "") {
+        throw new ApiError(400, "From hint is required.");
+      }
     }
     //find sender
     const sender = await User.findById(req.user.id);
@@ -173,9 +150,9 @@ STOP       create pending */
   "/temp/page1.jpg",
   "/temp/page2.jpg"
 ] */
-  const imageUrls = await Promise.all(
-  imagePaths.map((imagePath) => uploadImage(imagePath))
-); /*finally imageUrls = [
+      const imageUrls = await Promise.all(
+        imagePaths.map((imagePath) => uploadImage(imagePath)),
+      ); /*finally imageUrls = [
    "https://firebase...page1.jpg",
    "https://firebase...page2.jpg"
 ]; */
@@ -194,9 +171,8 @@ STOP       create pending */
         message,
         imageUrls,
 
-        publicConsent:
-    publicConsent === true,
-    theme,
+        publicConsent: publicConsent === true,
+        theme,
       });
 
       return res
@@ -247,36 +223,35 @@ Not sending to yourself ✅*/
     //this are currently sequential like 1st then 2nd page
 
     // 3. save in DB
-const confession = await Confession.create({
-  senderUser: sender._id,
-  senderAnonymousProfile: senderAnonymous._id,
-  senderAnonymousName: senderAnonymous.anonymousName,
+    const confession = await Confession.create({
+      senderUser: sender._id,
+      senderAnonymousProfile: senderAnonymous._id,
+      senderAnonymousName: senderAnonymous.anonymousName,
 
-  recipientUser: recipient._id,
-  recipientInstagramUsername: recipient.instagramUsername,
+      recipientUser: recipient._id,
+      recipientInstagramUsername: recipient.instagramUsername,
 
-  message,
-  imageUrls,
+      message,
+      imageUrls,
 
-  publicConsent:
-    publicConsent === true,
+      publicConsent: publicConsent === true,
 
-    theme,
-});
+      theme,
+    });
 
     notifyNewConfession(recipient._id, confession);
     notifyNewConfession(confession.senderUser, confession);
     console.log(`Emitted new-confession to room user:${recipient._id}`);
-// =========================
-// ADMIN NOTIFICATION
-// Disabled for V1.
-// Keep this for future admin moderation.
-// =========================
+    // =========================
+    // ADMIN NOTIFICATION
+    // Disabled for V1.
+    // Keep this for future admin moderation.
+    // =========================
 
-// await sendAdminNotification({
-//   title: "New confession request",
-//   body: `${confession.recipientInstagramUsername} received a confession`,
-// });
+    // await sendAdminNotification({
+    //   title: "New confession request",
+    //   body: `${confession.recipientInstagramUsername} received a confession`,
+    // });
 
     // SUCCESS RESPONSE
     return res
@@ -321,46 +296,36 @@ router.get("/pending", verifyAdmin, async (req, res) => {
 router.get("/inbox", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    /*Confession 1
-senderUser = BBB
-recipientUser = AAA   ✅
 
+    const dbStart = Date.now();
 
-Confession 2
-senderUser = AAA
-recipientUser = CCC   ❌
-
-
-Confession 3
-senderUser = DDD
-recipientUser = AAA   ✅ */
     const [received, sent] = await Promise.all([
-      //promise run both query parellaly and give result , not wait 1 to complete and then next NO
+      // Received confessions
       Confession.find({
-    recipientUser: userId,
-  })
-    .select(
-      "_id senderAnonymousName recipientAction deliveryStatus createdAt readAt"
-    )
-    .sort({ createdAt: -1 })
-    .limit(50)
-    .lean(),
+        recipientUser: userId,
+      })
+        .select(
+          "_id senderAnonymousName recipientAction deliveryStatus createdAt readAt",
+        )
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .lean(),
 
+      // Sent confessions
       Confession.find({
-    senderUser: userId,
-  })
-    .select(
-      "_id recipientInstagramUsername recipientAction deliveryStatus createdAt"
-    )
-    .sort({ createdAt: -1 })
-    .limit(50)
-    .lean(),
+        senderUser: userId,
+      })
+        .select(
+          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt",
+        )
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .lean(),
     ]);
-    /*Need to modify/save Mongoose document?
-→ normal document may be useful
 
-Just reading/displaying data?
-→ .lean() can be useful */
+    const dbTime = Date.now() - dbStart;
+
+    console.log(`INBOX DB TIME: ${dbTime} ms`);
 
     return res.status(200).json(
       new ApiResponse(
@@ -481,56 +446,39 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
 // RECIPIENT CHOOSES TO MAKE CONFESSION PUBLIC
 router.post("/:id/public", verifyToken, async (req, res) => {
   try {
-    const confession =
-      await publishConfessionPublicly(
-        req.params.id,
-        req.user.id
-      );
+    const confession = await publishConfessionPublicly(
+      req.params.id,
+      req.user.id,
+    );
 
     const notification = {
       confessionId: confession._id,
       status: "public",
-      instagramPostId:
-        confession.instagramPostId,
-      publicPostedAt:
-        confession.publicPostedAt,
+      instagramPostId: confession.instagramPostId,
+      publicPostedAt: confession.publicPostedAt,
     };
 
     // Notify sender.
-    notifyPublicPostUpdated(
-      confession.senderUser,
-      notification
-    );
+    notifyPublicPostUpdated(confession.senderUser, notification);
 
     // Notify recipient too.
-    notifyPublicPostUpdated(
-      confession.recipientUser,
-      notification
-    );
+    notifyPublicPostUpdated(confession.recipientUser, notification);
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        confession,
-        "Confession shared publicly."
-      )
-    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, confession, "Confession shared publicly."));
   } catch (error) {
-    console.error(
-      "PUBLIC CONFESSION ERROR:",
-      error
-    );
+    console.error("PUBLIC CONFESSION ERROR:", error);
 
-    return res.status(
-      error.statusCode || 500
-    ).json(
-      new ApiResponse(
-        error.statusCode || 500,
-        null,
-        error.message ||
-          "Unable to share confession publicly."
-      )
-    );
+    return res
+      .status(error.statusCode || 500)
+      .json(
+        new ApiResponse(
+          error.statusCode || 500,
+          null,
+          error.message || "Unable to share confession publicly.",
+        ),
+      );
   }
 });
 
@@ -548,36 +496,32 @@ router.patch("/:id/read", verifyToken, async (req, res) => {
       },
       {
         new: true,
-      }
+      },
     );
 
     if (!confession) {
-      return res.status(200).json(
-        new ApiResponse(
-          200,
-          null,
-          "Confession already read or not found."
-        )
-      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(200, null, "Confession already read or not found."),
+        );
     }
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        confession,
-        "Confession marked as read."
-      )
-    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, confession, "Confession marked as read."));
   } catch (error) {
     console.error("MARK CONFESSION READ ERROR:", error);
 
-    return res.status(500).json(
-      new ApiResponse(
-        500,
-        null,
-        error.message || "Unable to mark confession as read."
-      )
-    );
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(
+          500,
+          null,
+          error.message || "Unable to mark confession as read.",
+        ),
+      );
   }
 });
 
