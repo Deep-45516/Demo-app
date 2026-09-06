@@ -361,12 +361,12 @@ export default function Home() {
             </button>
           </div>
         )}
-      </section>
-      {validationError && (
+              {validationError && (
   <div className="wl-confess__validation-error" role="alert">
     ⚠ {validationError}
   </div>
 )}
+      </section>
 
       {/* MESSAGE */}
       <section className="wl-section wl-message-section">
