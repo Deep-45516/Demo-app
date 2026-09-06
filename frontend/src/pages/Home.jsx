@@ -84,6 +84,7 @@ export default function Home() {
   const [recipientStatus, setRecipientStatus] = useState(null);
   const [allowPending, setAllowPending] = useState(false);
   const [publicConsent, setPublicConsent] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
   const [checkingRecipient, setCheckingRecipient] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -159,20 +160,27 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
-    if (!recipientStatus) {
-      alert("Please verify the recipient first.");
-      return;
-    }
+  setValidationError("");
 
-    if (!message.trim()) {
-      alert("Message is required.");
-      return;
-    }
+  if (!recipientUsername.trim()) {
+    setValidationError("Please enter the Instagram username.");
+    return;
+  }
 
-    if (!recipientStatus.exists && !allowPending) {
-      alert("This recipient hasn't joined yet. Click Send Anyway first.");
-      return;
-    }
+  if (!recipientStatus) {
+    setValidationError("Please verify the Instagram username before sending.");
+    return;
+  }
+
+  if (!message.trim()) {
+    setValidationError("Please write something before sending.");
+    return;
+  }
+
+  if (!recipientStatus.exists && !allowPending) {
+    setValidationError("Please choose “Send Anyway” before sending.");
+    return;
+  }
 
     try {
       setSubmitting(true);
@@ -308,6 +316,7 @@ export default function Home() {
               setRecipientStatus(null);
               setAllowPending(false);
               setPublicConsent(false);
+              setValidationError("");
             }}
             placeholder="their_Insta"
             autoComplete="off"
@@ -328,6 +337,11 @@ export default function Home() {
               "➤"
             )}
           </button>
+          {validationError && (
+  <div className="wl-confess__validation-error" role="alert">
+    ⚠ {validationError}
+  </div>
+)}
         </div>
 
         {recipientStatus?.exists && (

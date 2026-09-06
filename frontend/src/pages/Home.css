@@ -685,3 +685,9 @@
   padding:14px 20px; background:rgba(10,10,18,0.75); backdrop-filter:blur(14px);
   border-bottom:1px solid var(--wl-line);
 }
+.wl-confess__validation-error {
+  margin-top: 8px;
+  color: #d64545;
+  font-size: 13px;
+  line-height: 1.4;
+}

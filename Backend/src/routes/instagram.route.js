@@ -136,25 +136,25 @@ router.post("/post/:id", verifyAdmin, async (req, res) => {
         setTimeout(resolve, 10000)
       );
 
-      console.log(
-        "IG ACCOUNT:",
-        process.env.INSTAGRAM_ACCOUNT_ID
-      );
+      // console.log(
+      //   "IG ACCOUNT:",
+      //   process.env.INSTAGRAM_ACCOUNT_ID
+      // );
 
-      console.log(
-        "TOKEN:",
-        process.env.INSTAGRAM_ACCESS_TOKEN
-      );
+      // console.log(
+      //   "TOKEN:",
+      //   process.env.INSTAGRAM_ACCESS_TOKEN
+      // );
 
-      console.log(
-        "CAROUSEL ID:",
-        carousel.id
-      );
+      // console.log(
+      //   "CAROUSEL ID:",
+      //   carousel.id
+      // );
 
-      console.log(
-        "CHILDREN:",
-        children
-      );
+      // console.log(
+      //   "CHILDREN:",
+      //   children
+      // );
 
       published =
         await publishInstagramMedia(
