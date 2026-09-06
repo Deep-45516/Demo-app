@@ -323,20 +323,19 @@ export default function Home() {
           />
 
           <button
-            type="button"
-            className="wl-recipient-verify"
-            onClick={verifyRecipient}
-            disabled={checkingRecipient || !recipientUsername.trim()}
-            aria-label="Check recipient"
-          >
-            {checkingRecipient ? (
-              <span className="wl-verify-spinner" />
-            ) : recipientStatus?.exists ? (
-              "✓"
-            ) : (
-              "➤"
-            )}
-          </button>
+  type="button"
+  className={`wl-btn wl-btn-primary wl-btn-block wl-confess__submit ${
+    !recipientStatus ||
+    !message.trim() ||
+    (!recipientStatus?.exists && !allowPending)
+      ? "is-disabled"
+      : ""
+  }`}
+  disabled={checkingRecipient || submitting}
+  onClick={handleSubmit}
+>
+  {submitting ? "Sending..." : "Send it anonymously"}
+</button>
           {validationError && (
   <div className="wl-confess__validation-error" role="alert">
     ⚠ {validationError}
