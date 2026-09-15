@@ -7,7 +7,7 @@
   width: 100%;
   margin: 0 auto;
 
-  padding: 110px 16px 150px;
+  padding: 125px 16px 150px;
   box-sizing: border-box;
 
   overflow-y: auto;
@@ -224,7 +224,7 @@
   .wl-chat {
     height: calc(100dvh - 144px);
 
-    padding: 105px 14px 150px;
+    padding: 120px 14px 150px;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -235,7 +235,7 @@
   }
 
   .wl-chat__messages {
-    padding: 6px 2px 20px;
+    padding: 6px 2px 2px;
   }
 
   .wl-chat__input-row {
