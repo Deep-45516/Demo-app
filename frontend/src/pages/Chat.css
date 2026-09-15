@@ -1,20 +1,26 @@
 .wl-chat {
   display: flex;
   flex-direction: column;
-
   min-height: calc(100dvh - 144px);
-
   max-width: 460px;
-  width: 100%;
   margin: 0 auto;
-
-  padding: 16px 16px 150px;
+  padding: 115px 16px 150px;
   box-sizing: border-box;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* Fixed header */
+.wl-chat__fixed-header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 460px;
+  padding: 16px 16px 10px;
+  box-sizing: border-box;
+  background: var(--wl-bg);
+  z-index: 30;
+}
 
 .wl-chat__header {
   display: flex;
@@ -23,60 +29,34 @@
   margin-bottom: 14px;
 }
 
-.wl-chat_fixed-header{
-  position: fixed;}
-
 .wl-chat__back {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-
   border: 1px solid var(--wl-line);
-  background: rgba(255, 255, 255, 0.04);
-
+  background: rgba(255,255,255,0.04);
   color: var(--wl-text-dim);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
   flex-shrink: 0;
 }
-
-/* =========================
-   MESSAGES
-========================= */
 
 .wl-chat__messages {
   display: flex;
   flex-direction: column;
   gap: 10px;
-
-  /*
-    Messages are intentionally not independently scrollable.
-    The page itself scrolls.
-
-    Extra bottom space prevents the fixed
-    message input from covering the last messages.
-  */
-  padding: 6px 2px 24px;
-
   overflow: visible;
   flex: none;
+  padding: 6px 2px 30px;
 }
-
-/* =========================
-   PUBLIC CONFESSION CARD
-========================= */
 
 .wl-chat__public-card {
   margin: 14px 0;
   padding: 14px 16px;
-
   border-radius: var(--wl-r-md);
-
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(255,255,255,0.035);
   border: 1px solid var(--wl-line);
 }
 
@@ -86,67 +66,47 @@
   margin-bottom: 10px;
 }
 
-/* =========================
-   MESSAGE LIMIT
-========================= */
-
 .wl-chat__limit-reached {
   text-align: center;
-
   padding: 16px;
   margin: 14px 0 20px;
-
   font-size: 12.5px;
   color: var(--wl-text-faint);
-
   border-top: 1px solid var(--wl-line);
 }
 
-/* =========================
-   FIXED MESSAGE INPUT
-========================= */
-
+/* Fixed input */
 .wl-chat__input-row {
   position: fixed;
-
   left: 50%;
   bottom: 78px;
-
   transform: translateX(-50%);
-
   width: calc(100% - 32px);
   max-width: 428px;
-
   z-index: 20;
 
   display: flex;
   align-items: center;
   gap: 10px;
 
-  background: rgba(20, 22, 18, 0.92);
+  background: rgba(20,22,18,0.92);
   backdrop-filter: blur(10px);
 
   border: 1px solid var(--wl-line);
   border-radius: var(--wl-r-pill);
-
   padding: 8px 8px 8px 18px;
 
   box-sizing: border-box;
-
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,.5);
 }
 
 .wl-chat__input-row input {
   flex: 1;
-
   min-width: 0;
-
   border: none;
   background: none;
   outline: none;
-
   color: var(--wl-text);
-
   font-family: 'Space Grotesk';
   font-size: 14.5px;
 }
@@ -158,44 +118,40 @@
 .wl-chat__send {
   width: 38px;
   height: 38px;
-
   border-radius: 50%;
   border: none;
-
   cursor: pointer;
   flex-shrink: 0;
-
-  background: linear-gradient(
-    135deg,
-    var(--wl-signal),
-    var(--wl-pink)
-  );
-
+  background: linear-gradient(135deg, var(--wl-signal), var(--wl-pink));
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .wl-chat__send:disabled {
-  opacity: 0.5;
+  opacity: .5;
   cursor: not-allowed;
 }
 
-/* =========================
-   MOBILE
-========================= */
 
+/* Mobile */
 @media (max-width: 480px) {
   .wl-chat {
     min-height: calc(100dvh - 144px);
+    padding: 105px 14px 150px;
+  }
 
-    width: 100%;
-
-    padding: 12px 14px 150px;
+  .wl-chat__fixed-header {
+    padding: 12px 14px 8px;
   }
 
   .wl-chat__messages {
-    padding: 6px 2px 24px;
+    padding: 6px 2px 30px;
+  }
+
+  .wl-chat__input-row {
+    width: calc(100% - 28px);
+    bottom: 78px;
   }
 
   .wl-chat__public-card {
@@ -205,27 +161,20 @@
   .wl-chat__limit-reached {
     margin: 16px 0 20px;
   }
-
-  .wl-chat__input-row {
-    width: calc(100% - 28px);
-
-    /*
-      Keep the input above the bottom navigation
-      while remaining responsive on smaller phones.
-    */
-    bottom: 78px;
-  }
 }
 
-/* =========================
-   VERY SMALL PHONES
-========================= */
 
+/* Small phones */
 @media (max-width: 360px) {
   .wl-chat {
     padding-left: 12px;
     padding-right: 12px;
     padding-bottom: 150px;
+  }
+
+  .wl-chat__fixed-header {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .wl-chat__input-row {
