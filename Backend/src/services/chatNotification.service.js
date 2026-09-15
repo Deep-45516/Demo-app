@@ -16,14 +16,21 @@ export function notifyNewMessage(
 
   const io = getIO();
 
-  io.to(
-  `user:${recipientUserId}`
-).emit(
+  const payload = {
+  message,
+  confessionId: conversation.confessionId,
+  lastActivityAt: message.createdAt,
+  senderUserId: senderId,
+  unreadFor: recipientUserId,
+};
+
+io.to(`user:${recipientUserId}`).emit(
   "new-message",
-  {
-    message,
-    confessionId: conversation.confessionId,
-    lastActivityAt: message.createdAt,
-  }
+  payload
+);
+
+io.to(`user:${senderId}`).emit(
+  "new-message",
+  payload
 );
 }

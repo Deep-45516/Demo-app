@@ -29,6 +29,7 @@ export default function Inbox() {
 const storedUser = localStorage.getItem("user");
 const user = storedUser ? JSON.parse(storedUser) : null;
 const userId = user?._id;
+const socket = getSocket();
   
   useEffect(() => {
   loadInbox();
@@ -41,29 +42,50 @@ const userId = user?._id;
   }
 
   function handleNewMessage(data) {
-    setReceived((current) => {
-      const index = current.findIndex(
-        (item) =>
-          String(item._id) === String(data.confessionId)
-      );
+  setReceived((current) => {
+    const index = current.findIndex(
+      (item) =>
+        String(item._id) === String(data.confessionId)
+    );
 
-      if (index === -1) return current;
+    if (index === -1) return current;
 
-      const updated = {
-        ...current[index],
-        unreadFor: userId,
-        readAt: null,
-        lastActivityAt: data.lastActivityAt,
-      };
+    const updated = {
+      ...current[index],
+      unreadFor: data.unreadFor,
+      readAt: null,
+      lastActivityAt: data.lastActivityAt,
+    };
 
-      const newList = [...current];
+    const newList = [...current];
+    newList.splice(index, 1);
+    newList.unshift(updated);
 
-      newList.splice(index, 1);
-      newList.unshift(updated);
+    return newList;
+  });
 
-      return newList;
-    });
-  }
+  setSent((current) => {
+    const index = current.findIndex(
+      (item) =>
+        String(item._id) === String(data.confessionId)
+    );
+
+    if (index === -1) return current;
+
+    const updated = {
+      ...current[index],
+      unreadFor: data.unreadFor,
+      readAt: null,
+      lastActivityAt: data.lastActivityAt,
+    };
+
+    const newList = [...current];
+    newList.splice(index, 1);
+    newList.unshift(updated);
+
+    return newList;
+  });
+}
 
   subscribeToNewConfession(handleNewConfession);
 
@@ -171,16 +193,15 @@ const userId = user?._id;
                 <div className="wl-row__top">
                   <span className="wl-row__name">
   {label}
-  {tab === "received" &&
-  String(confession.unreadFor) === String(userId) && (
-    <span
-      className="wl-unread-dot"
-      style={{
-        marginLeft: 6,
-        verticalAlign: "middle",
-      }}
-    />
-  )}
+  {String(confession.unreadFor) === String(userId) && (
+  <span
+    className="wl-unread-dot"
+    style={{
+      marginLeft: 6,
+      verticalAlign: "middle",
+    }}
+  />
+)}
 </span>
                   <span className="wl-row__time wl-mono">
                     {new Date(confession.lastActivityAt || confession.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
