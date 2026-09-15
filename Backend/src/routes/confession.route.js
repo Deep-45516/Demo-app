@@ -296,31 +296,220 @@ router.get("/pending", verifyAdmin, async (req, res) => {
 router.get("/inbox", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
+    const userObjectId = new mongoose.Types.ObjectId(userId);
 
     const dbStart = Date.now();
 
     const [received, sent] = await Promise.all([
-      // Received confessions
-      Confession.find({
-        recipientUser: userId,
-      })
-        .select(
-          "_id senderAnonymousName recipientAction deliveryStatus createdAt readAt",
-        )
-        .sort({ createdAt: -1 })
-        .limit(50)
-        .lean(),
+      // =========================================================
+      // RECEIVED CONFESSIONS
+      // =========================================================
+      Confession.aggregate([
+        {
+          $match: {
+            recipientUser: userObjectId,
+          },
+        },
 
-      // Sent confessions
-      Confession.find({
-        senderUser: userId,
-      })
-        .select(
-          "_id recipientInstagramUsername recipientAction deliveryStatus createdAt",
-        )
-        .sort({ createdAt: -1 })
-        .limit(50)
-        .lean(),
+        // Find conversation connected to this confession
+        {
+          $lookup: {
+            from: "conversations",
+            localField: "_id",
+            foreignField: "confessionId",
+            as: "conversation",
+          },
+        },
+
+        {
+          $unwind: {
+            path: "$conversation",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+
+        // Find latest unread message from the other user
+        {
+          $lookup: {
+            from: "messages",
+            let: {
+              conversationId: "$conversation._id",
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $eq: [
+                          "$conversationId",
+                          "$$conversationId",
+                        ],
+                      },
+                      {
+                        $ne: ["$senderUser", userObjectId],
+                      },
+                      {
+                        $eq: ["$seenAt", null],
+                      },
+                    ],
+                  },
+                },
+              },
+              {
+                $limit: 1,
+              },
+            ],
+            as: "unreadMessages",
+          },
+        },
+
+        {
+          $set: {
+            hasUnreadConfession: {
+              $eq: ["$readAt", null],
+            },
+
+            hasUnreadMessages: {
+              $gt: [
+                {
+                  $size: "$unreadMessages",
+                },
+                0,
+              ],
+            },
+          },
+        },
+
+        // Unread first, then newest
+        {
+          $sort: {
+            hasUnreadConfession: -1,
+            hasUnreadMessages: -1,
+            createdAt: -1,
+          },
+        },
+
+        {
+          $limit: 50,
+        },
+
+        {
+          $project: {
+            _id: 1,
+            senderAnonymousName: 1,
+            recipientAction: 1,
+            deliveryStatus: 1,
+            createdAt: 1,
+            readAt: 1,
+            hasUnreadConfession: 1,
+            hasUnreadMessages: 1,
+          },
+        },
+      ]),
+
+      // =========================================================
+      // SENT CONFESSIONS
+      // =========================================================
+      Confession.aggregate([
+        {
+          $match: {
+            senderUser: userObjectId,
+          },
+        },
+
+        // Find conversation connected to this confession
+        {
+          $lookup: {
+            from: "conversations",
+            localField: "_id",
+            foreignField: "confessionId",
+            as: "conversation",
+          },
+        },
+
+        {
+          $unwind: {
+            path: "$conversation",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+
+        // Find unread messages from recipient
+        {
+          $lookup: {
+            from: "messages",
+            let: {
+              conversationId: "$conversation._id",
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $eq: [
+                          "$conversationId",
+                          "$$conversationId",
+                        ],
+                      },
+                      {
+                        $ne: ["$senderUser", userObjectId],
+                      },
+                      {
+                        $eq: ["$seenAt", null],
+                      },
+                    ],
+                  },
+                },
+              },
+              {
+                $limit: 1,
+              },
+            ],
+            as: "unreadMessages",
+          },
+        },
+
+        {
+          $set: {
+            hasUnreadConfession: false,
+
+            hasUnreadMessages: {
+              $gt: [
+                {
+                  $size: "$unreadMessages",
+                },
+                0,
+              ],
+            },
+          },
+        },
+
+        // Unread conversations first, then newest confession
+        {
+          $sort: {
+            hasUnreadMessages: -1,
+            createdAt: -1,
+          },
+        },
+
+        {
+          $limit: 50,
+        },
+
+        {
+          $project: {
+            _id: 1,
+            recipientInstagramUsername: 1,
+            recipientAction: 1,
+            deliveryStatus: 1,
+            createdAt: 1,
+            hasUnreadConfession: 1,
+            hasUnreadMessages: 1,
+          },
+        },
+      ]),
     ]);
 
     const dbTime = Date.now() - dbStart;
@@ -340,11 +529,13 @@ router.get("/inbox", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("INBOX ERROR:", error);
 
-    return res
-      .status(500)
-      .json(
-        new ApiResponse(500, null, error.message || "Unable to fetch inbox."),
-      );
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        null,
+        error.message || "Unable to fetch inbox.",
+      ),
+    );
   }
 });
 // RECIPIENT RESPONDS TO CONFESSION

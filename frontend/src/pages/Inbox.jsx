@@ -8,6 +8,8 @@ import { getInbox } from "../inbox";
 import {
   subscribeToNewConfession,
   unsubscribeFromNewConfession,
+  getSocket,
+  connectSocket,
 } from "../socket";
 
 function StatusTag({ action }) {
@@ -28,21 +30,40 @@ export default function Inbox() {
 
   
   useEffect(() => {
+  loadInbox();
+
+  async function handleNewConfession(data) {
+    console.log("🔥 NEW CONFESSION EVENT");
+    console.log(data);
+
+    await loadInbox();
+
+    console.log("🔥 Inbox Reloaded");
+  }
+
+  function handleNewMessage(data) {
+    console.log("🔥 NEW MESSAGE EVENT");
+    console.log(data);
+
     loadInbox();
+  }
 
-    async function handleNewConfession(data) {
-      console.log("🔥 EVENT");
-      console.log(data);
-      await loadInbox();
-      console.log("🔥 Inbox Reloaded");
+  subscribeToNewConfession(handleNewConfession);
+
+  const socket = getSocket() || connectSocket();
+
+  if (socket) {
+    socket.on("new-message", handleNewMessage);
+  }
+
+  return () => {
+    unsubscribeFromNewConfession(handleNewConfession);
+
+    if (socket) {
+      socket.off("new-message", handleNewMessage);
     }
-
-    subscribeToNewConfession(handleNewConfession);
-
-    return () => {
-      unsubscribeFromNewConfession(handleNewConfession);
-    };
-  }, []);
+  };
+}, []);
 
   async function loadInbox() {
     try {
@@ -133,9 +154,16 @@ export default function Inbox() {
                 <div className="wl-row__top">
                   <span className="wl-row__name">
   {label}
-  {tab === "received" && !confession.readAt && (
-    <span className="wl-unread-dot" style={{ marginLeft: 6, verticalAlign: "middle" }} />
-  )}
+  {(confession.hasUnreadConfession ||
+  confession.hasUnreadMessages) && (
+  <span
+    className="wl-unread-dot"
+    style={{
+      marginLeft: 6,
+      verticalAlign: "middle",
+    }}
+  />
+)}
 </span>
                   <span className="wl-row__time wl-mono">
                     {new Date(confession.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
