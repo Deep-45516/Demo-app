@@ -4,6 +4,7 @@ import Message from "../models/message.model.js";
 import { moderateMessage } from "./moderation.service.js";
 import { CHAT_MAX_MESSAGES } from "../rules/chatBox.rule.js";
 import User from "../models/user.model.js";
+import Confession from "../models/confession.model.js";
 
 
 /*
@@ -65,7 +66,26 @@ export async function sendMessage(conversationId, userId, text) {
   // Update conversation mongoDB Conversation.
   conversation.lastMessageAt = message.createdAt; //lastMessage used to check recent conversation ,use in inbox
 
+  // Mark the OTHER user as having an unread message
+conversation.unreadFor =
+  String(conversation.senderUser) === String(userId)
+    ? conversation.recipientUser
+    : conversation.senderUser;
+
   await conversation.save(); //MongoDB updates the Conversation.
+
+  await Confession.findByIdAndUpdate(
+  conversation.confessionId,
+  {
+    unreadFor:
+      String(conversation.senderUser) === String(userId)
+        ? conversation.recipientUser
+        : conversation.senderUser,
+
+    readAt: null,
+    lastActivityAt: message.createdAt,
+  },
+);
 
   return {
     message,

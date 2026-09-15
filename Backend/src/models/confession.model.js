@@ -64,6 +64,19 @@ const confessionSchema = new mongoose.Schema(
       default: "sent",
     },
 
+    unreadFor: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+  index: true,
+},
+
+lastActivityAt: {
+  type: Date,
+  default: Date.now,
+  index: true,
+},
+
     recipientAction: {
       type: String,
       enum: ["pending", "curious", "not_interested"],

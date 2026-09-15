@@ -17,11 +17,13 @@ export function notifyNewMessage(
   const io = getIO();
 
   io.to(
-    `user:${recipientUserId}`
-  ).emit(
-    "new-message",
-    {
-      message,
-    }
-  );
+  `user:${recipientUserId}`
+).emit(
+  "new-message",
+  {
+    message,
+    confessionId: conversation.confessionId,
+    lastActivityAt: message.createdAt,
+  }
+);
 }

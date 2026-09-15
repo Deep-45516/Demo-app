@@ -6,10 +6,9 @@ import StaticAvatar, { hueFromString } from "../components/InstagramVerification
 
 import { getInbox } from "../inbox";
 import {
+  getSocket,
   subscribeToNewConfession,
   unsubscribeFromNewConfession,
-  getSocket,
-  connectSocket,
 } from "../socket";
 
 function StatusTag({ action }) {
@@ -27,7 +26,9 @@ export default function Inbox() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-
+const storedUser = localStorage.getItem("user");
+const user = storedUser ? JSON.parse(storedUser) : null;
+const userId = user?._id;
   
   useEffect(() => {
   loadInbox();
@@ -37,20 +38,36 @@ export default function Inbox() {
     console.log(data);
 
     await loadInbox();
-
-    console.log("🔥 Inbox Reloaded");
   }
 
   function handleNewMessage(data) {
-    console.log("🔥 NEW MESSAGE EVENT");
-    console.log(data);
+    setReceived((current) => {
+      const index = current.findIndex(
+        (item) =>
+          String(item._id) === String(data.confessionId)
+      );
 
-    loadInbox();
+      if (index === -1) return current;
+
+      const updated = {
+        ...current[index],
+        unreadFor: userId,
+        readAt: null,
+        lastActivityAt: data.lastActivityAt,
+      };
+
+      const newList = [...current];
+
+      newList.splice(index, 1);
+      newList.unshift(updated);
+
+      return newList;
+    });
   }
 
   subscribeToNewConfession(handleNewConfession);
 
-  const socket = getSocket() || connectSocket();
+  const socket = getSocket();
 
   if (socket) {
     socket.on("new-message", handleNewMessage);
@@ -154,19 +171,19 @@ export default function Inbox() {
                 <div className="wl-row__top">
                   <span className="wl-row__name">
   {label}
-  {(confession.hasUnreadConfession ||
-  confession.hasUnreadMessages) && (
-  <span
-    className="wl-unread-dot"
-    style={{
-      marginLeft: 6,
-      verticalAlign: "middle",
-    }}
-  />
-)}
+  {tab === "received" &&
+  String(confession.unreadFor) === String(userId) && (
+    <span
+      className="wl-unread-dot"
+      style={{
+        marginLeft: 6,
+        verticalAlign: "middle",
+      }}
+    />
+  )}
 </span>
                   <span className="wl-row__time wl-mono">
-                    {new Date(confession.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    {new Date(confession.lastActivityAt || confession.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                   </span>
                 </div>
                 <div className="wl-row__status">
