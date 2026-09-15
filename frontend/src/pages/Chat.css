@@ -4,11 +4,16 @@
   min-height: calc(100dvh - 144px);
   max-width: 460px;
   margin: 0 auto;
-  padding: 16px 16px 24px;
+  padding: 16px 16px 138px;
   box-sizing: border-box;
 }
 
 .wl-chat__header{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+
+wl-chat_fixed-header{
+  position:fixed;
+}
+
 .wl-chat__back{
   width:32px; height:32px; border-radius:50%; border:1px solid var(--wl-line);
   background:rgba(255,255,255,0.04); color:var(--wl-text-dim); display:flex; align-items:center; justify-content:center;
@@ -21,6 +26,7 @@
   gap:10px;
   overflow:visible;
   flex:none;
+  padding-top:100px;
   /* padding:6px 2px 130px; */
 }
 
