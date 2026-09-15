@@ -2,12 +2,14 @@
   display: flex;
   flex-direction: column;
 
-  height: calc(100dvh - 144px);
+  height: calc(100dvh - 144px - 110px);
+
   max-width: 460px;
   width: 100%;
-  margin: 0 auto;
+  margin: 110px auto 0;
 
-  padding: 125px 16px 150px;
+  padding: 0 16px 150px;
+
   box-sizing: border-box;
 
   overflow-y: auto;
@@ -40,7 +42,6 @@
   background: var(--wl-bg);
   z-index: 30;
 }
-
 .wl-chat__header {
   display: flex;
   align-items: center;
@@ -222,9 +223,11 @@
 @media (max-width: 480px) {
 
   .wl-chat {
-    height: calc(100dvh - 144px);
+    height: calc(100dvh - 144px - 105px);
 
-    padding: 120px 14px 150px;
+    margin-top: 105px;
+
+    padding: 0 14px 150px;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -234,13 +237,13 @@
     padding: 12px 14px 8px;
   }
 
-  .wl-chat__messages {
-    padding: 6px 2px 2px;
-  }
-
   .wl-chat__input-row {
     width: calc(100% - 28px);
     bottom: 78px;
+  }
+
+  .wl-chat__messages {
+    padding: 6px 2px 2px;
   }
 
   .wl-chat__public-card {
