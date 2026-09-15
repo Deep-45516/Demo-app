@@ -125,8 +125,8 @@ export default function Chat() {
       setPublicPosted(response.data.publicPosted || false);
       setInstagramPostId(response.data.instagramPostId || null);
 
-      if (response.data.revealStatus) setRevealStatus(response.data.revealStatus);
-      if (response.data.revealRequestedBy) setRevealRequestedBy(response.data.revealRequestedBy);
+      setRevealStatus(response.data.revealStatus || "none");
+setRevealRequestedBy(response.data.revealRequestedBy || null);
 
       setRevealedIdentity(response.data.revealedIdentity || null);
       setAutoOpenIdentity(false);

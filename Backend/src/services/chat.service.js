@@ -313,9 +313,7 @@ return {
     conversation.confessionId?.instagramPostId || null,
 
   revealStatus:
-    conversation.identityRevealed
-      ? "revealed"
-      : "none",
+  conversation.identityRevealStatus || "none",
 
   revealRequestedBy:
     conversation.identityRevealRequestedBy,
