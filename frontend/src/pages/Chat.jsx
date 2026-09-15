@@ -241,7 +241,7 @@ setRevealRequestedBy(response.data.revealRequestedBy || null);
             <span>{remainingMessages} left</span>
           </div>
           <div className="wl-limit__track">
-            <div className="wl-limit__fill" style={{ width: `${Math.min(100, (remainingMessages / 12) * 100)}%` }} />
+            <div className="wl-limit__fill" style={{ width: `${Math.min(100, (remainingMessages / 16) * 100)}%` }} />
           </div>
         </div>
       )}

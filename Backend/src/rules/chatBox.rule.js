@@ -1,4 +1,4 @@
-export const CHAT_MAX_MESSAGES = 12;
+export const CHAT_MAX_MESSAGES = 16;
 
 export const REVEAL_REQUEST_START_MESSAGE = 7;
 
