@@ -223,7 +223,7 @@ setRevealRequestedBy(response.data.revealRequestedBy || null);
 
   return (
     <div className="wl-chat">
-      <div className="wl-chat_fixed-header">
+      <div className="wl-chat__fixed-header">
       <div className="wl-chat__header">
         <button className="wl-chat__back" onClick={() => window.history.back()}>
           <BackIcon />
