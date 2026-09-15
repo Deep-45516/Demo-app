@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Router } from "express";
 import Confession from "../models/confession.model.js";
 import { generateImages } from "../utils/generateImages.js";
