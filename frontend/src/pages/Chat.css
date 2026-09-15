@@ -10,8 +10,18 @@
 
 .wl-chat__header{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
 
-wl-chat_fixed-header{
-  position: fixed;
+.wl-chat_fixed-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 30;
+
+  background: var(--wl-bg);
+  padding: 16px;
+
+  box-sizing: border-box;
 }
 
 .wl-chat__back{
