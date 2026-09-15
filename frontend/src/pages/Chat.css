@@ -11,7 +11,7 @@
 .wl-chat__header{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
 
 wl-chat_fixed-header{
-  position:fixed;
+  position: fixed;
 }
 
 .wl-chat__back{
@@ -79,7 +79,7 @@ wl-chat_fixed-header{
 .wl-chat{
   display:flex; flex-direction:column;
   min-height:calc(100vh - 144px);   /* was: height */
-  max-width:460px; margin:0 auto; padding:100px 16px 140px; box-sizing:border-box;
+  max-width:460px; margin:0 auto; padding:16px 16px 123px; box-sizing:border-box;
 }
 
 .wl-chat__messages{
