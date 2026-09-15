@@ -17,12 +17,14 @@
 ========================= */
 
 .wl-chat__header {
-  position:fixed;
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 14px;
 }
+
+.wl-chat_fixed-header{
+  position: fixed;}
 
 .wl-chat__back {
   width: 32px;
