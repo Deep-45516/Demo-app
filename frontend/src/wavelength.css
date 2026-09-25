@@ -47,7 +47,7 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
   font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px;
   padding:14px 22px; border-radius:var(--wl-r-pill); border:none; cursor:pointer;
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  transition:transform .15s ease, box-shadow .2s ease, opacity .20s ease;
+  transition:transform .15s ease, box-shadow .2s ease, opacity .15s ease;
 }
 .wl-btn:active{ transform:scale(.97); }
 .wl-btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
@@ -120,15 +120,7 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
   font-family:'Space Grotesk'; font-size:12.5px; font-weight:600; color:var(--wl-text-dim);
   cursor:pointer; transition:all .2s ease;
 }
-.wl-segment button.active {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--wl-signal) 60%, #1a1a1f 40%),
-    color-mix(in srgb, var(--wl-pink) 60%, #1a1a1f 40%)
-  );
-  color: #fff;
-}
-
+.wl-segment button.active{ background:linear-gradient(135deg, var(--wl-signal), var(--wl-pink)); color:#fff; }
 
 /* -- list rows -- */
 .wl-row{ display:flex; align-items:center; gap:12px; padding:13px 8px; border-radius:16px; cursor:pointer; transition:background .2s ease; }
