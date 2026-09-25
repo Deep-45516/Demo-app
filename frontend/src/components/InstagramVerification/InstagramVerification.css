@@ -412,6 +412,7 @@
      ------------------------- */
 
   .wl-instagram-auth__success {
+    margin-top: 40%;
     width: 100%;
     max-width: 330px;
     padding: 0 10px;
