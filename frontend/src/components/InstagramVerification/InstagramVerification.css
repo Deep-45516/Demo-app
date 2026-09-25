@@ -44,11 +44,15 @@
 }
 .wl-instagram-auth__brand-name {
   margin: 0;
-  font-family: "Yeseva One", serif;
-  font-weight: 500;
-  font-size: 20px;
-  color: var(--wl-text);
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 31px;
+  line-height: 1;
+  letter-spacing: -0.7px;
+  color: #f8f5fb;
 }
+
 
 .wl-instagram-auth__brand-subtitle{
   margin:6px 0 0; font-size:12px; color:var(--wl-text-faint);
