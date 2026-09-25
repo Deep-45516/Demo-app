@@ -283,6 +283,7 @@
   .wl-instagram-auth__primary {
     min-height: 50px;
     margin-top: 12px;
+    opacity: 0.3;
   }
 
   /* -------------------------
