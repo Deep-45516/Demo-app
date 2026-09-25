@@ -416,6 +416,7 @@
     max-width: 330px;
     padding: 0 10px;
     box-sizing: border-box;
+    display:flex; align-items:center; justify-content:center;
   }
 
   .wl-instagram-auth__success-icon {
