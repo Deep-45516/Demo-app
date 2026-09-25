@@ -542,7 +542,7 @@ export default function InstagramVerification({
               </span>
             </>
           ) : (
-            "Find your anonymous name."
+            "Find your anonymous name"
           )}
         </h1>
 
