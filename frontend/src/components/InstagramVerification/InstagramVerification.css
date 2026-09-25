@@ -33,15 +33,37 @@
 
 /* -- brand -- */
 .wl-instagram-auth__brand{ text-align:center; margin-bottom:22px; }
-.wl-instagram-auth__brand-mark{
-  width:46px; height:46px; margin:0 auto 12px;
-  display:flex; align-items:center; justify-content:center;
-  border-radius:14px;
-  background:linear-gradient(135deg, rgba(124,92,252,0.22), rgba(255,77,141,0.12));
-  border:1px solid rgba(124,92,252,0.22);
-  color:var(--wl-signal-bright);
-  box-shadow:0 10px 32px rgba(124,92,252,0.16);
+.wl-instagram-auth__brand-mark {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+
+  background:
+    radial-gradient(
+      circle at 30% 25%,
+      rgba(255, 255, 255, 0.12),
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(124, 92, 252, 0.22),
+      rgba(255, 77, 141, 0.12)
+    );
+
+  border: 1px solid rgba(124, 92, 252, 0.25);
+
+  color: var(--wl-signal-bright);
+
+  box-shadow:
+    0 10px 32px rgba(124, 92, 252, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12);
 }
+
 .wl-instagram-auth__brand-name {
   margin: 0;
   font-family: "Space Grotesk", sans-serif;
