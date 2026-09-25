@@ -123,8 +123,8 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
 .wl-segment button.active {
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--wl-signal) 65%, #1a1a1f 35%),
-    color-mix(in srgb, var(--wl-pink) 65%, #1a1a1f 35%)
+    color-mix(in srgb, var(--wl-signal) 60%, #1a1a1f 40%),
+    color-mix(in srgb, var(--wl-pink) 60%, #1a1a1f 40%)
   );
   color: #fff;
 }
