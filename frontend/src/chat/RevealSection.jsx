@@ -81,7 +81,7 @@ export default function RevealSection({
         <div className="rs-revealed wl-fade-up">
           {isSender ? (
             <>
-              <div className="rs-icon">📡</div>
+              <div className="rs-icon">🍵</div>
               <strong>They know it's you now.</strong>
               <p><strong>@{revealedIdentity?.username || "them"}</strong> knows who was behind the message.</p>
               <p>You wondered what they'd think once they knew. Now they do.</p>

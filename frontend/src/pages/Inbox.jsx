@@ -160,7 +160,7 @@ const socket = getSocket();
       {list.length === 0 && (
         <div className="wl-empty wl-fade-up">
           <p className="wl-display">
-            {tab === "received" ? "No signals yet." : "Nothing sent yet."}
+            {tab === "received" ? "No Coffee yet." : "Nothing sent yet."}
           </p>
           <p className="wl-mono" style={{ fontSize: 11 }}>
             {tab === "received" ? "Someone out there might be listening." : "Send the first one from Confess."}

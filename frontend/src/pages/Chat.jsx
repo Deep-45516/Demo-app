@@ -238,7 +238,7 @@ setRevealRequestedBy(response.data.revealRequestedBy || null);
       {remainingMessages !== null && remainingMessages > 0 && (
         <div className="wl-limit">
           <div className="wl-limit__top">
-            <span>SIGNAL BUDGET</span>
+            <span>MESSAGES BUDGET</span>
             <span>{remainingMessages} left</span>
           </div>
           <div className="wl-limit__track">

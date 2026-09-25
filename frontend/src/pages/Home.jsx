@@ -343,14 +343,14 @@ export default function Home() {
 
         {recipientStatus?.exists && (
           <div className="wl-success-message">
-            <span>✓</span> They're on Wavelength.
+            <span>✓</span> They're on ExpressHo.
           </div>
         )}
 
         {recipientStatus && !recipientStatus.exists && (
           <div className="wl-status-card">
             <p>
-              Not on Wavelength yet — we'll hold this 7 days and deliver it if
+              Not on ExpressHo yet — we'll hold this 7 days and deliver it if
               they join.
             </p>
             <button
