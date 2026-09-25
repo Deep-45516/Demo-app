@@ -412,7 +412,7 @@
      ------------------------- */
 
   .wl-instagram-auth__success {
-    margin-top: 40%;
+    margin-top: 50%;
     width: 100%;
     max-width: 330px;
     padding: 0 10px;
@@ -421,8 +421,8 @@
   }
 
   .wl-instagram-auth__success-icon {
-    width: 56px;
-    height: 56px;
+    width: 100px;
+    height: 99px;
     margin-bottom: 18px;
   }
 
@@ -433,7 +433,7 @@
 
   .wl-instagram-auth__success-label {
     margin-top: 20px;
-    font-size: 9.5px;
+    font-size: 13px;
   }
 
   .wl-instagram-auth__anonymous-name {
