@@ -34,7 +34,7 @@
 /* -- brand -- */
 .wl-instagram-auth__brand{ text-align:center; margin-bottom:22px; }
 .wl-instagram-auth__brand-mark{
-  width:44px; height:44px; margin:0 auto 12px;
+  width:46px; height:46px; margin:0 auto 12px;
   display:flex; align-items:center; justify-content:center;
   border-radius:14px;
   background:linear-gradient(135deg, rgba(124,92,252,0.22), rgba(255,77,141,0.12));
@@ -42,10 +42,14 @@
   color:var(--wl-signal-bright);
   box-shadow:0 10px 32px rgba(124,92,252,0.16);
 }
-.wl-instagram-auth__brand-name{
-  margin:0; font-family:'Fraunces', serif; font-style:italic; font-weight:500;
-  font-size:17px; color:var(--wl-text);
+.wl-instagram-auth__brand-name {
+  margin: 0;
+  font-family: "Yeseva One", serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--wl-text);
 }
+
 .wl-instagram-auth__brand-subtitle{
   margin:6px 0 0; font-size:12px; color:var(--wl-text-faint);
 }
@@ -182,10 +186,6 @@
     width: 40px;
     height: 40px;
     margin-bottom: 10px;
-  }
-
-  .wl-instagram-auth__brand-name {
-    font-size: 16px;
   }
 
   .wl-instagram-auth__brand-subtitle {
