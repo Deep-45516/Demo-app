@@ -47,7 +47,7 @@ C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\wavelength.css
   font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px;
   padding:14px 22px; border-radius:var(--wl-r-pill); border:none; cursor:pointer;
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  transition:transform .15s ease, box-shadow .2s ease, opacity .15s ease;
+  transition:transform .15s ease, box-shadow .2s ease, opacity .25s ease;
 }
 .wl-btn:active{ transform:scale(.97); }
 .wl-btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
