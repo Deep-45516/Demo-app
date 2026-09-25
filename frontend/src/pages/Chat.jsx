@@ -147,9 +147,12 @@ setRevealRequestedBy(response.data.revealRequestedBy || null);
       setError("");
 
       const response = await sendMessage(conversationId, text);
-      setMessages((current) => [...current, response.data.message]);
-      setRemainingMessages(response.data.remainingMessages);
-      setText("");
+setMessages((current) => {
+  const alreadyExists = current.some((item) => item._id === response.data.message._id);
+  return alreadyExists ? current : [...current, response.data.message];
+});
+setRemainingMessages(response.data.remainingMessages);
+setText("");
     } catch (error) {
       console.error(error);
       setError(error.message || "Unable to send message.");
