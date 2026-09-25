@@ -42,7 +42,7 @@ const VERIFICATION_STATES = {
 
 function SignalMarkIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="5" y="9" width="11" height="9" rx="1.5" />
       <path d="M16 11.5h1.5a2 2 0 0 1 0 4H16" />
       <path d="M9 3.5c0 1-1 1-1 2s1 1 1 2" />
