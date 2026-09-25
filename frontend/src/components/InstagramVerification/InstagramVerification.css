@@ -43,16 +43,17 @@
   box-shadow:0 10px 32px rgba(124,92,252,0.16);
 }
 .wl-instagram-auth__brand-name {
-  margin: 0;
-  font-family: "Fraunces", serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 25px;
-  line-height: 1;
-  letter-spacing: 1px;
-  letter-spacing: -0.7px;
-  color: #f8f5fb;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #f7f4fa;
 }
+
+.wl-instagram-auth__brand-name span {
+  color: #b76cff;
+}
+
 
 
 .wl-instagram-auth__brand-subtitle{

@@ -3,31 +3,29 @@ import { useEffect, useRef, useState } from "react";
 import "./InstagramVerification.css";
 import "../../wavelength.css";
 
-
 const API = import.meta.env.VITE_BACKEND_URL;
 
 const BUSINESS_USERNAME = "wit_confessions.26";
 const SHAYARI_DELAY = 1500;
 
 const SHAYARIS = [
-
   `Wait for few seconds
    Getting there...`,
-//   `ज़िंदगी चलती रही, वक़्त भी चलता रहा,
-// बस दिल था कि वहीं ठहरा रहा`,
+  //   `ज़िंदगी चलती रही, वक़्त भी चलता रहा,
+  // बस दिल था कि वहीं ठहरा रहा`,
 
-//   `वक़्त के साथ हर रंग बदल जाता है,
-// कल का अपना, याद बन जाता है|
-// दिमाग़ तो छोड़ ही दे उसे,
-// मगर दिल है कि उसकी Story आते ही ठहर जाता है। `,
+  //   `वक़्त के साथ हर रंग बदल जाता है,
+  // कल का अपना, याद बन जाता है|
+  // दिमाग़ तो छोड़ ही दे उसे,
+  // मगर दिल है कि उसकी Story आते ही ठहर जाता है। `,
 
-//   `जब ख़ामोश आँखों से बात होती है,
-// ऐसे ही किसी कहानी की शुरुआत होती है,
-// तुम्हारी ही बातों में खोए रहते हैं,
-// पता नहीं कब नींद से मुलाक़ात होती है`,
+  //   `जब ख़ामोश आँखों से बात होती है,
+  // ऐसे ही किसी कहानी की शुरुआत होती है,
+  // तुम्हारी ही बातों में खोए रहते हैं,
+  // पता नहीं कब नींद से मुलाक़ात होती है`,
 
-//   `दिल अभी पूरी तरह टूटा नहीं,
-// दोस्तों की मेहरबानी चाहिए।`,
+  //   `दिल अभी पूरी तरह टूटा नहीं,
+  // दोस्तों की मेहरबानी चाहिए।`,
 ];
 
 const VERIFICATION_STATES = {
@@ -42,7 +40,17 @@ const VERIFICATION_STATES = {
 
 function SignalMarkIcon() {
   return (
-     <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="27"
+      height="27"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <rect x="5" y="9" width="11" height="9" rx="1.5" />
       <path d="M16 11.5h1.5a2 2 0 0 1 0 4H16" />
       <path d="M9 3.5c0 1-1 1-1 2s1 1 1 2" />
@@ -150,11 +158,10 @@ export default function InstagramVerification({
   backendReady,
   healthcheckStartedAt,
 }) {
+  const [startupState, setStartupState] = useState("checking");
 
-    const [startupState, setStartupState] = useState("checking");
-
-  const [shayariIndex] = useState(
-    () => Math.floor(Math.random() * SHAYARIS.length)
+  const [shayariIndex] = useState(() =>
+    Math.floor(Math.random() * SHAYARIS.length),
   );
   const [state, setState] = useState(VERIFICATION_STATES.IDLE);
   const [username, setUsername] = useState("");
@@ -170,28 +177,25 @@ export default function InstagramVerification({
   const mountedRef = useRef(true);
 
   useEffect(() => {
-  // Server responded before the threshold.
-  // Don't show Shayari.
-  if (backendReady) {
-    setStartupState("ready");
-    return;
-  }
-
-  const elapsed = performance.now() - healthcheckStartedAt;
-
-  const remaining = Math.max(
-    0,
-    SHAYARI_DELAY - elapsed
-  );
-
-  const timer = setTimeout(() => {
-    if (!backendReady) {
-      setStartupState("shayari");
+    // Server responded before the threshold.
+    // Don't show Shayari.
+    if (backendReady) {
+      setStartupState("ready");
+      return;
     }
-  }, remaining);
 
-  return () => clearTimeout(timer);
-}, [backendReady, healthcheckStartedAt]);
+    const elapsed = performance.now() - healthcheckStartedAt;
+
+    const remaining = Math.max(0, SHAYARI_DELAY - elapsed);
+
+    const timer = setTimeout(() => {
+      if (!backendReady) {
+        setStartupState("shayari");
+      }
+    }, remaining);
+
+    return () => clearTimeout(timer);
+  }, [backendReady, healthcheckStartedAt]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -471,40 +475,35 @@ export default function InstagramVerification({
 
   const stepLevel = verificationActive ? 2 : 1;
 
-
   if (startupState === "checking") {
-  return (
-    <main className="wl-instagram-auth wl-startup-shell">
-      <div className="wl-startup-shell__mark">
-        <SignalMarkIcon />
-      </div>
-    </main>
-  );
-}
-
-if (startupState === "shayari") {
-  return (
-    <main className="wl-instagram-auth wl-shayari-screen">
-      <div className="wl-shayari-screen__glow" />
-
-      <section className="wl-shayari">
-        <div className="wl-shayari__brand">
+    return (
+      <main className="wl-instagram-auth wl-startup-shell">
+        <div className="wl-startup-shell__mark">
           <SignalMarkIcon />
         </div>
+      </main>
+    );
+  }
 
-        <p className="wl-shayari__eyebrow">
-          कुछ बातें कही नहीं जातीं…
-        </p>
+  if (startupState === "shayari") {
+    return (
+      <main className="wl-instagram-auth wl-shayari-screen">
+        <div className="wl-shayari-screen__glow" />
 
-        <p className="wl-shayari__text">
-          {SHAYARIS[shayariIndex]}
-        </p>
+        <section className="wl-shayari">
+          <div className="wl-shayari__brand">
+            <SignalMarkIcon />
+          </div>
 
-        <div className="wl-shayari__line" />
-      </section>
-    </main>
-  );
-}
+          <p className="wl-shayari__eyebrow">कुछ बातें कही नहीं जातीं…</p>
+
+          <p className="wl-shayari__text">{SHAYARIS[shayariIndex]}</p>
+
+          <div className="wl-shayari__line" />
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="wl-instagram-auth">
@@ -513,7 +512,9 @@ if (startupState === "shayari") {
           <div className="wl-instagram-auth__brand-mark">
             <SignalMarkIcon />
           </div>
-          <p className="wl-instagram-auth__brand-name">ExpressHo</p>
+          <p class="wl-instagram-auth__brand-name">
+            Express<span>Ho</span>
+          </p>
           {/* <p className="wl-instagram-auth__brand-subtitle">
   Stay anonymous.
 </p> */}
@@ -533,17 +534,17 @@ if (startupState === "shayari") {
         </div> */}
 
         <h1 className="wl-instagram-auth__heading wl-display">
-  {verificationActive ? (
-    <>
-      Send this code to{" "}
-      <span className="wl-instagram-auth__destination">
-        @{BUSINESS_USERNAME}
-      </span>
-    </>
-  ) : (
-    "Find your anonymous name."
-  )}
-</h1>
+          {verificationActive ? (
+            <>
+              Send this code to{" "}
+              <span className="wl-instagram-auth__destination">
+                @{BUSINESS_USERNAME}
+              </span>
+            </>
+          ) : (
+            "Find your anonymous name."
+          )}
+        </h1>
 
         {/* <p className="wl-instagram-auth__description">
           {verificationActive
@@ -552,15 +553,13 @@ if (startupState === "shayari") {
         </p> */}
 
         <section className="wl-instagram-auth__card wl-card">
-<label
-  htmlFor="instagram-username"
-  className="wl-instagram-auth__field-label"
-  aria-hidden={true}
->
-  {verificationActive ? "" : "Instagram username"}
-</label>
-
-
+          <label
+            htmlFor="instagram-username"
+            className="wl-instagram-auth__field-label"
+            aria-hidden={true}
+          >
+            {verificationActive ? "" : "Instagram username"}
+          </label>
 
           <div className="wl-instagram-auth__input-wrap">
             <span className="wl-instagram-auth__input-prefix">@</span>
@@ -610,112 +609,106 @@ if (startupState === "shayari") {
             </div>
           )}
 
-            {verificationActive && (
-  <section
-    className="wl-instagram-auth__verification wl-fade-up"
-    aria-live="polite"
-  >
-    <p className="wl-instagram-auth__verification-text">
-                DM it from <strong>@{username}</strong> 
+          {verificationActive && (
+            <section
+              className="wl-instagram-auth__verification wl-fade-up"
+              aria-live="polite"
+            >
+              <p className="wl-instagram-auth__verification-text">
+                DM it from <strong>@{username}</strong>
                 {/* to{" "}
                 <span className="wl-instagram-auth__destination">
                   @{BUSINESS_USERNAME}
                 </span> */}
               </p>
 
-    {/* Instagram reference image */}
-    <div className="wl-instagram-auth__reference">
-      <img
-        src="/wyt-confessions(1).png"
-        alt="How to send the verification code on Instagram"
-      />
-    </div>
+              {/* Instagram reference image */}
+              <div className="wl-instagram-auth__reference">
+                <img
+                  src="/wyt-confessions(1).png"
+                  alt="How to send the verification code on Instagram"
+                />
+              </div>
 
-    {/* Verification code */}
-    <div className="wl-instagram-auth__code-label wl-mono">
-      YOUR CODE
-    </div>
+              {/* Verification code */}
+              <div className="wl-instagram-auth__code-label wl-mono">
+                YOUR CODE
+              </div>
 
-    <button
-      type="button"
-      className="wl-instagram-auth__code wl-mono"
-      onClick={handleCopy}
-      aria-label="Copy verification code"
-    >
-      <span>{code}</span>
+              <button
+                type="button"
+                className="wl-instagram-auth__code wl-mono"
+                onClick={handleCopy}
+                aria-label="Copy verification code"
+              >
+                <span>{code}</span>
 
-      <span
-        className="wl-instagram-auth__copy-icon"
-        aria-hidden="true"
-      >
-        {copied ? "✓" : "⧉"}
-      </span>
-    </button>
+                <span
+                  className="wl-instagram-auth__copy-icon"
+                  aria-hidden="true"
+                >
+                  {copied ? "✓" : "⧉"}
+                </span>
+              </button>
 
-    {/* Instagram button */}
-    <div className="wl-instagram-auth__actions">
-      <button
-        type="button"
-        className="wl-btn wl-instagram-auth__instagram"
-        disabled={openingInstagram}
-        onClick={handleOpenInstagram}
-      >
-        <InstagramIcon />
-        {openingInstagram ? "Opening..." : "Open Instagram"}
-      </button>
-    </div>
+              {/* Instagram button */}
+              <div className="wl-instagram-auth__actions">
+                <button
+                  type="button"
+                  className="wl-btn wl-instagram-auth__instagram"
+                  disabled={openingInstagram}
+                  onClick={handleOpenInstagram}
+                >
+                  <InstagramIcon />
+                  {openingInstagram ? "Opening..." : "Open Instagram"}
+                </button>
+              </div>
 
-    {/* Verification status */}
-    {state === VERIFICATION_STATES.WAITING && (
-      <div className="wl-instagram-auth__status">
-        <div className="wl-eq">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+              {/* Verification status */}
+              {state === VERIFICATION_STATES.WAITING && (
+                <div className="wl-instagram-auth__status">
+                  <div className="wl-eq">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
 
-        <span className="wl-mono">
-          Waiting for verification
-        </span>
-      </div>
-    )}
+                  <span className="wl-mono">Waiting for verification</span>
+                </div>
+              )}
 
-    {state === VERIFICATION_STATES.VERIFYING && (
-      <div className="wl-instagram-auth__status">
-        <div className="wl-eq">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+              {state === VERIFICATION_STATES.VERIFYING && (
+                <div className="wl-instagram-auth__status">
+                  <div className="wl-eq">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
 
-        <span className="wl-mono">
-          Verifying
-        </span>
-      </div>
-    )}
+                  <span className="wl-mono">Verifying</span>
+                </div>
+              )}
 
-    {(state === VERIFICATION_STATES.ERROR ||
-      state === VERIFICATION_STATES.EXPIRED) && (
-      <>
-        <div className="wl-instagram-auth__error">
-          {error}
-        </div>
+              {(state === VERIFICATION_STATES.ERROR ||
+                state === VERIFICATION_STATES.EXPIRED) && (
+                <>
+                  <div className="wl-instagram-auth__error">{error}</div>
 
-        <button
-          type="button"
-          className="wl-btn wl-btn-outline wl-btn-block wl-instagram-auth__retry"
-          onClick={handleRetry}
-        >
-          Generate new code
-        </button>
-      </>
-    )}
-  </section>
-)}
+                  <button
+                    type="button"
+                    className="wl-btn wl-btn-outline wl-btn-block wl-instagram-auth__retry"
+                    onClick={handleRetry}
+                  >
+                    Generate new code
+                  </button>
+                </>
+              )}
+            </section>
+          )}
         </section>
       </div>
     </main>
