@@ -59,17 +59,28 @@ export default function Chat() {
     if (!socket) return;
 
     function handleNewMessage(data) {
-      const message = data.message;
-      if (message.conversationId !== conversationId) return;
+  const message = data.message;
 
-      setMessages((current) => {
-        const alreadyExists = current.some((item) => item._id === message._id);
-        if (alreadyExists) return current;
+  if (String(message.conversationId) !== String(conversationId)) {
+    return;
+  }
 
-        setRemainingMessages((remaining) => (remaining === null ? remaining : Math.max(remaining - 1, 0)));
-        return [...current, message];
-      });
-    }
+  setMessages((current) => {
+    const alreadyExists = current.some(
+      (item) => String(item._id) === String(message._id)
+    );
+
+    if (alreadyExists) return current;
+
+    setRemainingMessages((remaining) =>
+      remaining === null
+        ? remaining
+        : Math.max(remaining - 1, 0)
+    );
+
+    return [...current, message];
+  });
+}
 
     function handleRevealUpdated(data) {
       if (data.conversationId !== conversationId) return;
