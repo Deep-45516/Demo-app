@@ -15,11 +15,17 @@ app.use(
     },
   }),
 );
+const allowedOrigins = [
+  "https://wit-tbh.vercel.app",
+  "https://sayitfreely.vercel.app",   // keep the old one if still used
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://sayitfreely.vercel.app","https://wit-tbh.vercel.app"],
+    origin: allowedOrigins,
     credentials: true,
-  }),
+  })
 );
 app.use(express.urlencoded({ extended: true }));
 // test route
