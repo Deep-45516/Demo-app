@@ -509,41 +509,53 @@ export default function InstagramVerification({
     <main className="wl-instagram-auth">
       <div className="wl-instagram-auth__container">
 <header className="wl-instagram-auth__brand">
+
   <div className="wl-instagram-auth__brand-mark">
     <svg
-      viewBox="0 0 64 64"
-      aria-hidden="true"
+      viewBox="0 0 48 48"
       className="wl-instagram-auth__logo"
+      aria-hidden="true"
     >
-      <path
-        d="M16 20h32M32 20v27"
-        stroke="currentColor"
-        strokeWidth="6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M18 34c3 5 7 7 12 7s9-2 12-7"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      <circle
-        cx="49"
-        cy="15"
-        r="4"
+      <rect
+        x="5"
+        y="5"
+        width="38"
+        height="38"
+        rx="12"
         fill="currentColor"
+      />
+
+      <path
+        d="M15 17.5H33"
+        stroke="var(--wl-bg, #0A0A12)"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M24 17.5V31"
+        stroke="var(--wl-bg, #0A0A12)"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M18 30.5H30"
+        stroke="var(--wl-bg, #0A0A12)"
+        strokeWidth="3"
+        strokeLinecap="round"
       />
     </svg>
   </div>
 
   <p className="wl-instagram-auth__brand-name">
-    <span>TBH</span>
+    TBH
   </p>
 
   <p className="wl-instagram-auth__brand-tagline">
-    say it. stay anonymous.
+    No Walls. No Cap.
   </p>
+
 </header>
 
         {/* <div

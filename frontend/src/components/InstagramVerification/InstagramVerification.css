@@ -35,114 +35,85 @@
 /* =========================
    TBH BRAND
 ========================= */
+/* =========================
+   TBH — PREMIUM BRAND
+========================= */
 
 .wl-instagram-auth__brand {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 30px;
 }
 
-/* Logo container */
+
+/* ---------- ICON ---------- */
+
 .wl-instagram-auth__brand-mark {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 13px;
+  width: 48px;
+  height: 48px;
+
+  margin: 0 auto 17px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 17px;
-
-  background:
-    radial-gradient(
-      circle at 30% 20%,
-      rgba(255, 255, 255, 0.16),
-      transparent 38%
-    ),
-    linear-gradient(
-      145deg,
-      #251047 0%,
-      #35115f 48%,
-      #180d2e 100%
-    );
-
-  border: 1px solid rgba(194, 120, 255, 0.32);
-
-  box-shadow:
-    0 14px 40px rgba(124, 58, 237, 0.22),
-    0 0 0 1px rgba(255, 255, 255, 0.025) inset,
-    0 1px 0 rgba(255, 255, 255, 0.10) inset;
+  color: #f5f3f7;
 
   position: relative;
-  overflow: hidden;
 }
 
-/* subtle glow */
-.wl-instagram-auth__brand-mark::after {
-  content: "";
-  position: absolute;
-  width: 35px;
-  height: 35px;
-  top: -18px;
-  right: -12px;
-
-  background: rgba(236, 72, 153, 0.28);
-  filter: blur(18px);
-  border-radius: 50%;
-}
-
-/* SVG */
 .wl-instagram-auth__logo {
-  width: 32px;
-  height: 32px;
-  color: #f5eaff;
+  width: 48px;
+  height: 48px;
 
-  position: relative;
-  z-index: 1;
+  display: block;
 
   filter:
-    drop-shadow(0 3px 8px rgba(168, 85, 247, 0.35));
+    drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
 }
 
 
-/* =========================
-   TBH WORDMARK
-========================= */
+/* ---------- WORDMARK ---------- */
 
 .wl-instagram-auth__brand-name {
   margin: 0;
 
-  font-family: "Space Grotesk", "Inter", sans-serif;
-  font-size: 30px;
+  font-family: "Syne", sans-serif;
+
+  font-size: 32px;
+  line-height: 0.95;
+
+  font-weight: 700;
+
+  letter-spacing: 2.2px;
+
+  color: #f8f7fa;
+
+  text-rendering: geometricPrecision;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* ---------- TAGLINE ---------- */
+
+.wl-instagram-auth__brand-tagline {
+  margin: 11px 0 0;
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 10px;
   line-height: 1;
 
-  font-weight: 650;
-  letter-spacing: 1.8px;
+  font-weight: 500;
 
-  display: inline-block;
-  position: relative;
+  letter-spacing: 2.2px;
+
+  color: rgba(255, 255, 255, 0.38);
 }
-
-.wl-instagram-auth__brand-name span {
-  background: linear-gradient(
-    110deg,
-    #ffffff 0%,
-    #f4e8ff 45%,
-    #d8b4fe 100%
-  );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  filter: drop-shadow(
-    0 3px 10px rgba(168, 85, 247, 0.18)
-  );
-}
-
 
 /* little brand accent */
-.wl-instagram-auth__brand-name::after {
+/* .wl-instagram-auth__brand-name::after {
   content: "";
 
   position: absolute;
@@ -159,7 +130,7 @@
 
   box-shadow:
     0 0 10px rgba(236, 72, 153, 0.7);
-}
+} */
 
 
 /* =========================
