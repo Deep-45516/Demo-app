@@ -112,38 +112,32 @@
 .wl-instagram-auth__brand-name {
   margin: 0;
 
-  font-family:
-    "Space Grotesk",
-    "Inter",
-    sans-serif;
-
+  font-family: "Space Grotesk", "Inter", sans-serif;
   font-size: 30px;
   line-height: 1;
 
-  font-weight: 750;
-  letter-spacing: -1.8px;
+  font-weight: 650;
+  letter-spacing: 1.8px;
 
   display: inline-block;
   position: relative;
 }
 
-/* gradient wordmark */
 .wl-instagram-auth__brand-name span {
-  background:
-    linear-gradient(
-      110deg,
-      #ffffff 5%,
-      #f3dfff 32%,
-      #c084fc 62%,
-      #ec4899 100%
-    );
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #f4e8ff 45%,
+    #d8b4fe 100%
+  );
 
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 
-  filter:
-    drop-shadow(0 3px 12px rgba(168, 85, 247, 0.22));
+  filter: drop-shadow(
+    0 3px 10px rgba(168, 85, 247, 0.18)
+  );
 }
 
 
