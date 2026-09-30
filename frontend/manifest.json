@@ -1,22 +1,22 @@
 {
   "name": "To Be Honest",
   "short_name": "TBH",
-  "description": "No walls. No Cap.",
+  "description": "No Walls. No Cap.",
   "icons": [
     {
-      "src": "/Icon1.png",
+      "src": "/Icon2.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Icon1.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "theme_color": "#0A0A12",
+  "background_color": "#0A0A12",
   "display": "standalone"
 }
