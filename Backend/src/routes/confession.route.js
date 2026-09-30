@@ -412,9 +412,9 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
             status: "active",
           },
         },
-        {
+                {
           upsert: true,
-          new: true,
+          returnDocument: "after",
         },
       );
 
@@ -520,8 +520,8 @@ router.patch("/:id/read", verifyToken, async (req, res) => {
         readAt: new Date(),
         unreadFor: null,
       },
-      {
-        new: true,
+            {
+        returnDocument: "after",
       },
     );
 

@@ -33,14 +33,20 @@ messaging.onBackgroundMessage((payload) => {
     self.registration.showNotification(payload.notification.title, {
       body: payload.notification.body,
       icon: "/favicon.svg",
-      data: { url: "https://sayitfreely.vercel.app/admin" },
+      data: {
+        url: "https://sayitfreely.vercel.app/admin",
+        fallbackUrl: "https://wit-tbh.vercel.app/admin",
+      },
     });
   }
 });
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const target = new URL(event.notification.data?.url || "/inbox", self.location.origin).href;
+  const target = new URL(
+    event.notification.data?.url || event.notification.data?.fallbackUrl || "/inbox",
+    self.location.origin
+  ).href;
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       for (const c of list) {
