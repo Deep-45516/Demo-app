@@ -508,17 +508,43 @@ export default function InstagramVerification({
   return (
     <main className="wl-instagram-auth">
       <div className="wl-instagram-auth__container">
-        <header className="wl-instagram-auth__brand">
-          <div className="wl-instagram-auth__brand-mark">
-            <SignalMarkIcon />
-          </div>
-          <p class="wl-instagram-auth__brand-name">
-            <span>TBH</span>
-          </p>
-          {/* <p className="wl-instagram-auth__brand-subtitle">e
-  Stay anonymous.
-</p> */}
-        </header>
+<header className="wl-instagram-auth__brand">
+  <div className="wl-instagram-auth__brand-mark">
+    <svg
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      className="wl-instagram-auth__logo"
+    >
+      <path
+        d="M16 20h32M32 20v27"
+        stroke="currentColor"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M18 34c3 5 7 7 12 7s9-2 12-7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="49"
+        cy="15"
+        r="4"
+        fill="currentColor"
+      />
+    </svg>
+  </div>
+
+  <p className="wl-instagram-auth__brand-name">
+    <span>TBH</span>
+  </p>
+
+  <p className="wl-instagram-auth__brand-tagline">
+    say it. stay anonymous.
+  </p>
+</header>
 
         {/* <div
           className="wl-eyebrow"
