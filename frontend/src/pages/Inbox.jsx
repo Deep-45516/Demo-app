@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../wavelength.css";
 import "./inbox.css";
 import StaticAvatar, { hueFromString } from "../components/InstagramVerification/StaticAvatar.jsx";
-import NotificationToggle from "../components/NotificationToggle.jsx";
+import NotificationToggle from "../components/InstagramVerification/NotificationToggle.jsx";
 
 import { getInbox } from "../inbox";
 import {
