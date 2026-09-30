@@ -17,7 +17,7 @@ app.use(
 );
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://sayitfreely.vercel.app"],
+    origin: ["http://localhost:5173", "https://sayitfreely.vercel.app","https://tbh-wit.vercel.app"],
     credentials: true,
   }),
 );
