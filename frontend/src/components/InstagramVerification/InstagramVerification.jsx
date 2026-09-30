@@ -513,7 +513,7 @@ export default function InstagramVerification({
             <SignalMarkIcon />
           </div>
           <p class="wl-instagram-auth__brand-name">
-            <span>No</span>Cap
+            <span>TBH</span>
           </p>
           {/* <p className="wl-instagram-auth__brand-subtitle">
   Stay anonymous.
