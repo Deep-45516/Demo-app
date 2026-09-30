@@ -4,7 +4,7 @@ import {
   enableUserNotifications,
   disableUserNotifications,
   syncUserToken,
-} from "../notification.js";
+} from "../notifications.js";
 
 export default function NotificationToggle() {
   const [state, setState] = useState("loading"); // unsupported | off | on | blocked
