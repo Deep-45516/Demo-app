@@ -515,7 +515,7 @@ export default function InstagramVerification({
           <p class="wl-instagram-auth__brand-name">
             <span>TBH</span>
           </p>
-          {/* <p className="wl-instagram-auth__brand-subtitle">
+          {/* <p className="wl-instagram-auth__brand-subtitle">e
   Stay anonymous.
 </p> */}
         </header>
