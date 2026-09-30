@@ -7,12 +7,6 @@ export const sendUserNotification = async (
   { title, body, url = "/inbox", tag, skipIfOnline = true }
 ) => {
   try {
-    // Free check: if the user has the app open (socket connected), skip the push
-    if (skipIfOnline) {
-      const room = getIO().sockets.adapter.rooms.get(`user:${userId}`);
-      if (room && room.size > 0) return;
-    }
-
     const docs = await UserNotificationToken.find({ user: userId }).select("token");
     if (!docs.length) return;
     const tokens = docs.map((d) => d.token);
