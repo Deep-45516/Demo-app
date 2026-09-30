@@ -668,7 +668,7 @@ export default function InstagramVerification({
                 />
               </div>
 
-              {/* Verification code */}
+              {/* Vderification code */}
               <div className="wl-instagram-auth__code-label wl-mono">
                 YOUR CODE
               </div>
