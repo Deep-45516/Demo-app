@@ -20,6 +20,7 @@ import Conversation from "../models/conversation.model.js";
 import { publishConfessionPublicly } from "../services/publicPost.service.js";
 
 import { notifyPublicPostUpdated } from "../socket/publicPost.socket.js";
+import { sendUserNotification } from "../services/sendUserNotification.js";
 
 /*verifytoken is middleware act as a seccurity guard which checks for valid jwt and if succed then countinue by next(), middleware runs before function execute */
 const router = Router();
@@ -244,6 +245,12 @@ Not sending to yourself ✅*/
 
     notifyNewConfession(recipient._id, confession);
     notifyNewConfession(confession.senderUser, confession);
+        sendUserNotification(recipient._id, {
+      title: "New confession 👀",
+      body: "Someone sent you a confession",
+      url: "/inbox",
+      tag: "confession",
+    });
     console.log(`Emitted new-confession to room user:${recipient._id}`);
     // =========================
     // ADMIN NOTIFICATION
@@ -419,6 +426,21 @@ router.patch("/:id/action", verifyToken, async (req, res) => {
         confession.recipientAction,
         conversationId,
       );
+    }
+        if (action === "curious") {
+      sendUserNotification(confession.senderUser, {
+        title: "Someone is curious 👀",
+        body: "They want to know more. Open the chat!",
+        url: `/confessions/${confession._id}`,
+        tag: `action-${confession._id}`,
+      });
+    } else {
+      sendUserNotification(confession.senderUser, {
+        title: "Confession update",
+        body: "Your confession was seen",
+        url: "/inbox",
+        tag: `action-${confession._id}`,
+      });
     }
 
     return res.status(200).json(

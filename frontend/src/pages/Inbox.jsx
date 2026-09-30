@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../wavelength.css";
 import "./inbox.css";
 import StaticAvatar, { hueFromString } from "../components/InstagramVerification/StaticAvatar.jsx";
+import NotificationToggle from "../components/NotificationToggle.jsx";
 
 import { getInbox } from "../inbox";
 import {
@@ -145,6 +146,8 @@ const socket = getSocket();
     <div className="wl-inbox">
       {/* <div className="wl-eyebrow" style={{ marginBottom: 8 }}>INBOX</div>
       <h1 className="wl-display wl-inbox__heading">Every signal you've caught.</h1> */}
+    <div className="wl-inbox">
+      <NotificationToggle /></div>
 
       <div className="wl-segment wl-inbox__segment">
         <button className={tab === "received" ? "active" : ""} 

@@ -149,3 +149,22 @@
 }
 
 .wl-unread-dot{ width:8px; height:8px; border-radius:50%; background:red; flex-shrink:0; display:inline-block; }
+
+.notif-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.notif-bar button {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+}

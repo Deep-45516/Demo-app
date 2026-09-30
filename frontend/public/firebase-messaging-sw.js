@@ -17,30 +17,39 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  self.registration.showNotification(
-    payload.notification.title,
-    {
+  // User pushes are data-only
+  if (payload.data && payload.data.title) {
+    const { title, body, url, tag } = payload.data;
+    return self.registration.showNotification(title, {
+      body,
+      tag,            // same tag = replaces the old notification
+      renotify: true,
+      icon: "/favicon.svg",
+      data: { url },
+    });
+  }
+  // Admin pushes (unchanged behavior)
+  if (payload.notification) {
+    self.registration.showNotification(payload.notification.title, {
       body: payload.notification.body,
       icon: "/favicon.svg",
-      data: {
-        url:
-          "https://sayitfreely.vercel.app/admin"
-      }
-    }
-  );
-
+      data: { url: "https://sayitfreely.vercel.app/admin" },
+    });
+  }
 });
 
-self.addEventListener(
-  "notificationclick",
-  (event) => {
-
-    event.notification.close();
-
-    event.waitUntil(
-      clients.openWindow(
-        event.notification.data.url
-      )
-    );
-  }
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "/inbox", self.location.origin).href;
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if (c.url.startsWith(self.location.origin) && "focus" in c) {
+          c.navigate(target);
+          return c.focus();
+        }
+      }
+      return clients.openWindow(target);
+    })
   );
+});
