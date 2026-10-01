@@ -509,53 +509,26 @@ export default function InstagramVerification({
     <main className="wl-instagram-auth">
       <div className="wl-instagram-auth__container">
 <header className="wl-instagram-auth__brand">
+  <div className="wl-instagram-auth__brand-name-wrap">
+    <p className="wl-instagram-auth__brand-name">
+      TBH
+    </p>
 
-  <div className="wl-instagram-auth__brand-mark">
     <svg
-      viewBox="0 0 48 48"
-      className="wl-instagram-auth__logo"
+      className="wl-instagram-auth__brand-underline"
+      viewBox="0 0 120 18"
       aria-hidden="true"
+      preserveAspectRatio="none"
     >
-      <rect
-        x="5"
-        y="5"
-        width="38"
-        height="38"
-        rx="12"
-        fill="currentColor"
-      />
-
       <path
-        d="M15 17.5H33"
-        stroke="var(--wl-bg, #0A0A12)"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M24 17.5V31"
-        stroke="var(--wl-bg, #0A0A12)"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M18 30.5H30"
-        stroke="var(--wl-bg, #0A0A12)"
-        strokeWidth="3"
-        strokeLinecap="round"
+        d="M4 11 C28 5, 52 5, 76 8 C91 10, 103 9, 116 6"
       />
     </svg>
   </div>
 
-  <p className="wl-instagram-auth__brand-name">
-    TBH
-  </p>
-
   <p className="wl-instagram-auth__brand-tagline">
     No Walls. No Cap.
   </p>
-
 </header>
 
         {/* <div
