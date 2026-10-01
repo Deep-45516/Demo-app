@@ -280,7 +280,16 @@ export default function Home() {
 
   return (
     <div className="wl-confess wl-fade-up">
-      <p style={{display:"flex"}}>Hi, </p>
+      <p
+        style={{
+          display: "inline",
+          fontFamily: "'Trebuchet MS', 'Segoe Print', 'Comic Sans MS', cursive",
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+        }}
+      >
+        Hey,
+      </p>
       <div className="wl-confess__you">
         <div className="wl-confess__you-mark">
           <SignalMarkIcon />
