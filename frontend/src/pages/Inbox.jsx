@@ -143,82 +143,115 @@ const socket = getSocket();
   }
 
   return (
-    <div className="wl-inbox">
-      {/* <div className="wl-eyebrow" style={{ marginBottom: 8 }}>INBOX</div>
-      <h1 className="wl-display wl-inbox__heading">Every signal you've caught.</h1> */}
-    <div className="wl-inbox">
-      <NotificationToggle />
+  <div className="wl-inbox">
+    <NotificationToggle />
 
-      <div className="wl-segment wl-inbox__segment">
-        <button className={tab === "received" ? "active" : ""} 
+    <div className="wl-segment wl-inbox__segment">
+      <button
+        className={tab === "received" ? "active" : ""}
         style={{ fontSize: 15 }}
-        onClick={() => setTab("received")}>
-          Received ({received.length})
-        </button>
-        <button className={tab === "sent" ? "active" : ""} style={{ fontSize: 15 }}onClick={() => setTab("sent")}>
-          Sent ({sent.length})
-        </button>
+        onClick={() => setTab("received")}
+      >
+        Received ({received.length})
+      </button>
+
+      <button
+        className={tab === "sent" ? "active" : ""}
+        style={{ fontSize: 15 }}
+        onClick={() => setTab("sent")}
+      >
+        Sent ({sent.length})
+      </button>
+    </div>
+
+    {list.length === 0 && (
+      <div className="wl-empty wl-fade-up">
+        <p className="wl-display">
+          {tab === "received"
+            ? "No Coffee yet."
+            : "Nothing sent yet."}
+        </p>
+
+        <p className="wl-mono" style={{ fontSize: 11 }}>
+          {tab === "received"
+            ? "Someone out there might be listening."
+            : "Send the first one from Confess."}
+        </p>
       </div>
+    )}
 
-      {list.length === 0 && (
-        <div className="wl-empty wl-fade-up">
-          <p className="wl-display">
-            {tab === "received" ? "No Coffee yet." : "Nothing sent yet."}
-          </p>
-          <p className="wl-mono" style={{ fontSize: 11 }}>
-            {tab === "received" ? "Someone out there might be listening." : "Send the first one from Confess."}
-          </p>
-        </div>
-      )}
-      </div>
+    <div className="wl-stagger">
+      {list.map((confession) => {
+        console.log("CONFESSION:", confession);
 
-      <div className="wl-stagger">
-        {list.map((confession) => {
-          console.log("CONFESSION:", confession);
-          const label =
-            tab === "received"
-              ? confession.senderAnonymousName
-              : `@${confession.recipientInstagramUsername}`;
-              console.log(confession.senderAnonymousName, "readAt:", confession.readAt);
+        const label =
+          tab === "received"
+            ? confession.senderAnonymousName
+            : `@${confession.recipientInstagramUsername}`;
 
-          return (
-            <div
-              key={confession._id}
-              className="wl-row wl-fade-up"
-              onClick={() => navigate(`/confessions/${confession._id}`)}
-            >
-              {tab === "received" ? (
-                <StaticAvatar size={44} hue={hueFromString(confession.senderAnonymousName)} />
-              ) : (
-                <StaticAvatar size={44} initial={confession.recipientInstagramUsername} />
-              )}
+        console.log(
+          confession.senderAnonymousName,
+          "readAt:",
+          confession.readAt
+        );
 
-              <div className="wl-row__meta">
-                <div className="wl-row__top">
-                  <span className="wl-row__name">
-  {label}
-  {String(confession.unreadFor) === String(userId) && (
-  <span
-    className="wl-unread-dot"
-    style={{
-      marginLeft: 6,
-      verticalAlign: "middle",
-    }}
-  />
-)}
-</span>
-                  <span className="wl-row__time wl-mono">
-                    {new Date(confession.lastActivityAt || confession.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                  </span>
-                </div>
-                <div className="wl-row__status">
-                  <StatusTag action={confession.recipientAction} />
-                </div>
+        return (
+          <div
+            key={confession._id}
+            className="wl-row wl-fade-up"
+            onClick={() =>
+              navigate(`/confessions/${confession._id}`)
+            }
+          >
+            {tab === "received" ? (
+              <StaticAvatar
+                size={44}
+                hue={hueFromString(confession.senderAnonymousName)}
+              />
+            ) : (
+              <StaticAvatar
+                size={44}
+                initial={confession.recipientInstagramUsername}
+              />
+            )}
+
+            <div className="wl-row__meta">
+              <div className="wl-row__top">
+                <span className="wl-row__name">
+                  {label}
+
+                  {String(confession.unreadFor) === String(userId) && (
+                    <span
+                      className="wl-unread-dot"
+                      style={{
+                        marginLeft: 6,
+                        verticalAlign: "middle",
+                      }}
+                    />
+                  )}
+                </span>
+
+                <span className="wl-row__time wl-mono">
+                  {new Date(
+                    confession.lastActivityAt ||
+                      confession.createdAt
+                  ).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+
+              <div className="wl-row__status">
+                <StatusTag
+                  action={confession.recipientAction}
+                />
               </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
     </div>
-  );
+  </div>
+);
 }

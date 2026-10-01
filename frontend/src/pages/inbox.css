@@ -168,3 +168,13 @@
   border: 0;
   cursor: pointer;
 }
+
+.wl-inbox__segment {
+  margin-top: 14px;
+  margin-bottom: 0;
+}
+
+.wl-inbox > .wl-stagger {
+  margin-top: 18px;
+  padding-top: 0;
+}
