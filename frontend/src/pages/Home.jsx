@@ -288,7 +288,7 @@ export default function Home() {
           letterSpacing: "0.04em",
         }}
       >
-        Hey,
+        Hey 
       </p>
       <div className="wl-confess__you">
         <div className="wl-confess__you-mark">

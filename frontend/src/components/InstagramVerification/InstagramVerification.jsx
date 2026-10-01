@@ -495,9 +495,14 @@ export default function InstagramVerification({
             <SignalMarkIcon />
           </div>
 
-          <p className="wl-shayari__eyebrow">कुछ बातें कही नहीं जातीं…</p>
+          <p className="wl-shayari__eyebrow">बाद में? बाद में चाय ठंडी हो जाती है.</p>
 
-          <p className="wl-shayari__text">{SHAYARIS[shayariIndex]}</p>
+          <p
+            className="wl-shayari__text"
+            style={{ fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif' }}
+          >
+            {SHAYARIS[shayariIndex]}
+          </p>
 
           <div className="wl-shayari__line" />
         </section>
