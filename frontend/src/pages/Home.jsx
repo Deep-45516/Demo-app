@@ -285,7 +285,7 @@ export default function Home() {
           <SignalMarkIcon />
         </div>
         <div className="wl-confess__you-name">
-          Hey {anonymousProfile?.anonymousName || "Anonymous"}
+          {anonymousProfile?.anonymousName || "Anonymous"}
         </div>
       </div>
       <button
