@@ -16,7 +16,7 @@ app.use(
   }),
 );
 const allowedOrigins = [
-  "https://wit-tbh.vercel.app",
+  "https://t-b-h.in",
   "https://sayitfreely.vercel.app",   // keep the old one if still used
   "http://localhost:5173",
 ];
