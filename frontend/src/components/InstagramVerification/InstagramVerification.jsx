@@ -28,6 +28,9 @@ const SHAYARIS = [
   // दोस्तों की मेहरबानी चाहिए।`,
 ];
 
+const COUNT_KEY = "confessionCount";
+const COUNT_TTL = 10 * 60 * 1000; // 10 minutes
+
 const VERIFICATION_STATES = {
   IDLE: "idle",
   GENERATING: "generating",
@@ -154,6 +157,35 @@ function ArrowIcon() {
   );
 }
 
+function AnimatedNumber({ value }) {
+  const [display, setDisplay] = useState(value);
+  const prev = useRef(value);
+
+  useEffect(() => {
+    const from = prev.current;
+    const to = value;
+    if (from === to) return;
+
+    const start = performance.now();
+    const duration = 900;
+    let raf;
+
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else prev.current = to;
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+
+  return <>{display.toLocaleString("en-IN")}</>;
+}
+
+
 export default function InstagramVerification({
   backendReady,
   healthcheckStartedAt,
@@ -163,6 +195,11 @@ export default function InstagramVerification({
   const [shayariIndex] = useState(() =>
     Math.floor(Math.random() * SHAYARIS.length),
   );
+    const [progress, setProgress] = useState(4);
+  const [totalConfessions, setTotalConfessions] = useState(() => {
+    const saved = Number(localStorage.getItem(COUNT_KEY));
+    return Number.isFinite(saved) && saved > 0 ? saved : null;
+  });
   const [state, setState] = useState(VERIFICATION_STATES.IDLE);
   const [username, setUsername] = useState("");
   const [sessionId, setSessionId] = useState(null);
@@ -232,6 +269,36 @@ export default function InstagramVerification({
       console.error("Existing login check failed:", error);
     }
   }
+
+    // Fetch the real count once the server is awake, and remember it
+    // Fetch the real count (only when needed) and remember it
+  useEffect(() => {
+    if (!backendReady) return;
+
+    // Logged-in users get redirected, so they never see the count
+    if (localStorage.getItem("token")) return;
+
+    // Saved number is still fresh, so no call
+    const fetchedAt = Number(localStorage.getItem("confessionCountAt")) || 0;
+    if (
+      Date.now() - fetchedAt < COUNT_TTL &&
+      localStorage.getItem(COUNT_KEY)
+    ) {
+      return;
+    }
+
+    fetch(`${API}/api/v1/confessions/public-count`)
+      .then((r) => r.json())
+      .then((d) => {
+        const n = d?.data?.total;
+        if (typeof n === "number") {
+          setTotalConfessions(n);
+          localStorage.setItem(COUNT_KEY, String(n));
+          localStorage.setItem("confessionCountAt", String(Date.now()));
+        }
+      })
+      .catch(() => {});
+  }, [backendReady]);
 
   async function handleGenerateCode() {
     const cleanUsername = username.trim().replace(/^@/, "").toLowerCase();
@@ -505,7 +572,21 @@ export default function InstagramVerification({
           </p>
 
           <div className="wl-shayari__line" />
+<div className="wl-loading__bar" aria-hidden="true">
+            <span style={{ width: `${progress}%` }} />
+          </div>
+          <p className="wl-loading__hint wl-mono">
+            First open takes a little longer
+          </p>
+
+          {totalConfessions !== null && (
+            <p className="wl-loading__count wl-mono">
+              💌 {totalConfessions.toLocaleString("en-IN")} confessions sent
+            </p>
+          )}
+
         </section>
+
       </main>
     );
   }
@@ -534,6 +615,12 @@ export default function InstagramVerification({
   <p className="wl-instagram-auth__brand-tagline">
     No Walls. No Cap.
   </p>
+
+    {!verificationActive && totalConfessions !== null && (
+    <p className="wl-instagram-auth__count wl-mono">
+      💌 <AnimatedNumber value={totalConfessions} /> confessions sent
+    </p>
+  )}
 </header>
 
         {/* <div

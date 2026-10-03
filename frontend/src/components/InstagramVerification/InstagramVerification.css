@@ -965,3 +965,119 @@
     margin-top: 28px;
   }
 }
+
+/* ---------- login count pill ---------- */
+.wl-instagram-auth__count {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  margin: 16px auto 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--wl-text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--wl-line);
+}
+
+/* ---------- new waiting screen ---------- */
+.wl-loading {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  text-align: center;
+  padding: 24px 20px;
+  animation: wl-shayari-enter 0.8s ease both;
+}
+
+.wl-loading__mark {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f5f3f7;
+}
+
+.wl-loading__mark svg {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.wl-loading__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(124, 92, 252, 0.55);
+  animation: wl-ring 2.4s ease-out infinite;
+}
+
+.wl-loading__ring--2 {
+  animation-delay: 1.2s;
+}
+
+@keyframes wl-ring {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.wl-loading__eyebrow {
+  margin: 0 0 16px;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--wl-text-faint);
+}
+
+.wl-loading__line {
+  min-height: 56px;
+  max-width: 320px;
+  margin: 0 auto;
+  font-size: clamp(19px, 5vw, 23px);
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--wl-text);
+  animation: wl-line-in 0.6s ease both;
+}
+
+@keyframes wl-line-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wl-loading__bar {
+  width: 100%;
+  max-width: 240px;
+  height: 3px;
+  margin: 26px auto 0;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.wl-loading__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #7c5cfc, #ff4d8d);
+  transition: width 0.25s linear;
+}
+
+.wl-loading__hint {
+  margin: 12px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--wl-text-faint);
+}
+
+.wl-loading__count {
+  margin: 22px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--wl-text-dim);
+}

@@ -68,6 +68,24 @@ returns null when nothing is found. in frontend */
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
+let cachedCount = { value: 0, at: 0 };
+
+router.get("/public-count", async (req, res) => {
+  try {
+    if (Date.now() - cachedCount.at > 60_000) {
+      cachedCount = {
+        value: await Confession.estimatedDocumentCount(),
+        at: Date.now(),
+      };
+    }
+    res.set("Cache-Control", "public, max-age=60");
+    return res
+      .status(200)
+      .json({ success: true, data: { total: cachedCount.value } });
+  } catch (error) {
+    return res.status(500).json({ success: false });
+  }
+});
 // CREATE CONFESSION
 router.post("/", verifyToken, async (req, res) => {
   try {
