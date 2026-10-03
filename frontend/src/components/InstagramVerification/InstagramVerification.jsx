@@ -618,7 +618,7 @@ export default function InstagramVerification({
 
     {!verificationActive && totalConfessions !== null && (
     <p className="wl-instagram-auth__count wl-mono">
-      💌 <AnimatedNumber value={totalConfessions} /> confessions sent
+      💌 <AnimatedNumber value={totalConfessions} /> confessions sent yet
     </p>
   )}
 </header>
