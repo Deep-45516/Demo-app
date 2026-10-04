@@ -1,9 +1,9 @@
-//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\InviteCard.jsx
 import { useCallback, useEffect, useState } from "react";
 import "./InviteCard.css";
+import { track } from "../analytics.js";
 
-// Change to https://wit-tbh.vercel.app if t-b-h.in doesn't open the app yet
-const INVITE_URL = "https://t-b-h.in";
+// Use www directly so a domain redirect can't drop the ?utm params
+const INVITE_BASE = "https://www.t-b-h.in";
 
 // Pure FOMO about the app. None of these say a confession exists.
 const STATIC_MESSAGES = [
@@ -13,16 +13,21 @@ const STATIC_MESSAGES = [
   "Our college is getting on TBH. Don't be last 😏",
 ];
 
+// ONE pickMessage only. Returns the text AND which variant it was.
 function pickMessage() {
-  const candidates = [...STATIC_MESSAGES];
+  const candidates = STATIC_MESSAGES.map((text, i) => ({
+    text,
+    variant: `static_${i}`,
+  }));
 
   // Real number as proof, only when it's big enough to impress
   const saved = Number(localStorage.getItem("confessionCount"));
   if (Number.isFinite(saved) && saved >= 50) {
     const rounded = Math.floor(saved / 10) * 10;
-    candidates.push(
-      `${rounded.toLocaleString("en-IN")}+ anonymous confessions already sent at WIT. You're not in yet 👀`,
-    );
+    candidates.push({
+      text: `${rounded.toLocaleString("en-IN")}+ anonymous confessions already sent at WIT. You're not in yet 👀`,
+      variant: "count_proof",
+    });
   }
 
   return candidates[Math.floor(Math.random() * candidates.length)];
@@ -49,40 +54,30 @@ function InviteIcon() {
   );
 }
 
-import { track } from "../analytics.js";
-
-const INVITE_BASE = "https://www.t-b-h.in"; // use www directly: a redirect from the apex can drop ?utm params
-
-function pickMessage() {
-  // ...same logic, but return the variant too:
-  const idx = Math.floor(Math.random() * candidates.length);
-  return { text: candidates[idx], variant: idx < STATIC_MESSAGES.length ? `static_${idx}` : "count_proof" };
-}
-
 export default function InviteCard({ pending, onClose }) {
   const [picked] = useState(pickMessage);
   const text = picked.text;
-  const inviteUrl = `${INVITE_BASE}/?utm_source=friend&utm_medium=share&utm_campaign=${pending ? "invite_pending" : "invite"}&utm_content=${picked.variant}`;
+  const variant = picked.variant;
+
+  // Tagged link: lets GA4 show which invite message brings visitors in
+  const inviteUrl = `${INVITE_BASE}/?utm_source=friend&utm_medium=share&utm_campaign=${
+    pending ? "invite_pending" : "invite"
+  }&utm_content=${variant}`;
+
   const [copied, setCopied] = useState(false);
   const [closing, setClosing] = useState(false);
 
   const close = useCallback(() => {
     if (closing) return;
+    track("invite_dismissed", { pending, variant });
     setClosing(true);
     setTimeout(onClose, 200);
-  }, [closing, onClose]);
+  }, [closing, onClose, pending, variant]);
 
-useEffect(() => { track("invite_card_shown", { pending, variant: picked.variant }); }, []);
-
-// handleCopy success:  copy `${text} ${inviteUrl}`
-track("invite_shared", { method: "copy", pending, variant: picked.variant });
-
-// handleShare, after `await navigator.share({ title: "TBH", text, url: inviteUrl })` resolves:
-track("invite_shared", { method: "native", pending, variant: picked.variant });
-
-// close():
-track("invite_dismissed", { pending, variant: picked.variant });
-
+  useEffect(() => {
+    track("invite_card_shown", { pending, variant });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     navigator.vibrate?.(15);
@@ -101,8 +96,9 @@ track("invite_dismissed", { pending, variant: picked.variant });
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(`${text} ${INVITE_URL}`);
+      await navigator.clipboard.writeText(`${text} ${inviteUrl}`);
       setCopied(true);
+      track("invite_shared", { method: "copy", pending, variant });
       setTimeout(() => setCopied(false), 1500);
     } catch (e) {
       console.error("Copy failed:", e);
@@ -112,7 +108,8 @@ track("invite_dismissed", { pending, variant: picked.variant });
   async function handleShare() {
     if (navigator.share) {
       try {
-        await navigator.share({ title: "TBH", text, url: INVITE_URL });
+        await navigator.share({ title: "TBH", text, url: inviteUrl });
+        track("invite_shared", { method: "native", pending, variant });
       } catch (e) {
         if (e?.name !== "AbortError") handleCopy();
       }
@@ -146,9 +143,7 @@ track("invite_dismissed", { pending, variant: picked.variant });
           {pending ? "waiting for them" : "Sent anonymously"}
         </h3>
         <p className="invite-sub">
-          {pending
-            ? "They will get it if they join within 7 days"
-            : ""}
+          {pending ? "They will get it if they join within 7 days" : ""}
         </p>
 
         <div className="invite-box">
