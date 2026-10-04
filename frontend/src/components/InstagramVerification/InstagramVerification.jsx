@@ -11,7 +11,7 @@ const SHAYARI_DELAY = 1500;
 const LOADING_LINES = [
 
 "Setting things up…",
-  "Locking your identity 🔒",
+  "Invite your friends. Let the confessions begin 👀",
   "Collecting confessions you got… if any 👀",
   "Someone might've written about you",
   "Almost there… don't blink 👀",
