@@ -8,7 +8,7 @@ const API = import.meta.env.VITE_BACKEND_URL;
 const BUSINESS_USERNAME = "wit_confessions.26";
 const SHAYARI_DELAY = 1500;
 
-const LOADING_STAGES = [
+const LOADING_LINES = [
 
 "Setting things up…",
   "Locking your identity 🔒",
@@ -203,6 +203,7 @@ export default function InstagramVerification({
 //     Math.floor(Math.random() * LOADING_LINES.length),
 //   );
   const [elapsed, setElapsed] = useState(0);
+    const [progress, setProgress] = useState(4);
   const [totalConfessions, setTotalConfessions] = useState(() => {
     const saved = Number(localStorage.getItem(COUNT_KEY));
     return Number.isFinite(saved) && saved > 0 ? saved : null;
@@ -589,14 +590,8 @@ export default function InstagramVerification({
       </main>
     );
   }
-    const stageIndex = Math.min(
-    LOADING_STAGES.length - 1,
-    Math.floor(elapsed / 3.5),
-  );
-  // Always creeps forward, never reaches 100%
-  const progress = 94 * (1 - 1 / (1 + elapsed / 12));
 
-   if (startupState === "shayari") {
+  if (startupState === "shayari") {
     return (
       <main className="wl-instagram-auth wl-shayari-screen">
         <div className="wl-shayari-screen__glow" />
@@ -608,39 +603,24 @@ export default function InstagramVerification({
             <SignalMarkIcon />
           </div>
 
-          <p className="wl-loading__eyebrow wl-mono">🔥 NOW LIVE AT WIT</p>
+          <p className="wl-loading__eyebrow">
+            बाद में? बाद में चाय ठंडी हो जाती है.
+          </p>
 
-          <h2 className="wl-loading__headline wl-display">
-            Who's saying what about you? 👀
-          </h2>
-
-          <ul className="wl-loading__steps">
-            {LOADING_STAGES.map((label, i) => (
-              <li
-                key={label}
-                className={
-                  i < stageIndex ? "is-done" : i === stageIndex ? "is-active" : ""
-                }
-              >
-                <span className="wl-loading__tick">
-                  {i < stageIndex ? "✓" : ""}
-                </span>
-                <span>{label}</span>
-              </li>
-            ))}
-          </ul>
+          <p key={lineIndex} className="wl-loading__line">
+            {LOADING_LINES[lineIndex]}
+          </p>
 
           <div className="wl-loading__bar" aria-hidden="true">
             <span style={{ width: `${progress}%` }} />
           </div>
-
           <p className="wl-loading__hint wl-mono">
-            First open takes a few extra seconds
+            First open takes a little longer
           </p>
 
           {totalConfessions !== null && (
             <p className="wl-loading__count wl-mono">
-              💌 {totalConfessions.toLocaleString("en-IN")} confessions sent so far
+              💌 {totalConfessions.toLocaleString("en-IN")} confessions sent
             </p>
           )}
         </section>

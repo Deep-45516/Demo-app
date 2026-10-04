@@ -109,17 +109,17 @@ export default function InviteCard({ pending, onClose }) {
         </div>
 
         <h3 className="invite-title">
-          {pending ? "It's waiting for them" : "Sent anonymously"}
+          {pending ? "waiting for them" : "Sent anonymously"}
         </h3>
         <p className="invite-sub">
           {pending
-            ? "Not on TBH yet. It lands the moment they join (within 7 days)."
-            : "Delivered. They'll never know it was you."}
+            ? "They get it when they join (within 7 days)."
+            : "Delivered.They will chat if they want to, check inbox."}
         </p>
 
         <div className="invite-box">
           <p className="invite-box__label">
-            {pending ? "GET THEM IN FASTER" : "BRING YOUR PEOPLE"}
+            {pending ? "INVITE THEM" : "INVITE YOUR FRIENDS"}
           </p>
           <p className="invite-box__text">{text}</p>
           <p className="invite-box__link">t-b-h.in</p>
@@ -136,8 +136,7 @@ export default function InviteCard({ pending, onClose }) {
 
         {pending && (
           <p className="invite-tip">
-            Tip: drop it in a group or your story instead of DM-ing them.
-            Keeps the mystery 🤫
+            Tip: drop it in a group instead of DM-ing them.
           </p>
         )}
 
