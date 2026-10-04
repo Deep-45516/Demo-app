@@ -5,7 +5,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./wavelength.css"
 import App from "./App";
 import "./index.css";
-
+import ReactGA from "react-ga4";
+ReactGA.initialize("G-HRWCNGD34D");
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <GoogleOAuthProvider

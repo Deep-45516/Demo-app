@@ -1,6 +1,8 @@
 //App.jsx
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import ReactGA from "react-ga4";
 
 import {
   connectSocket,
@@ -18,6 +20,17 @@ import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import AppLayout from "./layouts/AppLayout.jsx";
 
 function App() {
+  const location = useLocation();
+
+useEffect(() => {
+  ReactGA.send({
+    hitType: "pageview",
+    page: location.pathname + location.search,
+    title: document.title,
+  });
+}, [location]);
+
+
     const [backendReady, setBackendReady] = useState(false);
   const [healthcheckStartedAt] = useState(() => performance.now());
   useEffect(() => {
