@@ -27,14 +27,23 @@ function pickMessage() {
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-function ShareIcon() {
+function InviteIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="18" cy="5" r="3" />
-      <circle cx="6" cy="12" r="3" />
-      <circle cx="18" cy="19" r="3" />
-      <path d="M8.6 10.6l6.8-4.2M8.6 13.4l6.8 4.2" />
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="8.5" cy="7" r="4" />
+      <path d="M19 8v6" />
+      <path d="M16 11h6" />
     </svg>
   );
 }
@@ -116,7 +125,6 @@ export default function InviteCard({ pending, onClose }) {
             ? "They will get it if they join within 7 days"
             : ""}
         </p>
-        //Check inbox to chat & reveal yourself if wants.(paste it here after successfull send)
 
         <div className="invite-box">
           <p className="invite-box__label">
@@ -127,7 +135,7 @@ export default function InviteCard({ pending, onClose }) {
 
           <div className="invite-actions">
             <button type="button" className="invite-btn invite-btn--primary" onClick={handleShare}>
-              <ShareIcon /> Share
+              <InviteIcon /> Invite
             </button>
             <button type="button" className="invite-btn invite-btn--ghost" onClick={handleCopy}>
               {copied ? "Copied ✓" : "Copy link"}
