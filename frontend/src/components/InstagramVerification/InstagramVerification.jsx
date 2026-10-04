@@ -8,7 +8,7 @@ const API = import.meta.env.VITE_BACKEND_URL;
 const BUSINESS_USERNAME = "wit_confessions.26";
 const SHAYARI_DELAY = 1500;
 
-const LOADING_LINES = [
+const LOADING_STAGES = [
 
 "Setting things up…",
   "Locking your identity 🔒",
