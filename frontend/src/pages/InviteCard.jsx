@@ -6,10 +6,10 @@ const INVITE_URL = "https://t-b-h.in";
 
 // Pure FOMO about the app. None of these say a confession exists.
 const STATIC_MESSAGES = [
-  "WIT has an anonymous app now. Join before everyone knows more than you 👀",
-  "Something's going around WIT and you're not on it yet 👀",
-  "Anonymous. WIT-only. Already moving. Get in 👇",
-  "One by one, WIT is getting on TBH. Don't be the last 😏",
+  "Our college has anonymous app now. Join before it's too late 👀",
+  "Something's going around our college & you're not on it yet 👀",
+  "Anonymous app. live in our collge. Get in 👇",
+  "Our college is getting on TBH. Don't be last 😏",
 ];
 
 function pickMessage() {
