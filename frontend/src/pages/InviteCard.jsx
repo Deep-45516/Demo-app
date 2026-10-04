@@ -15,6 +15,7 @@ const STATIC_MESSAGES = [
 function pickMessage() {
   const candidates = [...STATIC_MESSAGES];
 
+  // Real number as proof, only when it's big enough to impress
   const saved = Number(localStorage.getItem("confessionCount"));
   if (Number.isFinite(saved) && saved >= 50) {
     const rounded = Math.floor(saved / 10) * 10;
@@ -64,16 +65,7 @@ export default function InviteCard({ pending, onClose }) {
     };
   }, [close]);
 
-  async function handleShare() {
-    if (navigator.share) {
-      try {
-        await navigator.share({ text, url: INVITE_URL });
-        return;
-      } catch (e) {
-        if (e?.name === "AbortError") return;
-      }
-    }
-    // Desktop / fallback: copy
+  async function handleCopy() {
     try {
       await navigator.clipboard.writeText(`${text} ${INVITE_URL}`);
       setCopied(true);
@@ -81,6 +73,18 @@ export default function InviteCard({ pending, onClose }) {
     } catch (e) {
       console.error("Copy failed:", e);
     }
+  }
+
+  async function handleShare() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "TBH", text, url: INVITE_URL });
+      } catch (e) {
+        if (e?.name !== "AbortError") handleCopy();
+      }
+      return;
+    }
+    handleCopy(); // desktop fallback
   }
 
   return (
@@ -105,23 +109,37 @@ export default function InviteCard({ pending, onClose }) {
         </div>
 
         <h3 className="invite-title">
-          {pending ? "Waiting for them" : "Sent anonymously"}
+          {pending ? "It's waiting for them" : "Sent anonymously"}
         </h3>
-        {pending && (
-          <p className="invite-sub">Lands the moment they join. Held 7 days.</p>
-        )}
+        <p className="invite-sub">
+          {pending
+            ? "Not on TBH yet. It lands the moment they join (within 7 days)."
+            : "Delivered. They'll never know it was you."}
+        </p>
 
-        <p className="invite-text">{text}</p>
+        <div className="invite-box">
+          <p className="invite-box__label">
+            {pending ? "GET THEM IN FASTER" : "BRING YOUR PEOPLE"}
+          </p>
+          <p className="invite-box__text">{text}</p>
+          <p className="invite-box__link">t-b-h.in</p>
 
-        <button type="button" className="invite-btn" onClick={handleShare}>
-          {copied ? (
-            "Copied ✓"
-          ) : (
-            <>
+          <div className="invite-actions">
+            <button type="button" className="invite-btn invite-btn--primary" onClick={handleShare}>
               <ShareIcon /> Share
-            </>
-          )}
-        </button>
+            </button>
+            <button type="button" className="invite-btn invite-btn--ghost" onClick={handleCopy}>
+              {copied ? "Copied ✓" : "Copy link"}
+            </button>
+          </div>
+        </div>
+
+        {pending && (
+          <p className="invite-tip">
+            Tip: drop it in a group or your story instead of DM-ing them.
+            Keeps the mystery 🤫
+          </p>
+        )}
 
         <button type="button" className="invite-close" onClick={close}>
           Done
