@@ -199,11 +199,9 @@ export default function InstagramVerification({
 }) {
   const [startupState, setStartupState] = useState("checking");
 
-// const [lineIndex, setLineIndex] = useState(() =>
-//     Math.floor(Math.random() * LOADING_LINES.length),
-//   );
-  const [elapsed, setElapsed] = useState(0);
-    const [progress, setProgress] = useState(4);
+  const [lineIndex, setLineIndex] = useState(0);
+  const [progress, setProgress] = useState(4);
+
   const [totalConfessions, setTotalConfessions] = useState(() => {
     const saved = Number(localStorage.getItem(COUNT_KEY));
     return Number.isFinite(saved) && saved > 0 ? saved : null;
@@ -328,15 +326,36 @@ export default function InstagramVerification({
   //   };
   // }, [startupState]);
     // Seconds since the waiting screen appeared
+  // useEffect(() => {
+  //   if (startupState !== "shayari") return;
+
+  //   const start = performance.now();
+  //   const timer = setInterval(() => {
+  //     setElapsed((performance.now() - start) / 1000);
+  //   }, 250);
+
+  //   return () => clearInterval(timer);
+  // }, [startupState]);
+
+    // Waiting screen: swap the line in place + keep the bar creeping forward
   useEffect(() => {
     if (startupState !== "shayari") return;
 
+    const lineTimer = setInterval(
+      () => setLineIndex((i) => (i + 1) % LOADING_LINES.length),
+      3200,
+    );
+
     const start = performance.now();
-    const timer = setInterval(() => {
-      setElapsed((performance.now() - start) / 1000);
+    const barTimer = setInterval(() => {
+      const t = (performance.now() - start) / 1000;
+      setProgress(94 * (1 - 1 / (1 + t / 12)));
     }, 250);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(lineTimer);
+      clearInterval(barTimer);
+    };
   }, [startupState]);
 
   async function handleGenerateCode() {
@@ -596,16 +615,18 @@ export default function InstagramVerification({
       <main className="wl-instagram-auth wl-shayari-screen">
         <div className="wl-shayari-screen__glow" />
 
-        <section className="wl-loading">
+                <section className="wl-loading">
           <div className="wl-loading__mark">
             <span className="wl-loading__ring" />
             <span className="wl-loading__ring wl-loading__ring--2" />
             <SignalMarkIcon />
           </div>
 
-          <p className="wl-loading__eyebrow">
-            बाद में? बाद में चाय ठंडी हो जाती है.
-          </p>
+          <p className="wl-loading__eyebrow wl-mono">🔥 NOW LIVE AT WIT</p>
+
+          <h2 className="wl-loading__headline wl-display">
+            Who's saying what about you? 👀
+          </h2>
 
           <p key={lineIndex} className="wl-loading__line">
             {LOADING_LINES[lineIndex]}
@@ -614,9 +635,8 @@ export default function InstagramVerification({
           <div className="wl-loading__bar" aria-hidden="true">
             <span style={{ width: `${progress}%` }} />
           </div>
-          <p className="wl-loading__hint wl-mono">
-            First open takes a little longer
-          </p>
+
+          <p className="wl-loading__hint">First open takes a little longer</p>
 
           {totalConfessions !== null && (
             <p className="wl-loading__count wl-mono">
