@@ -113,9 +113,10 @@ export default function InviteCard({ pending, onClose }) {
         </h3>
         <p className="invite-sub">
           {pending
-            ? "They get it when they join (within 7 days)."
-            : "Delivered.They will chat if they want to, check inbox."}
+            ? "They will get it if they join within 7 days"
+            : ""}
         </p>
+        //Check inbox to chat & reveal yourself if wants.(paste it here after successfull send)
 
         <div className="invite-box">
           <p className="invite-box__label">
