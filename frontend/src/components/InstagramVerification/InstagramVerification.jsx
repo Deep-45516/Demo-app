@@ -8,7 +8,7 @@ const API = import.meta.env.VITE_BACKEND_URL;
 const BUSINESS_USERNAME = "wit_confessions.26";
 const SHAYARI_DELAY = 1500;
 
-const SHAYARIS = [
+const LOADING_LINES = [
   `Wait for few seconds
    Getting there...`,
   //   `ज़िंदगी चलती रही, वक़्त भी चलता रहा,
@@ -192,8 +192,8 @@ export default function InstagramVerification({
 }) {
   const [startupState, setStartupState] = useState("checking");
 
-  const [shayariIndex] = useState(() =>
-    Math.floor(Math.random() * SHAYARIS.length),
+const [lineIndex, setLineIndex] = useState(() =>
+    Math.floor(Math.random() * LOADING_LINES.length),
   );
     const [progress, setProgress] = useState(4);
   const [totalConfessions, setTotalConfessions] = useState(() => {
@@ -299,6 +299,26 @@ export default function InstagramVerification({
       })
       .catch(() => {});
   }, [backendReady]);
+
+  useEffect(() => {
+    if (startupState !== "shayari") return;
+
+    const lineTimer = setInterval(
+      () => setLineIndex((i) => (i + 1) % LOADING_LINES.length),
+      3200,
+    );
+
+    const start = performance.now();
+    const barTimer = setInterval(() => {
+      const t = (performance.now() - start) / 1000;
+      setProgress(Math.min(92, 92 * (1 - Math.exp(-t / 14))));
+    }, 250);
+
+    return () => {
+      clearInterval(lineTimer);
+      clearInterval(barTimer);
+    };
+  }, [startupState]);
 
   async function handleGenerateCode() {
     const cleanUsername = username.trim().replace(/^@/, "").toLowerCase();
@@ -552,27 +572,27 @@ export default function InstagramVerification({
     );
   }
 
-  if (startupState === "shayari") {
+    if (startupState === "shayari") {
     return (
       <main className="wl-instagram-auth wl-shayari-screen">
         <div className="wl-shayari-screen__glow" />
 
-        <section className="wl-shayari">
-          <div className="wl-shayari__brand">
+        <section className="wl-loading">
+          <div className="wl-loading__mark">
+            <span className="wl-loading__ring" />
+            <span className="wl-loading__ring wl-loading__ring--2" />
             <SignalMarkIcon />
           </div>
 
-          <p className="wl-shayari__eyebrow">बाद में? बाद में चाय ठंडी हो जाती है.</p>
-
-          <p
-            className="wl-shayari__text"
-            style={{ fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif' }}
-          >
-            {SHAYARIS[shayariIndex]}
+          <p className="wl-loading__eyebrow">
+            बाद में? बाद में चाय ठंडी हो जाती है...
           </p>
 
-          <div className="wl-shayari__line" />
-<div className="wl-loading__bar" aria-hidden="true">
+          <p key={lineIndex} className="wl-loading__line">
+            {LOADING_LINES[lineIndex]}
+          </p>
+
+          <div className="wl-loading__bar" aria-hidden="true">
             <span style={{ width: `${progress}%` }} />
           </div>
           <p className="wl-loading__hint wl-mono">
@@ -581,12 +601,10 @@ export default function InstagramVerification({
 
           {totalConfessions !== null && (
             <p className="wl-loading__count wl-mono">
-              💌 {totalConfessions.toLocaleString("en-IN")} confessions sent
+              💌 {totalConfessions.toLocaleString("en-IN")} confessions sent yet
             </p>
           )}
-
         </section>
-
       </main>
     );
   }
