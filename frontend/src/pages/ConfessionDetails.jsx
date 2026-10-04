@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\ConfessionDetails.jsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../wavelength.css";
@@ -10,6 +11,7 @@ import {
 } from "../inbox";
 import { getSocket, connectSocket } from "../socket";
 import { publishConfessionPublicly } from "../publicPost.js";
+import { track, hoursBucket, setUserStage } from "../analytics.js";
 
 function BackIcon() {
   return (
@@ -89,6 +91,26 @@ export default function ConfessionDetails() {
       setError("");
       const response = await getConfession(id);
       setConfession(response.data);
+      // loadConfession, after setConfession(response.data):
+const c = response.data;
+track("confession_opened", {
+  role: c.recipientUser === user?._id ? "recipient" : "sender",
+  recipient_action: c.recipientAction,
+  hours_since_sent: hoursBucket((Date.now() - new Date(c.createdAt)) / 36e5),
+  public_consent: !!c.publicConsent,
+});
+
+// handleAction, after success:
+track("recipient_decision", {
+  decision: action,   // "curious" | "not_interested"
+  hours_to_decide: hoursBucket((Date.now() - new Date(confession.createdAt)) / 36e5),
+});
+if (action === "curious") { track("chat_unlocked"); setUserStage("receiver"); }
+
+// handlePublicPost, after success:
+track("public_post_shared", { role: "recipient" });
+// catch:
+track("public_post_failed", { reason: errorReason(error) });
       setConversationId(response.data.conversationId || null);
     } catch (error) {
       console.error("CONFESSION LOAD ERROR:", error);

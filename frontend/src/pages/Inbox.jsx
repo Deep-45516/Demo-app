@@ -1,9 +1,11 @@
+//inbox.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../wavelength.css";
 import "./inbox.css";
 import StaticAvatar, { hueFromString } from "../components/InstagramVerification/StaticAvatar.jsx";
 import NotificationToggle from "../components/InstagramVerification/NotificationToggle.jsx";
+import { track, trackOnce, countBucket } from "../analytics.js";
 
 import { getInbox } from "../inbox";
 import {
@@ -111,6 +113,15 @@ const socket = getSocket();
       const response = await getInbox();
       setReceived(response.data.received || []);
       setSent(response.data.sent || []);
+      // loadInbox, after setSent(...):
+const unread = [...(response.data.received || []), ...(response.data.sent || [])]
+  .filter((c) => String(c.unreadFor) === String(userId)).length;
+track("inbox_opened", {
+  received_bucket: countBucket((response.data.received || []).length),
+  sent_bucket: countBucket((response.data.sent || []).length),
+  unread_count: Math.min(unread, 20),
+  is_empty: !(response.data.received?.length || response.data.sent?.length),
+});
     } catch (error) {
       console.error(error);
       setError("Unable to load inbox.");

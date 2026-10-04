@@ -18,17 +18,16 @@ import Chat from "./pages/Chat.jsx";
 
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import AppLayout from "./layouts/AppLayout.jsx";
+import { trackPageview } from "./analytics.js";
 
 function App() {
   const location = useLocation();
 
+
+
 useEffect(() => {
-  ReactGA.send({
-    hitType: "pageview",
-    page: location.pathname + location.search,
-    title: document.title,
-  });
-}, [location]);
+  trackPageview(location);
+}, [location.pathname, location.search]);
 
 
     const [backendReady, setBackendReady] = useState(false);

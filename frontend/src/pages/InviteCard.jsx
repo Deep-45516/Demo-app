@@ -1,3 +1,4 @@
+//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\InviteCard.jsx
 import { useCallback, useEffect, useState } from "react";
 import "./InviteCard.css";
 
@@ -48,8 +49,20 @@ function InviteIcon() {
   );
 }
 
+import { track } from "../analytics.js";
+
+const INVITE_BASE = "https://www.t-b-h.in"; // use www directly: a redirect from the apex can drop ?utm params
+
+function pickMessage() {
+  // ...same logic, but return the variant too:
+  const idx = Math.floor(Math.random() * candidates.length);
+  return { text: candidates[idx], variant: idx < STATIC_MESSAGES.length ? `static_${idx}` : "count_proof" };
+}
+
 export default function InviteCard({ pending, onClose }) {
-  const [text] = useState(pickMessage);
+  const [picked] = useState(pickMessage);
+  const text = picked.text;
+  const inviteUrl = `${INVITE_BASE}/?utm_source=friend&utm_medium=share&utm_campaign=${pending ? "invite_pending" : "invite"}&utm_content=${picked.variant}`;
   const [copied, setCopied] = useState(false);
   const [closing, setClosing] = useState(false);
 
@@ -58,6 +71,18 @@ export default function InviteCard({ pending, onClose }) {
     setClosing(true);
     setTimeout(onClose, 200);
   }, [closing, onClose]);
+
+useEffect(() => { track("invite_card_shown", { pending, variant: picked.variant }); }, []);
+
+// handleCopy success:  copy `${text} ${inviteUrl}`
+track("invite_shared", { method: "copy", pending, variant: picked.variant });
+
+// handleShare, after `await navigator.share({ title: "TBH", text, url: inviteUrl })` resolves:
+track("invite_shared", { method: "native", pending, variant: picked.variant });
+
+// close():
+track("invite_dismissed", { pending, variant: picked.variant });
+
 
   useEffect(() => {
     navigator.vibrate?.(15);

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import "../wavelength.css";
 import "./Chat.css";
 import StaticAvatar, { hueFromString } from "../components/InstagramVerification/StaticAvatar.jsx";
-
+import { track, countBucket, lengthBucket, errorReason, setUserStage } from "../analytics.js";
 import { getMessages, sendMessage } from "../chat/chat.js";
 import { requestReveal, respondToReveal } from "../reveal/reveal.js";
 import { getSocket, connectSocket } from "../socket";
@@ -141,6 +141,45 @@ setRevealRequestedBy(response.data.revealRequestedBy || null);
 
       setRevealedIdentity(response.data.revealedIdentity || null);
       setAutoOpenIdentity(false);
+      // loadMessages, after the setState calls:
+const role = String(userId) === String(response.data.senderUser) ? "sender" : "recipient";
+track("chat_opened", {
+  role,
+  message_count_bucket: countBucket((response.data.messages || []).length),
+  remaining_messages: response.data.remainingMessages,
+  reveal_status: response.data.revealStatus || "none",
+});
+setUserStage("chatter");
+
+// handleSend, after setMessages(...):
+const myCountBefore = messages.filter((m) => String(m.senderUser) === String(userId)).length;
+track("message_sent", {
+  role: String(userId) === String(conversationSenderId) ? "sender" : "recipient",
+  is_first_from_me: myCountBefore === 0,
+  length_bucket: lengthBucket(text.trim().length),
+  remaining_messages: response.data.remainingMessages,
+});
+if (response.data.remainingMessages === 0) track("chat_limit_reached");
+// handleSend catch (captures your moderation hit-rate):
+track("message_failed", { reason: errorReason(error) });
+
+// handleNewMessage (socket), only for the other person's message:
+if (String(message.senderUser) !== String(userId)) track("message_received_live");
+
+// handleRevealUpdated (socket):
+//   status === "pending":              track("reveal_request_received")
+//   decision === "not_yet":            track("reveal_declined_received")
+//   status === "revealed":             track("identity_revealed_seen")
+
+// handleRequestReveal, after success:
+track("reveal_request_sent", { remaining_messages: remainingMessages });
+
+// handleRevealResponse, after success:
+if (decision === "reveal") { track("reveal_request_accepted"); track("identity_revealed"); setUserStage("revealed"); }
+else track("reveal_request_declined");
+
+// handlePublishPublicly, after success:
+track("public_post_shared", { role: "recipient" });
     } catch (error) {
       console.error(error);
       setError(error.message || "Unable to load messages.");

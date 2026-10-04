@@ -1,6 +1,15 @@
 //revealsection.jsx
 import { useEffect, useState } from "react";
 import "./revealSection.css";
+import { track, trackOnce } from "../analytics.js";
+
+const askVisible = !isSender && remainingMessages !== null && remainingMessages <= 5 && revealStatus === "none";
+useEffect(() => { if (askVisible) trackOnce("reveal_prompt_shown"); }, [askVisible]);
+
+// "See identity" / "See their identity" buttons:
+track("identity_viewed", { role: isSender ? "sender" : "recipient" });
+// "Continue on Instagram" button:
+track("reveal_continue_instagram");
 
 export default function RevealSection({
   userId,

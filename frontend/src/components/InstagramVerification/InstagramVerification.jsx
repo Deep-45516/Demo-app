@@ -2,8 +2,16 @@
 import { useEffect, useRef, useState } from "react";
 import "./InstagramVerification.css";
 import "../../wavelength.css";
-
+import {
+  track, trackOnce, startTimer, elapsed, endTimer,
+  trackLoginSuccess, errorReason,
+} from "../../analytics.js";
 const API = import.meta.env.VITE_BACKEND_URL;
+
+const shayariShownRef = useRef(false);   // cold-start screen visible?
+const instagramOpenedAtRef = useRef(null);
+const stateRef = useRef(state);
+useEffect(() => { stateRef.current = state; }, [state]);
 
 const BUSINESS_USERNAME = "wit_confessions.26";
 const SHAYARI_DELAY = 1500;
@@ -219,26 +227,60 @@ export default function InstagramVerification({
   const timeoutRef = useRef(null);
   const mountedRef = useRef(true);
 
-  useEffect(() => {
-    // Server responded before the threshold.
-    // Don't show Shayari.
-    if (backendReady) {
-      setStartupState("ready");
-      return;
+useEffect(() => {
+  if (backendReady) {
+    if (shayariShownRef.current) {
+      track("cold_start_resolved", {
+        wait_s: Math.round((performance.now() - healthcheckStartedAt) / 1000),
+      });
+      shayariShownRef.current = false;
     }
+    setStartupState("ready");
+    return;
+  }
+  const elapsedMs = performance.now() - healthcheckStartedAt;
+  const remaining = Math.max(0, SHAYARI_DELAY - elapsedMs);
+  const timer = setTimeout(() => {
+    if (!backendReady) {
+      shayariShownRef.current = true;
+      track("cold_start_screen_shown");
+      setStartupState("shayari");
+    }
+  }, remaining);
+  return () => clearTimeout(timer);
+}, [backendReady, healthcheckStartedAt]);
 
-    const elapsed = performance.now() - healthcheckStartedAt;
+// Left while the waiting screen was still showing
+useEffect(() => {
+  const onHide = () => {
+    if (shayariShownRef.current) track("cold_start_abandoned", {}, { beacon: true });
+    else if (stateRef.current === VERIFICATION_STATES.WAITING)
+      track("verification_abandoned", {
+        stage: instagramOpenedAtRef.current ? "after_instagram" : "before_instagram",
+      }, { beacon: true });
+  };
+  window.addEventListener("pagehide", onHide);
+  return () => window.removeEventListener("pagehide", onHide);
+}, []);
 
-    const remaining = Math.max(0, SHAYARI_DELAY - elapsed);
+// Came back from Instagram
+useEffect(() => {
+  const onVisible = () => {
+    if (document.visibilityState === "visible" && instagramOpenedAtRef.current) {
+      track("verification_returned", {
+        away_s: Math.round((Date.now() - instagramOpenedAtRef.current) / 1000),
+      });
+      instagramOpenedAtRef.current = null;
+    }
+  };
+  document.addEventListener("visibilitychange", onVisible);
+  return () => document.removeEventListener("visibilitychange", onVisible);
+}, []);
 
-    const timer = setTimeout(() => {
-      if (!backendReady) {
-        setStartupState("shayari");
-      }
-    }, remaining);
-
-    return () => clearTimeout(timer);
-  }, [backendReady, healthcheckStartedAt]);
+// Login screen actually usable (this is the real top of the funnel)
+useEffect(() => {
+  if (startupState === "ready") trackOnce("auth_screen_ready", { has_count: totalConfessions !== null });
+}, [startupState]);
 
   useEffect(() => {
     mountedRef.current = true;

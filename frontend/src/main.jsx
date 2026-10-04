@@ -6,7 +6,9 @@ import "./wavelength.css"
 import App from "./App";
 import "./index.css";
 import ReactGA from "react-ga4";
-ReactGA.initialize("G-HRWCNGD34D");
+// ReactGA.initialize("G-HRWCNGD34D");
+import { initAnalytics } from "./analytics.js";
+initAnalytics();            // before ReactDOM.createRoot(...)
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <GoogleOAuthProvider
