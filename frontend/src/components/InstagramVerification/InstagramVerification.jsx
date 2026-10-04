@@ -8,11 +8,6 @@ import {
 } from "../../analytics.js";
 const API = import.meta.env.VITE_BACKEND_URL;
 
-const shayariShownRef = useRef(false);   // cold-start screen visible?
-const instagramOpenedAtRef = useRef(null);
-const stateRef = useRef(state);
-useEffect(() => { stateRef.current = state; }, [state]);
-
 const BUSINESS_USERNAME = "wit_confessions.26";
 const SHAYARI_DELAY = 1500;
 
@@ -226,6 +221,10 @@ export default function InstagramVerification({
   const pollingRef = useRef(null);
   const timeoutRef = useRef(null);
   const mountedRef = useRef(true);
+  const shayariShownRef = useRef(false);   // cold-start screen visible?
+const instagramOpenedAtRef = useRef(null);
+const stateRef = useRef(state);
+useEffect(() => { stateRef.current = state; }, [state]);
 
 useEffect(() => {
   if (backendReady) {
