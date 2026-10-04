@@ -306,6 +306,15 @@ function installErrorTracking() {
 
 /* ---------------------------------- PWA ---------------------------------- */
 let deferredInstallPrompt = null;
+const installListeners = new Set();
+const notifyInstall = () => installListeners.forEach((fn) => fn(!!deferredInstallPrompt));
+
+// UI can subscribe so a button appears the moment the browser says "installable".
+export function subscribeInstallAvailability(fn) {
+  installListeners.add(fn);
+  fn(!!deferredInstallPrompt); // current value immediately
+  return () => installListeners.delete(fn);
+}
 
 function installPwaTracking() {
   // We deliberately do NOT preventDefault(), so the browser's own install UI
@@ -313,6 +322,7 @@ function installPwaTracking() {
   window.addEventListener("beforeinstallprompt", (e) => {
     deferredInstallPrompt = e;
     trackOnce("pwa_install_available", {}, "session");
+    notifyInstall();
   });
 
   window.addEventListener("appinstalled", () => {
@@ -320,10 +330,14 @@ function installPwaTracking() {
     lsSet("tbh_pwa_installed", "1");
     setUserProperties({ pwa_installed: "yes" });
     track("pwa_installed");
+    notifyInstall();
   });
 }
 
 export const canInstallPwa = () => !!deferredInstallPrompt;
+
+export const isIOSSafariBrowser = () =>
+  detectOS() === "ios" && detectInAppBrowser() === "none" && getDisplayMode() === "browser";
 
 export async function promptPwaInstall(placement = "unknown") {
   if (!deferredInstallPrompt) return null;
@@ -332,6 +346,7 @@ export async function promptPwaInstall(placement = "unknown") {
   const { outcome } = await deferredInstallPrompt.userChoice;
   track(outcome === "accepted" ? "pwa_install_clicked" : "pwa_install_dismissed", { placement });
   deferredInstallPrompt = null;
+  notifyInstall();
   return outcome;
 }
 

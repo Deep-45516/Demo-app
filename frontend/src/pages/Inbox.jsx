@@ -37,12 +37,10 @@ const socket = getSocket();
   useEffect(() => {
   loadInbox();
 
-  async function handleNewConfession(data) {
-    console.log("🔥 NEW CONFESSION EVENT");
-    console.log(data);
-
-    await loadInbox();
-  }
+async function handleNewConfession(data) {
+  track("confession_received_live");   // <-- add this line
+  await loadInbox();
+}
 
   function handleNewMessage(data) {
   setReceived((current) => {
@@ -158,21 +156,21 @@ track("inbox_opened", {
     <NotificationToggle />
 
     <div className="wl-segment wl-inbox__segment">
-      <button
-        className={tab === "received" ? "active" : ""}
-        style={{ fontSize: 15 }}
-        onClick={() => setTab("received")}
-      >
-        Received ({received.length})
-      </button>
+<button
+  className={tab === "received" ? "active" : ""}
+  style={{ fontSize: 15 }}
+  onClick={() => { setTab("received"); track("inbox_tab_switched", { tab: "received" }); }}
+>
+  Received ({received.length})
+</button>
 
-      <button
-        className={tab === "sent" ? "active" : ""}
-        style={{ fontSize: 15 }}
-        onClick={() => setTab("sent")}
-      >
-        Sent ({sent.length})
-      </button>
+<button
+  className={tab === "sent" ? "active" : ""}
+  style={{ fontSize: 15 }}
+  onClick={() => { setTab("sent"); track("inbox_tab_switched", { tab: "sent" }); }}
+>
+  Sent ({sent.length})
+</button>
     </div>
 
     {list.length === 0 && (
@@ -210,9 +208,14 @@ track("inbox_opened", {
           <div
             key={confession._id}
             className="wl-row wl-fade-up"
-            onClick={() =>
-              navigate(`/confessions/${confession._id}`)
-            }
+            onClick={() => {
+  track("inbox_item_clicked", {
+    tab,
+    status: confession.recipientAction || "pending",
+    unread: String(confession.unreadFor) === String(userId),
+  });
+  navigate(`/confessions/${confession._id}`);
+}}
           >
             {tab === "received" ? (
               <StaticAvatar

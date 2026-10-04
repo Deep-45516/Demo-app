@@ -8,7 +8,7 @@ import "../wavelength.css";
 import "./Home.css";
 import "./template.css";
 import InviteCard from "./InviteCard.jsx";
-
+import InstallButton from "./InstallButton.jsx";
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
 import { downloadPages } from "../download.js";
@@ -268,7 +268,16 @@ export default function Home() {
       </div>
     );
   }
+const canSend =
+  !!recipientStatus && !!message.trim() && !checkingRecipient && !submitting;
 
+const missingHint = !recipientUsername.trim()
+  ? "Enter who it's for"
+  : !recipientStatus
+    ? "Tap ➤ to check their username"
+    : !message.trim()
+      ? "Write your message"
+      : "";
   return (
     <div className="wl-confess wl-fade-up">
       <p
@@ -472,16 +481,20 @@ export default function Home() {
         </label>
       )}
 
-      <button
-  className={`wl-btn wl-btn-primary wl-btn-block wl-confess__submit ${
-        !recipientStatus || !message.trim() ? "is-disabled" : ""
-  }`}
-  disabled={checkingRecipient || submitting}
+<button
+  className={`wl-btn wl-btn-primary wl-btn-block wl-confess__submit ${!canSend ? "is-disabled" : ""}`}
+  disabled={!canSend}
   onClick={handleSubmit}
 >
   {submitting ? "Sending..." : "Send it anonymously"}
 </button>
 
+{missingHint && (
+  <p className="wl-mono" style={{ fontSize: 11, textAlign: "center", marginTop: 8, opacity: 0.7 }}>
+    {missingHint}
+  </p>
+)}
+<InstallButton placement="home" />
       {showPreview && (
         <div
           className="wl-preview-modal"
