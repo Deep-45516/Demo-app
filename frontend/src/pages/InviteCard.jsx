@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import "./InviteCard.css";
 
 // Change to https://wit-tbh.vercel.app if t-b-h.in doesn't open the app yet
-const INVITE_URL = "https://t-b-h.in";
+const INVITE_URL = "www.t-b-h.in";
 
 // Pure FOMO about the app. None of these say a confession exists.
 const STATIC_MESSAGES = [
