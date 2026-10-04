@@ -3,14 +3,6 @@ import { useEffect, useState } from "react";
 import "./revealSection.css";
 import { track, trackOnce } from "../analytics.js";
 
-const askVisible = !isSender && remainingMessages !== null && remainingMessages <= 5 && revealStatus === "none";
-useEffect(() => { if (askVisible) trackOnce("reveal_prompt_shown"); }, [askVisible]);
-
-// "See identity" / "See their identity" buttons:
-track("identity_viewed", { role: isSender ? "sender" : "recipient" });
-// "Continue on Instagram" button:
-track("reveal_continue_instagram");
-
 export default function RevealSection({
   userId,
   conversationSenderId,
@@ -33,6 +25,22 @@ export default function RevealSection({
   }, [autoOpenIdentity, revealedIdentity]);
 
   const isSender = String(userId) === String(conversationSenderId);
+
+  // Tracking: how many people were actually shown the "Ask to reveal" button
+  const askVisible =
+    !isSender &&
+    remainingMessages !== null &&
+    remainingMessages <= 5 &&
+    revealStatus === "none";
+
+  useEffect(() => {
+    if (askVisible) trackOnce("reveal_prompt_shown");
+  }, [askVisible]);
+
+  function openIdentity() {
+    track("identity_viewed", { role: isSender ? "sender" : "recipient" });
+    setShowIdentity(true);
+  }
 
   return (
     <>
@@ -96,11 +104,14 @@ export default function RevealSection({
               <p>You wondered what they'd think once they knew. Now they do.</p>
               <button
                 className="wl-btn wl-btn-primary"
-                onClick={() => window.open(`https://www.instagram.com/direct/t/${revealedIdentity?.username}/`, "_blank")}
+                onClick={() => {
+                  track("reveal_continue_instagram");
+                  window.open(`https://www.instagram.com/direct/t/${revealedIdentity?.username}/`, "_blank");
+                }}
               >
                 Continue on Instagram
               </button>
-              <button className="wl-btn wl-btn-ghost rs-secondary-btn" onClick={() => setShowIdentity(true)}>
+              <button className="wl-btn wl-btn-ghost rs-secondary-btn" onClick={openIdentity}>
                 See their identity
               </button>
             </>
@@ -109,7 +120,7 @@ export default function RevealSection({
               <div className="rs-icon">📡</div>
               <strong>Identity revealed</strong>
               <p>You both chose to take this conversation beyond anonymity.</p>
-              <button className="wl-btn wl-btn-primary" onClick={() => setShowIdentity(true)}>
+              <button className="wl-btn wl-btn-primary" onClick={openIdentity}>
                 See identity
               </button>
             </>
