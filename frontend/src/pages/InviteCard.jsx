@@ -1,16 +1,31 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./InviteCard.css";
 
-// Change this if t-b-h.in doesn't point to the app yet (e.g. https://wit-tbh.vercel.app)
+// Change to https://wit-tbh.vercel.app if t-b-h.in doesn't open the app yet
 const INVITE_URL = "https://t-b-h.in";
 
-// None of these mention confessions on purpose
-const INVITE_MESSAGES = [
-  "Make your secret name on TBH 👀 anonymous & only for WIT.",
-  "TBH is live at WIT. Pick your secret name 🤫",
-  "No Walls. No Cap. Find your secret name on TBH 👀",
-  "Your secret name is waiting on TBH 😏",
+// Pure FOMO about the app. None of these say a confession exists.
+const STATIC_MESSAGES = [
+  "WIT has an anonymous app now. Join before everyone knows more than you 👀",
+  "Something's going around WIT and you're not on it yet 👀",
+  "Anonymous. WIT-only. Already moving. Get in 👇",
+  "One by one, WIT is getting on TBH. Don't be the last 😏",
 ];
+
+function pickMessage() {
+  const candidates = [...STATIC_MESSAGES];
+
+  // Real number as proof, only when it's big enough to impress
+  const saved = Number(localStorage.getItem("confessionCount"));
+  if (Number.isFinite(saved) && saved >= 50) {
+    const rounded = Math.floor(saved / 10) * 10;
+    candidates.push(
+      `${rounded.toLocaleString("en-IN")}+ anonymous confessions already sent at WIT. You're not in yet 👀`,
+    );
+  }
+
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
 
 function ShareIcon() {
   return (
@@ -25,16 +40,30 @@ function ShareIcon() {
 }
 
 export default function InviteCard({ pending, onClose }) {
-  const [text] = useState(
-    () => INVITE_MESSAGES[Math.floor(Math.random() * INVITE_MESSAGES.length)],
-  );
+  const [text] = useState(pickMessage);
   const [copied, setCopied] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  const close = useCallback(() => {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 200);
+  }, [closing, onClose]);
 
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && onClose();
+    navigator.vibrate?.(15);
+
+    const onKey = (e) => e.key === "Escape" && close();
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [close]);
 
   async function handleCopy() {
     try {
@@ -59,32 +88,47 @@ export default function InviteCard({ pending, onClose }) {
   }
 
   return (
-    <div className="invite-overlay" onClick={onClose}>
+    <div
+      className={`invite-overlay ${closing ? "is-closing" : ""}`}
+      onClick={close}
+    >
       <div
-        className="invite-sheet wl-card"
+        className="invite-sheet"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
-        <h3 className="invite-title wl-display">
-          {pending ? "Saved 🔒" : "Sent 💌"}
+        <div className={`invite-badge ${pending ? "is-pending" : ""}`}>
+          {pending ? (
+            "⏳"
+          ) : (
+            <svg viewBox="0 0 56 56" aria-hidden="true">
+              <path d="M17 29l8 8 14-16" />
+            </svg>
+          )}
+        </div>
+
+        <h3 className="invite-title">
+          {pending ? "It's waiting for them" : "Sent anonymously"}
         </h3>
         <p className="invite-sub">
           {pending
-            ? "They're not on TBH yet. We'll deliver it if they join within 7 days."
-            : "Delivered anonymously."}
+            ? "Not on TBH yet. It lands the moment they join (within 7 days)."
+            : "Delivered. They'll never know it was you."}
         </p>
 
         <div className="invite-box">
-          <p className="invite-box__label wl-mono">INVITE YOUR PEOPLE</p>
+          <p className="invite-box__label">
+            {pending ? "GET THEM IN FASTER" : "BRING YOUR PEOPLE"}
+          </p>
           <p className="invite-box__text">{text}</p>
-          <p className="invite-box__link wl-mono">t-b-h.in</p>
+          <p className="invite-box__link">t-b-h.in</p>
 
           <div className="invite-actions">
-            <button type="button" className="wl-btn wl-btn-primary" onClick={handleShare}>
+            <button type="button" className="invite-btn invite-btn--primary" onClick={handleShare}>
               <ShareIcon /> Share
             </button>
-            <button type="button" className="wl-btn wl-btn-outline" onClick={handleCopy}>
+            <button type="button" className="invite-btn invite-btn--ghost" onClick={handleCopy}>
               {copied ? "Copied ✓" : "Copy link"}
             </button>
           </div>
@@ -92,12 +136,12 @@ export default function InviteCard({ pending, onClose }) {
 
         {pending && (
           <p className="invite-tip">
-            Tip: post it in a group or your story instead of DM-ing them
-            directly. Keeps the mystery 🤫
+            Tip: drop it in a group or your story instead of DM-ing them.
+            Keeps the mystery 🤫
           </p>
         )}
 
-        <button type="button" className="invite-close" onClick={onClose}>
+        <button type="button" className="invite-close" onClick={close}>
           Done
         </button>
       </div>

@@ -5,57 +5,117 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  animation: invite-fade 0.2s ease both;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  background: rgba(6, 5, 12, 0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: invite-fade-in 0.22s ease both;
 }
 
 .invite-sheet {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   box-sizing: border-box;
-  padding: 24px 20px 18px;
+  padding: 26px 20px 14px;
   text-align: center;
-  background: linear-gradient(145deg, rgba(124, 92, 252, 0.16), rgba(20, 18, 31, 0.97));
-  animation: invite-up 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  color: #f5f3f7;
+  border-radius: 24px;
+  background: linear-gradient(160deg, rgba(58, 40, 120, 0.8), rgba(18, 14, 34, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 30px 80px -20px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  animation: invite-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
 }
 
-.invite-title { margin: 0; font-size: 26px; }
+/* closing */
+.invite-overlay.is-closing {
+  animation: invite-fade-out 0.2s ease both;
+}
+.invite-overlay.is-closing .invite-sheet {
+  animation: invite-down 0.2s ease-in both;
+}
+
+/* badge */
+.invite-badge {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 24px;
+  background: rgba(77, 238, 234, 0.12);
+  border: 1.5px solid rgba(77, 238, 234, 0.5);
+  animation: invite-pop 0.4s 0.05s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.invite-badge.is-pending {
+  background: rgba(255, 190, 90, 0.12);
+  border-color: rgba(255, 190, 90, 0.5);
+}
+.invite-badge svg {
+  width: 56px;
+  height: 56px;
+}
+.invite-badge path {
+  fill: none;
+  stroke: #4deeea;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+  animation: invite-draw 0.4s 0.2s ease forwards;
+}
+
+.invite-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
 
 .invite-sub {
   margin: 8px 0 0;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--wl-text-dim);
+  color: rgba(245, 243, 247, 0.7);
 }
 
+/* invite box */
 .invite-box {
   margin-top: 20px;
   padding: 16px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  animation: invite-rise 0.4s 0.1s ease both;
 }
 
 .invite-box__label {
   margin: 0;
   font-size: 10px;
-  letter-spacing: 0.14em;
-  opacity: 0.5;
+  letter-spacing: 0.16em;
+  color: rgba(245, 243, 247, 0.55);
 }
 
 .invite-box__text {
   margin: 10px 0 0;
-  font-size: 15px;
+  font-size: 15.5px;
   line-height: 1.45;
-  color: var(--wl-text);
+  font-weight: 500;
+  color: #ffffff;
 }
 
 .invite-box__link {
   margin: 8px 0 0;
   font-size: 12px;
-  color: var(--wl-cyan);
+  letter-spacing: 0.04em;
+  color: #4deeea;
 }
 
 .invite-actions {
@@ -65,25 +125,84 @@
   margin-top: 14px;
 }
 
+.invite-btn {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.invite-btn:active {
+  transform: scale(0.96);
+}
+.invite-btn--primary {
+  color: #fff;
+  background: linear-gradient(135deg, #7c5cfc, #ff4d8d);
+  box-shadow: 0 10px 24px -12px rgba(124, 92, 252, 0.9);
+}
+.invite-btn--ghost {
+  color: #f5f3f7;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
 .invite-tip {
   margin: 14px 4px 0;
   font-size: 11.5px;
   line-height: 1.5;
-  color: var(--wl-text-faint);
+  color: rgba(245, 243, 247, 0.55);
 }
 
 .invite-close {
-  margin-top: 14px;
-  padding: 8px 18px;
+  margin-top: 12px;
+  padding: 10px 22px;
   border: 0;
   background: transparent;
-  color: var(--wl-text-dim);
+  color: rgba(245, 243, 247, 0.7);
   font-size: 13px;
   cursor: pointer;
 }
 
-@keyframes invite-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 600px) {
+  .invite-overlay {
+    align-items: center;
+  }
+}
+
+@keyframes invite-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes invite-fade-out { to { opacity: 0; } }
 @keyframes invite-up {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(28px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes invite-down {
+  to { opacity: 0; transform: translateY(20px) scale(0.98); }
+}
+@keyframes invite-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes invite-draw { to { stroke-dashoffset: 0; } }
+@keyframes invite-rise {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invite-overlay,
+  .invite-sheet,
+  .invite-badge,
+  .invite-badge path,
+  .invite-box {
+    animation: none !important;
+  }
+  .invite-badge path {
+    stroke-dashoffset: 0;
+  }
 }

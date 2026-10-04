@@ -83,7 +83,6 @@ export default function Home() {
   const [message, setMessage] = useState("");
 
   const [recipientStatus, setRecipientStatus] = useState(null);
-  const [allowPending, setAllowPending] = useState(false);
   const [publicConsent, setPublicConsent] = useState(false);
   const [validationError, setValidationError] = useState("");
 
@@ -152,7 +151,6 @@ export default function Home() {
       setCheckingRecipient(true);
       const result = await searchRecipient(recipientUsername);
       setRecipientStatus(result.data);
-      setAllowPending(false);
     } catch (error) {
       console.error(error);
       alert(error.message || "Unable to verify recipient.");
@@ -179,11 +177,6 @@ export default function Home() {
     return;
   }
 
-  if (!recipientStatus.exists && !allowPending) {
-    setValidationError("Please choose “Send Anyway” before sending.");
-    return;
-  }
-
     try {
       setSubmitting(true);
       await new Promise((resolve) => setTimeout(resolve, 0));
@@ -207,7 +200,7 @@ export default function Home() {
       setMessage("");
       setFrom("");
       setRecipientStatus(null);
-      setAllowPending(false);
+      
       setPublicConsent(false);
       setShowMore(false);
       setShowPreview(false);
@@ -322,7 +315,6 @@ export default function Home() {
             onChange={(e) => {
               setRecipientUsername(e.target.value);
               setRecipientStatus(null);
-              setAllowPending(false);
               setPublicConsent(false);
               setValidationError("");
             }}
@@ -356,24 +348,14 @@ export default function Home() {
         )}
 
         {recipientStatus && !recipientStatus.exists && (
-          <div className="wl-status-card">
+          <div className="wl-pending-note wl-fade-up">
+            <span className="wl-pending-note__icon">⏳</span>
             <p>
-              Not on TBH yet — we'll hold this 7 days and deliver it if
-              they join.
+              Not on TBH yet, no stress. We'll hold it for 7 days and
+              deliver it the moment they join.
             </p>
-            <button
-              className="wl-btn wl-btn-outline"
-              onClick={() => setAllowPending(true)}
-            >
-              Send anyway
-            </button>
           </div>
         )}
-              {validationError && (
-  <div className="wl-confess__validation-error" role="alert">
-    ⚠ {validationError}
-  </div>
-)}
       </section>
 
       {/* MESSAGE */}
@@ -492,11 +474,7 @@ export default function Home() {
 
       <button
   className={`wl-btn wl-btn-primary wl-btn-block wl-confess__submit ${
-    !recipientStatus ||
-    !message.trim() ||
-    (!recipientStatus?.exists && !allowPending)
-      ? "is-disabled"
-      : ""
+        !recipientStatus || !message.trim() ? "is-disabled" : ""
   }`}
   disabled={checkingRecipient || submitting}
   onClick={handleSubmit}
