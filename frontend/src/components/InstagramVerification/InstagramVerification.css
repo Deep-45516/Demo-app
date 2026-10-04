@@ -313,9 +313,9 @@
   stroke-dasharray: 140;
   stroke-dashoffset: 140;
 
-  animation: wl-brand-underline 700ms
-    cubic-bezier(0.65, 0, 0.35, 1)
-    forwards;
+  animation: wl-brand-underline 1s
+  cubic-bezier(0.4, 0, 0.2, 1)
+  forwards;
 }
 
 .wl-instagram-auth__brand-tagline {
