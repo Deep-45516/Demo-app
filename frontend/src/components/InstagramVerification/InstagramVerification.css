@@ -986,7 +986,7 @@
 .wl-loading {
   position: relative;
   z-index: 1;
-  width: min(420px, 100%);
+  width: min(380px, 100%);
   text-align: center;
   padding: 24px 20px;
   animation: wl-shayari-enter 0.8s ease both;
@@ -996,7 +996,7 @@
   position: relative;
   width: 64px;
   height: 64px;
-  margin: 0 auto 30px;
+  margin: 0 auto 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1028,44 +1028,120 @@
 }
 
 .wl-loading__eyebrow {
-  margin: 0 0 16px;
-  font-size: 12.5px;
-  letter-spacing: 0.06em;
-  color: var(--wl-text-faint);
+  margin: 0 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--wl-signal-bright);
 }
 
-.wl-loading__line {
-  min-height: 56px;
-  max-width: 320px;
+.wl-loading__headline {
+  margin: 0 0 26px;
+  font-size: clamp(24px, 6.5vw, 30px);
+  line-height: 1.2;
+}
+
+.wl-loading__steps {
+  list-style: none;
   margin: 0 auto;
-  font-size: clamp(19px, 5vw, 23px);
-  line-height: 1.45;
-  font-weight: 500;
-  color: var(--wl-text);
-  animation: wl-line-in 0.6s ease both;
+  padding: 0;
+  max-width: 300px;
+  text-align: left;
 }
 
-@keyframes wl-line-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+.wl-loading__steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--wl-text-faint);
+  opacity: 0.45;
+  transition: opacity 0.4s ease, color 0.4s ease;
+}
+
+.wl-loading__steps li.is-done {
+  opacity: 0.75;
+  color: var(--wl-text-dim);
+}
+
+.wl-loading__steps li.is-active {
+  opacity: 1;
+  color: var(--wl-text);
+  font-weight: 500;
+  animation: wl-step-in 0.45s ease both;
+}
+
+.wl-loading__tick {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 10px;
+  color: var(--wl-cyan);
+}
+
+.wl-loading__steps li.is-done .wl-loading__tick {
+  border-color: rgba(77, 238, 234, 0.45);
+  background: rgba(77, 238, 234, 0.1);
+}
+
+.wl-loading__steps li.is-active .wl-loading__tick {
+  border-color: var(--wl-signal-bright);
+  animation: wl-tick-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes wl-step-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes wl-tick-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.5); }
+  50% { box-shadow: 0 0 0 5px rgba(124, 92, 252, 0); }
 }
 
 .wl-loading__bar {
   width: 100%;
-  max-width: 240px;
-  height: 3px;
-  margin: 26px auto 0;
-  border-radius: 3px;
+  max-width: 260px;
+  height: 4px;
+  margin: 24px auto 0;
+  border-radius: 4px;
   background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
 }
 
 .wl-loading__bar span {
+  position: relative;
   display: block;
   height: 100%;
-  border-radius: 3px;
+  border-radius: 4px;
+  overflow: hidden;
   background: linear-gradient(90deg, #7c5cfc, #ff4d8d);
-  transition: width 0.25s linear;
+  transition: width 0.3s linear;
+}
+
+/* shimmer so there is always visible motion */
+.wl-loading__bar span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: wl-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes wl-shimmer {
+  to { transform: translateX(100%); }
 }
 
 .wl-loading__hint {
@@ -1076,7 +1152,7 @@
 }
 
 .wl-loading__count {
-  margin: 22px 0 0;
+  margin: 20px 0 0;
   font-size: 11px;
   letter-spacing: 0.06em;
   color: var(--wl-text-dim);
