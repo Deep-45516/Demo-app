@@ -7,6 +7,7 @@ import { disconnectSocket } from "../socket";
 import "../wavelength.css";
 import "./Home.css";
 import "./template.css";
+import InviteCard from "./InviteCard.jsx";
 
 import { generatePages } from "../pageGenerator.js";
 import { submitConfession } from "../submit.js";
@@ -90,6 +91,7 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false);
 
   const [mood, setMood] = useState("signal");
+  const [invite, setInvite] = useState(null);
 
   const [showMore, setShowMore] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -198,11 +200,7 @@ export default function Home() {
 
       console.log("CONFESSION CREATED:", data);
 
-      alert(
-        recipientStatus.exists
-          ? "Confession submitted!"
-          : "Confession saved! It will be delivered if they join within 7 days.",
-      );
+            setInvite({ pending: !recipientStatus.exists });
 
       setTo("");
       setRecipientUsername("");
@@ -561,7 +559,14 @@ export default function Home() {
         <div className="from">
           <h3 className="previewFrom">Unknown</h3>
         </div>
+        
       </div>
+            {invite && (
+        <InviteCard
+          pending={invite.pending}
+          onClose={() => setInvite(null)}
+        />
+      )}
     </div>
   );
 }
