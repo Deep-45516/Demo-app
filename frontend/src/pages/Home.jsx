@@ -272,9 +272,9 @@ const canSend =
   !!recipientStatus && !!message.trim() && !checkingRecipient && !submitting;
 
 const missingHint = !recipientUsername.trim()
-  ? "Enter who it's for"
+  ? "Enter their Username above 1st"
   : !recipientStatus
-    ? "Tap ➤ to check their username"
+    ? "Click ➤ icon next to their usrname"
     : !message.trim()
       ? "Write your message"
       : "";

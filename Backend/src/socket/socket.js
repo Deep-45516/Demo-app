@@ -7,7 +7,7 @@ let io;
 export function initializeSocket(httpServer) {
   io = new Server(httpServer, {
     cors: {
-      origin: ["http://localhost:5173", "https://sayitfreely.vercel.app", "https://wit-tbh.vercel.app"],
+      origin: ["http://localhost:5173", "https://sayitfreely.vercel.app", "https://wit-tbh.vercel.app","https://www.t-b-h.in","https://t-b-h.in"],
       credentials: true,
     },
   });
