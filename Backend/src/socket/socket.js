@@ -1,15 +1,17 @@
 import { Server } from "socket.io";
 import { authenticateSocket } from "./auth.socket.js";
 import { joinUserRoom } from "./room.socket.js";
+import { ALLOWED_ORIGINS } from "../config/cors.js";
 
 let io;
 
 export function initializeSocket(httpServer) {
   io = new Server(httpServer, {
     cors: {
-      origin: ["http://localhost:5173", "https://sayitfreely.vercel.app", "https://wit-tbh.vercel.app","https://www.t-b-h.in","https://t-b-h.in"],
-      credentials: true,
-    },
+  origin: ALLOWED_ORIGINS,
+  methods: ["GET", "POST"],
+  credentials: true,
+},
   });
   //This is the Socket.IO middleware,like app.use for express
   io.use(authenticateSocket);

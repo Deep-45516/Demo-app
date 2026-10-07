@@ -3,6 +3,7 @@ import cors from "cors";
 import instagramRouter from "./routes/instagram.route.js";
 import webhookRouter from "./routes/webhook.route.js";
 import testRoutes from "./routes/test.route.js";
+import { ALLOWED_ORIGINS } from "./config/cors.js";
 
 const app = express(); //creates the Express application instance.
 app.set("trust proxy", 1); //trust request come from render for each ip address can send linmited req per min / sec i.e rate limiting
@@ -15,18 +16,14 @@ app.use(
     },
   }),
 );
-const allowedOrigins = [
-  "https://www.t-b-h.in",
-  "https://sayitfreely.vercel.app",   // keep the old one if still used
-  "http://localhost:5173",
-];
-
+//check config/cors.js for allowed origins and socke/socket.js for allowed origins for socket.io
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   })
 );
+
 app.use(express.urlencoded({ extended: true }));
 // test route
 app.get("/", (req, res) => {
