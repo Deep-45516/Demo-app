@@ -1,4 +1,3 @@
-//C:\Users\yashl\OneDrive\Desktop\clean-repo\frontend\src\pages\ConfessionDetails.jsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../wavelength.css";
@@ -11,7 +10,7 @@ import {
 } from "../inbox";
 import { getSocket, connectSocket } from "../socket";
 import { publishConfessionPublicly } from "../publicPost.js";
-import { track, hoursBucket, setUserStage } from "../analytics.js";
+import { track, hoursBucket, setUserStage, errorReason } from "../analytics.js";
 
 function BackIcon() {
   return (
@@ -19,6 +18,15 @@ function BackIcon() {
       <path d="M15 18l-6-6 6-6" />
     </svg>
   );
+}
+
+// Analytics must never be able to break the page.
+function safeTrack(fn) {
+  try {
+    fn();
+  } catch (e) {
+    console.warn("analytics skipped:", e);
+  }
 }
 
 export default function ConfessionDetails() {
@@ -39,12 +47,12 @@ export default function ConfessionDetails() {
     loadConfession();
 
     markConfessionRead(id).catch((error) => {
-    console.error("MARK CONFESSION READ ERROR:", error);
-  });
+      console.error("MARK CONFESSION READ ERROR:", error);
+    });
 
-  const socket = getSocket() || connectSocket();
+    const socket = getSocket() || connectSocket();
 
-  if (!socket) return;
+    if (!socket) return;
 
     function handleConfessionUpdated(data) {
       if (data.confessionId !== id) return;
@@ -90,28 +98,21 @@ export default function ConfessionDetails() {
       setLoading(true);
       setError("");
       const response = await getConfession(id);
-      setConfession(response.data);
-      // loadConfession, after setConfession(response.data):
-const c = response.data;
-track("confession_opened", {
-  role: c.recipientUser === user?._id ? "recipient" : "sender",
-  recipient_action: c.recipientAction,
-  hours_since_sent: hoursBucket((Date.now() - new Date(c.createdAt)) / 36e5),
-  public_consent: !!c.publicConsent,
-});
+      const c = response.data;
 
-// handleAction, after success:
-track("recipient_decision", {
-  decision: action,   // "curious" | "not_interested"
-  hours_to_decide: hoursBucket((Date.now() - new Date(confession.createdAt)) / 36e5),
-});
-if (action === "curious") { track("chat_unlocked"); setUserStage("receiver"); }
+      // 1) State first: the page must work even if tracking fails.
+      setConfession(c);
+      setConversationId(c.conversationId || null);
 
-// handlePublicPost, after success:
-track("public_post_shared", { role: "recipient" });
-// catch:
-track("public_post_failed", { reason: errorReason(error) });
-      setConversationId(response.data.conversationId || null);
+      // 2) Tracking after, fully guarded.
+      safeTrack(() =>
+        track("confession_opened", {
+          role: c.recipientUser === user?._id ? "recipient" : "sender",
+          recipient_action: c.recipientAction,
+          hours_since_sent: hoursBucket((Date.now() - new Date(c.createdAt)) / 36e5),
+          public_consent: !!c.publicConsent,
+        }),
+      );
     } catch (error) {
       console.error("CONFESSION LOAD ERROR:", error);
       setError(error.message || "Unable to load confession.");
@@ -129,6 +130,20 @@ track("public_post_failed", { reason: errorReason(error) });
       const response = await updateConfessionAction(confession._id, action);
       setConfession(response.data);
       setConversationId(response.data.conversationId || null);
+
+      // `action` exists here because it is this function's parameter.
+      safeTrack(() => {
+        track("recipient_decision", {
+          decision: action, // "curious" | "not_interested"
+          hours_to_decide: hoursBucket(
+            (Date.now() - new Date(confession.createdAt)) / 36e5,
+          ),
+        });
+        if (action === "curious") {
+          track("chat_unlocked");
+          setUserStage("receiver");
+        }
+      });
     } catch (error) {
       console.error(error);
       setError(error.message || "Unable to respond.");
@@ -145,9 +160,11 @@ track("public_post_failed", { reason: errorReason(error) });
       setError("");
       const response = await publishConfessionPublicly(confession._id);
       setConfession(response.data);
+      safeTrack(() => track("public_post_shared", { role: "recipient" }));
     } catch (error) {
       console.error(error);
       setError(error.message || "Unable to share confession publicly.");
+      safeTrack(() => track("public_post_failed", { reason: errorReason(error) }));
     } finally {
       setPublicPosting(false);
     }
@@ -205,10 +222,6 @@ track("public_post_failed", { reason: errorReason(error) });
 
       {error && <div className="wl-error-banner">{error}</div>}
 
-      {/* <div className="wl-paper-card wl-details__card wl-fade-up">
-        <p>{confession.message}</p>
-      </div> */}
-
       {confession.imageUrls?.map((url) => (
         <img key={url} src={url} alt="Confession" className="wl-details__image" />
       ))}
@@ -226,8 +239,8 @@ track("public_post_failed", { reason: errorReason(error) });
             <>
               <p className="wl-details__prompt">Curious who sent this?</p>
               <p className="wl-mono" style={{ fontSize: 10.5, color: "var(--wl-text-faint)", marginBottom: 12 }}>
-  Choosing curious starts an anonymous chat.
-</p>
+                Choosing curious starts an anonymous chat.
+              </p>
               <div className="wl-details__actions">
                 <button className="wl-btn wl-btn-primary" disabled={actionLoading} onClick={() => handleAction("curious")}>
                   {actionLoading ? "Updating..." : "👀 Know them"}
@@ -280,11 +293,11 @@ track("public_post_failed", { reason: errorReason(error) });
           <div className="wl-eyebrow">RECIPIENT RESPONSE</div>
 
           {confession.recipientAction === "pending" && (
-  <>
-    <span className="wl-tag wl-tag--waiting">⏳ They're taking time to decide.</span>
-    <p className="wl-details__prompt">If they're curious, a chat opens here automatically.</p>
-  </>
-)}
+            <>
+              <span className="wl-tag wl-tag--waiting">⏳ They're taking time to decide.</span>
+              <p className="wl-details__prompt">If they're curious, a chat opens here automatically.</p>
+            </>
+          )}
 
           {confession.recipientAction === "curious" && (
             <>
