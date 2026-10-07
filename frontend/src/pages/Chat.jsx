@@ -58,19 +58,30 @@ export default function Chat() {
     const socket = getSocket() || connectSocket();
     if (!socket) return;
 
-    function handleNewMessage(data) {
+function handleNewMessage(data) {
   const message = data.message;
 
-  if (String(message.conversationId) !== String(conversationId)) {
+  if (
+    String(message.conversationId) !==
+    String(conversationId)
+  ) {
     return;
   }
 
   setMessages((current) => {
     const alreadyExists = current.some(
-      (item) => String(item._id) === String(message._id)
+      (item) =>
+        String(item._id) === String(message._id)
     );
 
     if (alreadyExists) return current;
+
+    if (
+      String(message.senderUser) !==
+      String(userId)
+    ) {
+      track("message_received_live");
+    }
 
     setRemainingMessages((remaining) =>
       remaining === null
@@ -89,19 +100,34 @@ export default function Chat() {
       setRevealStatus(data.status);
 
       if (data.status === "pending") {
-        setRevealRequestedBy(data.requestedBy || null);
-        return;
-      }
+  setRevealRequestedBy(data.requestedBy || null);
+  track("reveal_request_received");
+  return;
+}
 
       if (data.decision === "not_yet") {
         setRevealStatus("none");
         setRevealRequestedBy(null);
+        track("reveal_declined_received");
         setRevealNotice("🌱 They're not ready to reveal yet. You can keep talking anonymously.");
         return;
       }
 
       if (data.status === "revealed") {
         setRevealRequestedBy(null);
+        track("identity_revealed_seen");
+        if (decision === "reveal") {
+  track("reveal_request_accepted");
+  track("identity_revealed");
+
+  setUserStage("revealed");
+
+  setRevealedIdentity(response.data.identity);
+  setAutoOpenIdentity(true);
+  setRevealNotice("");
+} else {
+  track("reveal_request_declined");
+}
         setRevealedIdentity(data.identity || null);
         setAutoOpenIdentity(true);
         setRevealNotice("");
@@ -141,14 +167,21 @@ setRevealRequestedBy(response.data.revealRequestedBy || null);
 
       setRevealedIdentity(response.data.revealedIdentity || null);
       setAutoOpenIdentity(false);
-      // loadMessages, after the setState calls:
-const role = String(userId) === String(response.data.senderUser) ? "sender" : "recipient";
+
+const role =
+  String(userId) === String(response.data.senderUser)
+    ? "sender"
+    : "recipient";
+
 track("chat_opened", {
   role,
-  message_count_bucket: countBucket((response.data.messages || []).length),
+  message_count_bucket: countBucket(
+    (response.data.messages || []).length
+  ),
   remaining_messages: response.data.remainingMessages,
   reveal_status: response.data.revealStatus || "none",
 });
+
 setUserStage("chatter");
 
 // handleSend, after setMessages(...):
@@ -189,27 +222,71 @@ track("public_post_shared", { role: "recipient" });
   }
 
   async function handleSend(event) {
-    event.preventDefault();
-    if (!text.trim()) return;
+  event.preventDefault();
+  if (!text.trim()) return;
 
-    try {
-      setSending(true);
-      setError("");
+  try {
+    setSending(true);
+    setError("");
 
-      const response = await sendMessage(conversationId, text);
-setMessages((current) => {
-  const alreadyExists = current.some((item) => item._id === response.data.message._id);
-  return alreadyExists ? current : [...current, response.data.message];
-});
-setRemainingMessages(response.data.remainingMessages);
-setText("");
-    } catch (error) {
-      console.error(error);
-      setError(error.message || "Unable to send message.");
-    } finally {
-      setSending(false);
+    const messageText = text.trim();
+
+    const response = await sendMessage(
+      conversationId,
+      messageText
+    );
+
+    setMessages((current) => {
+      const alreadyExists = current.some(
+        (item) =>
+          String(item._id) ===
+          String(response.data.message._id)
+      );
+
+      return alreadyExists
+        ? current
+        : [...current, response.data.message];
+    });
+
+    setRemainingMessages(
+      response.data.remainingMessages
+    );
+
+    setText("");
+
+    const myCountBefore = messages.filter(
+      (m) =>
+        String(m.senderUser) === String(userId)
+    ).length;
+
+    track("message_sent", {
+      role:
+        String(userId) === String(conversationSenderId)
+          ? "sender"
+          : "recipient",
+      is_first_from_me: myCountBefore === 0,
+      length_bucket: lengthBucket(messageText.length),
+      remaining_messages:
+        response.data.remainingMessages,
+    });
+
+    if (response.data.remainingMessages === 0) {
+      track("chat_limit_reached");
     }
+  } catch (error) {
+    console.error(error);
+
+    setError(
+      error.message || "Unable to send message."
+    );
+
+    track("message_failed", {
+      reason: errorReason(error),
+    });
+  } finally {
+    setSending(false);
   }
+}
 
   async function handlePublishPublicly() {
     try {
@@ -217,6 +294,9 @@ setText("");
       const response = await publishConfessionPublicly(conversationId);
       setPublicPosted(true);
       setInstagramPostId(response.data?.instagramPostId || null);
+      track("public_post_shared", {
+  role: "recipient",
+});
     } catch (error) {
       console.error(error);
       setError(error.message || "Unable to share confession publicly.");
@@ -228,8 +308,13 @@ setText("");
       setRevealLoading(true);
       setError("");
       const response = await requestReveal(conversationId);
-      setRevealStatus(response.data.status);
-      setRevealRequestedBy(response.data.requestedBy);
+
+setRevealStatus(response.data.status);
+setRevealRequestedBy(response.data.requestedBy);
+
+track("reveal_request_sent", {
+  remaining_messages: remainingMessages,
+});
     } catch (error) {
       console.error(error);
       setError(error.message || "Unable to request reveal.");
